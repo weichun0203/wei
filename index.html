@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wei-Chun Personal Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        'app-bg': '#F2F2F7', // iOS Light Background (Default/Personal)
+                        'finance-bg': '#E2E2E7', // Darker gray for Finance
+                        'church-bg': '#F5F5F0', // Warm beige for Church
+                        'work-bg': '#F0F4F8', // Cool blue-gray for Work
+                        'friendship-bg': '#FFF0F5', // Soft Pink for Friendship
+                        'card-bg': '#FFFFFF',
+                        'card-dark': '#1C1C1E', // iOS Dark Surface
+                        'text-primary': '#000000',
+                        'text-secondary': '#8E8E93',
+                        'accent': '#000000', 
+                    },
+                    boxShadow: {
+                        'app': '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 0 3px rgba(0,0,0,0.02)',
+                        'dock': '0 0 20px rgba(0,0,0,0.1)',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* 卡片互動 */
+        .bento-card {
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .bento-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .tap-effect:active { transform: scale(0.96); }
+        
+        /* 圖片濾鏡 */
+        .img-cover {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: all 0.6s ease;
+        }
+        .group:hover .img-cover { transform: scale(1.05); }
+
+        /* 隱藏/顯示動畫類別 - 使用 !important 確保覆蓋 Tailwind 的 flex/block */
+        .card-hidden {
+            display: none !important;
+        }
+        .card-visible {
+            display: flex !important; /* 恢復顯示，假設大多數卡片是 flex */
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        
+        /* 導覽列選取狀態 */
+        .nav-item.active i {
+            color: #000000;
+            transform: scale(1.1);
+        }
+        .nav-item.active span {
+            color: #000000;
+            font-weight: 700;
+        }
+        .nav-item.active .indicator {
+            background-color: #000000;
+            width: 4px;
+        }
+    </style>
+</head>
+<body id="app-body" class="bg-app-bg text-text-primary font-sans antialiased min-h-screen pb-32 transition-colors duration-700">
+
+    <!-- 主容器 -->
+    <main class="max-w-5xl mx-auto p-4 md:p-8">
+        
+        <!-- Header / Status Bar -->
+        <div class="flex justify-between items-center mb-6 px-2">
+            <div class="flex items-center gap-2">
+                <div id="status-dot" class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                <span id="status-text" class="text-xs font-medium text-text-secondary tracking-wide transition-all duration-300">FOCUS: WELLNESS</span>
+            </div>
+            <div class="text-xs font-bold text-text-primary tracking-widest">W.C. LIFEOS v4.4</div>
+        </div>
+
+        <!-- Bento Grid Layout -->
+        <div id="bento-grid" class="grid grid-cols-1 md:grid-cols-4 grid-flow-dense gap-4 md:gap-6 auto-rows-[minmax(180px,auto)] transition-all duration-500">
+            
+            <!-- 1. 個人 Profile (2x2) [Work] -->
+            <div data-categories="work" class="col-span-1 md:col-span-2 md:row-span-2 bg-card-bg rounded-[32px] p-8 shadow-app bento-card flex flex-col justify-between relative overflow-hidden group card-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-gray-100 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 opacity-50 pointer-events-none"></div>
+                
+                <div class="z-10">
+                    <div class="w-20 h-20 rounded-[20px] bg-gray-200 mb-6 overflow-hidden shadow-sm relative">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop" alt="Profile" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                    </div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 uppercase tracking-wider">Identity</span>
+                    </div>
+                    <h1 class="text-4xl font-bold tracking-tight mb-2">Wei-Chun<br>Portfolio.</h1>
+                    <p class="text-text-secondary text-lg">UI/UX Designer & <br>Product Strategist.</p>
+                </div>
+                
+                <div class="mt-8 flex gap-3 z-10">
+                    <a href="#" class="bg-black text-white px-6 py-3 rounded-full font-medium text-sm hover:bg-gray-800 transition-colors tap-effect shadow-lg shadow-black/20 flex items-center gap-2">
+                        <span>Contact Me</span>
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. 教會 (1x1) [Church] -->
+            <a href="#" data-categories="church" class="col-span-1 md:col-span-1 md:row-span-1 bg-white rounded-[32px] p-6 shadow-app bento-card flex flex-col justify-between group tap-effect cursor-pointer relative overflow-hidden card-hidden">
+                <div class="absolute -right-2 -top-2 text-8xl text-gray-50 opacity-50 group-hover:text-gray-100 transition-colors pointer-events-none">
+                    <i class="ph-fill ph-cross"></i>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center z-10 shadow-md">
+                    <i class="ph-fill ph-church text-xl"></i>
+                </div>
+                <div class="z-10 mt-4">
+                    <p class="text-xs text-text-secondary font-medium uppercase tracking-wide mb-1">Spirituality</p>
+                    <p class="font-bold text-lg leading-tight">教會生活<br>& 靈修</p>
+                </div>
+            </a>
+
+            <!-- 3. 人際關係 (1x1) [Friendship] -->
+            <div data-categories="friendship" class="col-span-1 md:col-span-1 md:row-span-1 bg-white rounded-[32px] p-6 shadow-app bento-card flex flex-col justify-between group cursor-pointer card-hidden">
+                <div class="flex justify-between items-start">
+                    <div class="flex -space-x-2 overflow-hidden">
+                        <div class="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gray-200 grayscale group-hover:grayscale-0 transition-all"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop" class="w-full h-full object-cover rounded-full"></div>
+                        <div class="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gray-300 grayscale group-hover:grayscale-0 transition-all"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&h=64&fit=crop" class="w-full h-full object-cover rounded-full"></div>
+                        <div class="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500">+5</div>
+                    </div>
+                    <i class="ph-fill ph-heart text-pink-500 text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex justify-between items-end mb-1">
+                        <span class="text-xs text-text-secondary font-medium">Connect</span>
+                        <span class="text-sm font-bold text-pink-500">Strong</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                        <div class="bg-pink-500 h-1.5 rounded-full w-[85%]"></div>
+                    </div>
+                    <p class="mt-2 font-bold text-lg">人際關係</p>
+                </div>
+            </div>
+
+            <!-- 4. KNOT 記帳 (2x1 Wide) [Work] -->
+            <div data-categories="work" class="col-span-1 md:col-span-2 md:row-span-1 bg-card-dark rounded-[32px] p-6 shadow-app bento-card flex flex-row items-center justify-between text-white relative overflow-hidden group cursor-pointer card-hidden">
+                <div class="z-10 flex flex-col justify-center h-full">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                        <span class="text-xs text-gray-400 font-medium uppercase tracking-widest">Side Project</span>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-1">KNOT</h2>
+                    <p class="text-gray-400 text-sm">Finance Tracker App</p>
+                </div>
+                
+                <!-- Mockup Visual -->
+                <div class="absolute right-6 top-1/2 -translate-y-1/2 w-32 h-20 bg-gray-800/50 rounded-xl border border-white/10 flex items-center justify-center backdrop-blur-md group-hover:scale-105 transition-transform">
+                    <div class="flex items-end gap-1 h-10">
+                        <div class="w-2 bg-orange-500 rounded-t-sm h-4"></div>
+                        <div class="w-2 bg-white/20 rounded-t-sm h-8"></div>
+                        <div class="w-2 bg-white/20 rounded-t-sm h-6"></div>
+                        <div class="w-2 bg-white/20 rounded-t-sm h-10"></div>
+                        <div class="w-2 bg-white/20 rounded-t-sm h-5"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. 成長與學習 (1x2 Tall) [Personal] -->
+            <div data-categories="personal" class="col-span-1 md:col-span-1 md:row-span-2 bg-white rounded-[32px] p-6 shadow-app bento-card flex flex-col relative overflow-hidden group card-visible">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center">
+                        <i class="ph-fill ph-book-open-text text-xl"></i>
+                    </div>
+                    <span class="text-xs font-bold bg-black text-white px-2 py-1 rounded-md">GROWTH</span>
+                </div>
+                
+                <h3 class="font-bold text-xl mb-4">成長與學習</h3>
+                
+                <div class="flex-1 overflow-y-auto no-scrollbar space-y-3">
+                    <!-- List Item 1 -->
+                    <div class="flex items-start gap-3 p-3 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer group/item">
+                        <i class="ph-bold ph-lightbulb text-yellow-500 mt-1"></i>
+                        <div>
+                            <p class="text-sm font-medium leading-tight mb-0.5">Philosophy</p>
+                            <p class="text-[10px] text-gray-500">Stoicism Daily</p>
+                        </div>
+                    </div>
+                    <!-- List Item 2 -->
+                    <div class="flex items-start gap-3 p-3 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
+                        <i class="ph-bold ph-translate text-blue-500 mt-1"></i>
+                        <div>
+                            <p class="text-sm font-medium leading-tight mb-0.5">Spanish L3</p>
+                            <p class="text-[10px] text-gray-500">Duolingo</p>
+                        </div>
+                    </div>
+                    <!-- List Item 3 -->
+                    <div class="flex items-start gap-3 p-3 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
+                        <div class="mt-1 w-4 h-4 rounded border-2 border-green-500 bg-green-500 flex items-center justify-center flex-shrink-0 text-white text-[10px]"><i class="ph-bold ph-check"></i></div>
+                        <div>
+                            <p class="text-sm font-medium leading-tight mb-0.5 line-through text-gray-400">Coding</p>
+                            <p class="text-[10px] text-gray-400">React Advanced</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. 預算管理 (1x1) [Finance] -->
+            <div data-categories="finance" class="col-span-1 md:col-span-1 md:row-span-1 bg-white rounded-[32px] p-6 shadow-app bento-card flex flex-col justify-center gap-2 group cursor-pointer card-hidden">
+                <div class="flex justify-between items-center mb-1">
+                    <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+                        <i class="ph-fill ph-wallet text-xl"></i>
+                    </div>
+                    <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-md">OCT</span>
+                </div>
+                <div>
+                    <p class="text-text-secondary text-xs font-medium uppercase tracking-wide">Monthly Budget</p>
+                    <p class="text-2xl font-bold font-mono tracking-tight">$12,450</p>
+                </div>
+                <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden mt-1">
+                    <div class="bg-black h-full w-[65%] rounded-full"></div>
+                </div>
+                <p class="text-[10px] text-right text-gray-400 mt-0.5">65% Used</p>
+            </div>
+
+            <!-- 7. 地圖 (1x1) [Personal] -->
+            <div data-categories="personal" class="col-span-1 md:col-span-1 md:row-span-1 bg-white rounded-[32px] p-0 shadow-app bento-card relative overflow-hidden group card-visible">
+                <img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/121.5,25.03,12,0/400x400?access_token=pk.placeholder" onerror="this.src='https://images.unsplash.com/photo-1517409986345-42289434b931?q=80&w=400&auto=format&fit=crop'" class="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 transition-all">
+                <div class="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur px-3 py-2 rounded-xl shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold">Life Circle</span>
+                        <i class="ph-fill ph-house text-gray-400"></i>
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-1">Taipei, Environment</p>
+                </div>
+            </div>
+
+            <!-- 8. 身心健康 (2x1) [Personal] -->
+             <div data-categories="personal" class="col-span-1 md:col-span-2 md:row-span-1 bg-white rounded-[32px] p-6 shadow-app bento-card flex items-center justify-between gap-6 group card-visible">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="ph-fill ph-heartbeat text-red-500 text-xl"></i>
+                        <h3 class="font-bold text-lg">身心健康</h3>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4">Sleep, Exercise & Mindfulness</p>
+                    <div class="flex gap-4 text-center">
+                        <div>
+                            <p class="text-lg font-bold">7.5h</p>
+                            <p class="text-[10px] text-gray-400 uppercase">Sleep</p>
+                        </div>
+                        <div class="w-px h-8 bg-gray-100"></div>
+                        <div>
+                            <p class="text-lg font-bold">85</p>
+                            <p class="text-[10px] text-gray-400 uppercase">Readiness</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Activity Rings Visualization -->
+                <div class="relative w-20 h-20 flex items-center justify-center">
+                    <svg class="w-full h-full transform -rotate-90">
+                        <circle cx="40" cy="40" r="36" stroke="#f3f4f6" stroke-width="6" fill="transparent"></circle>
+                        <circle cx="40" cy="40" r="36" stroke="#EF4444" stroke-width="6" fill="transparent" stroke-dasharray="226" stroke-dashoffset="40" stroke-linecap="round"></circle>
+                        
+                        <circle cx="40" cy="40" r="26" stroke="#f3f4f6" stroke-width="6" fill="transparent"></circle>
+                        <circle cx="40" cy="40" r="26" stroke="#10B981" stroke-width="6" fill="transparent" stroke-dasharray="163" stroke-dashoffset="60" stroke-linecap="round"></circle>
+                    </svg>
+                    <i class="ph-fill ph-person-simple-run absolute text-gray-800 text-xl"></i>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- Footer -->
+        <div class="mt-12 text-center pb-24 opacity-60">
+            <p class="text-xs text-text-secondary font-medium tracking-widest uppercase">© 2026 Wei-Chun. Crafted with Intention.</p>
+        </div>
+
+    </main>
+
+    <!-- Floating Dock Navigation -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4">
+        <nav class="bg-white/80 backdrop-blur-xl border border-white/20 shadow-dock rounded-full px-2 py-3 flex items-center justify-between md:justify-center md:gap-6 transition-all hover:bg-white/90">
+            
+            <!-- 1. 個人 Personal (Default Active) -->
+            <button onclick="filterContent('personal')" id="nav-personal" class="nav-item active flex flex-col items-center gap-1 group w-14 relative cursor-pointer outline-none">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                    <i class="ph-bold ph-user text-2xl text-gray-400 transition-transform duration-300"></i>
+                </div>
+                <span class="text-[10px] font-medium text-gray-400 transition-colors">個人</span>
+                <div class="indicator absolute -bottom-1 w-0 h-1 bg-black rounded-full transition-all duration-300"></div>
+            </button>
+
+            <!-- 2. 工作 Work -->
+            <button onclick="filterContent('work')" id="nav-work" class="nav-item flex flex-col items-center gap-1 group w-14 relative cursor-pointer outline-none">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                    <i class="ph-bold ph-briefcase text-2xl text-gray-400 transition-transform duration-300"></i>
+                </div>
+                <span class="text-[10px] font-medium text-gray-400 transition-colors">工作</span>
+                <div class="indicator absolute -bottom-1 w-0 h-1 bg-black rounded-full transition-all duration-300"></div>
+            </button>
+
+            <!-- 3. 理財 Finance -->
+            <button onclick="filterContent('finance')" id="nav-finance" class="nav-item flex flex-col items-center gap-1 group w-14 relative cursor-pointer outline-none">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                    <i class="ph-bold ph-currency-dollar text-2xl text-gray-400 transition-transform duration-300"></i>
+                </div>
+                <span class="text-[10px] font-medium text-gray-400 transition-colors">理財</span>
+                <div class="indicator absolute -bottom-1 w-0 h-1 bg-black rounded-full transition-all duration-300"></div>
+            </button>
+
+            <!-- 4. 教會 Church -->
+            <button onclick="filterContent('church')" id="nav-church" class="nav-item flex flex-col items-center gap-1 group w-14 relative cursor-pointer outline-none">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                    <i class="ph-bold ph-church text-2xl text-gray-400 transition-transform duration-300"></i>
+                </div>
+                <span class="text-[10px] font-medium text-gray-400 transition-colors">教會</span>
+                <div class="indicator absolute -bottom-1 w-0 h-1 bg-black rounded-full transition-all duration-300"></div>
+            </button>
+
+            <!-- 5. 友誼 Friendship -->
+            <button onclick="filterContent('friendship')" id="nav-friendship" class="nav-item flex flex-col items-center gap-1 group w-14 relative cursor-pointer outline-none">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                    <i class="ph-bold ph-users-three text-2xl text-gray-400 transition-transform duration-300"></i>
+                </div>
+                <span class="text-[10px] font-medium text-gray-400 transition-colors">友誼</span>
+                <div class="indicator absolute -bottom-1 w-0 h-1 bg-black rounded-full transition-all duration-300"></div>
+            </button>
+
+        </nav>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // 設定顏色主題配置
+        const themeColors = {
+            'personal': { bg: 'bg-app-bg', status: 'FOCUS: WELLNESS', dot: 'bg-blue-500' },
+            'work': { bg: 'bg-work-bg', status: 'MODE: DEEP WORK', dot: 'bg-gray-800' },
+            'finance': { bg: 'bg-finance-bg', status: 'MODE: ASSETS', dot: 'bg-orange-500' },
+            'church': { bg: 'bg-church-bg', status: 'MODE: SUNDAY', dot: 'bg-purple-500' },
+            'friendship': { bg: 'bg-friendship-bg', status: 'MODE: SOCIAL', dot: 'bg-pink-500' }
+        };
+
+        function filterContent(category) {
+            const cards = document.querySelectorAll('.bento-card');
+            const navItems = document.querySelectorAll('.nav-item');
+            const body = document.getElementById('app-body');
+            const statusText = document.getElementById('status-text');
+            const statusDot = document.getElementById('status-dot');
+
+            // 1. 更新導覽列狀態
+            navItems.forEach(item => {
+                if(item.id === `nav-${category}`) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // 2. 切換背景主題與狀態文字
+            const theme = themeColors[category];
+            
+            // 移除所有可能的背景色 class
+            Object.values(themeColors).forEach(t => body.classList.remove(t.bg));
+            // 加入新的背景色
+            body.classList.add(theme.bg);
+            
+            // 更新狀態列
+            statusText.textContent = theme.status;
+            statusText.style.opacity = '0';
+            setTimeout(() => statusText.style.opacity = '1', 200);
+
+            statusDot.className = `w-2 h-2 rounded-full animate-pulse transition-colors duration-500 ${theme.dot}`;
+
+            // 3. 篩選卡片
+            cards.forEach(card => {
+                const categories = card.getAttribute('data-categories');
+                
+                if (categories === category) {
+                    // 顯示卡片 - 使用 display flex 覆蓋 hidden
+                    card.classList.remove('card-hidden');
+                    card.classList.add('card-visible');
+                    
+                    // 重置動畫，強制瀏覽器重繪
+                    card.style.animation = 'none';
+                    card.offsetHeight; /* trigger reflow */
+                    card.style.animation = null; 
+                } else {
+                    // 隱藏卡片
+                    card.classList.remove('card-visible');
+                    card.classList.add('card-hidden');
+                }
+            });
+        }
+
+        // 強制初始化：頁面載入後確保預設為 'personal' 狀態
+        window.addEventListener('DOMContentLoaded', () => {
+            filterContent('personal');
+        });
+    </script>
+</body>
+</html>
