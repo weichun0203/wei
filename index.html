@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>常溫編集所 | 個人基地</title>
   
+  <!-- PWA 核心設定 (Meta Tags & Icons) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="apple-touch-icon" href="icon-192x192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="常溫編集">
+  
   <!-- 引入 Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -735,6 +743,19 @@
     // 啟動應用程式
     document.addEventListener('DOMContentLoaded', () => {
       app.init();
+
+      // 註冊 Service Worker (PWA 離線與安裝核心)
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+              console.log('ServiceWorker 註冊成功，範圍:', registration.scope);
+            })
+            .catch(err => {
+              console.log('ServiceWorker 註冊失敗:', err);
+            });
+        });
+      }
     });
   </script>
 </body>
