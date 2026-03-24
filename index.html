@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>常溫編集所 | 個人基地</title>
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- 引入 Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #0f172a; 
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    .font-serif {
+      font-family: 'Noto Serif TC', serif;
+    }
+
+    .bg-fluid {
+      background: linear-gradient(-45deg, #0F4C81, #1e1b4b, #4c1d95, #8B5CF6);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .falling-emoji {
+      position: fixed;
+      top: -10%;
+      user-select: none;
+      pointer-events: none;
+      animation: fall linear forwards;
+      z-index: 9999;
+      text-shadow: 0 0 10px rgba(255,255,255,0.3);
+    }
+
+    @keyframes fall {
+      to { transform: translateY(120vh) rotate(360deg); }
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.5); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.8); }
+
+    /* 淡入動畫 */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 隱藏滾動條但可滾動 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-fluid relative transition-colors duration-1000">
+
+  <!-- 彩蛋容器 -->
+  <div id="emoji-container"></div>
+
+  <!-- 導覽列 -->
+  <nav class="fixed bottom-0 w-full md:w-24 md:h-screen md:left-0 glass-panel z-50 flex md:flex-col items-center justify-around md:justify-center md:space-y-8 py-3 md:py-0">
+    <button onclick="app.switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-purple-300 scale-110" title="首頁">
+      <i data-lucide="home" class="w-6 h-6"></i>
+      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">首頁</span>
+    </button>
+    <button onclick="app.switchTab('shortcuts')" id="nav-shortcuts" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="捷徑">
+      <i data-lucide="link" class="w-6 h-6"></i>
+      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">捷徑</span>
+    </button>
+    <button onclick="app.switchTab('stories')" id="nav-stories" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="手札">
+      <i data-lucide="book-open" class="w-6 h-6"></i>
+      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">手札</span>
+    </button>
+    <button onclick="app.switchTab('curation')" id="nav-curation" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="選物">
+      <i data-lucide="coffee" class="w-6 h-6"></i>
+      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">選物</span>
+    </button>
+    <button onclick="app.switchTab('connections')" id="nav-connections" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="引力圈">
+      <i data-lucide="users" class="w-6 h-6"></i>
+      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">引力圈</span>
+    </button>
+  </nav>
+
+  <!-- 主要內容區 -->
+  <main class="md:ml-24 pb-24 md:pb-0 min-h-screen flex flex-col items-center justify-center p-6 md:p-12">
+    <div class="w-full max-w-5xl">
+      
+      <!-- 首頁視圖 -->
+      <div id="view-home" class="view-section flex flex-col items-center justify-center text-center fade-in">
+        <div class="glass-panel p-10 md:p-16 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl w-full">
+          <span class="text-purple-300/80 text-sm tracking-[0.3em] uppercase mb-4 block font-light">Quiet Ripples Dashboard</span>
+          <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 leading-tight tracking-wide text-white">
+            在這裡，我們慢慢說<br />我靜靜聽。
+          </h1>
+          <p class="text-white/70 font-light text-lg mb-8 leading-relaxed">
+            這是一個只屬於我的常溫空間。用來存放靈感、管理生活，以及那些偶爾冒出來的不確定性。
+          </p>
+          <div class="absolute bottom-6 right-6">
+            <button onclick="app.triggerEasterEgg()" class="w-12 h-12 rounded-full bg-purple-500/20 hover:bg-purple-500/50 border border-purple-400/30 flex items-center justify-center transition-all duration-300 hover:scale-110 group/btn">
+              <span class="text-xl group-hover/btn:hidden">👀</span>
+              <span class="text-xl hidden group-hover/btn:block">✨</span>
+              <div class="absolute right-full mr-3 bottom-1/2 translate-y-1/2 whitespace-nowrap bg-white text-slate-900 text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity pointer-events-none">
+                我都說了不要點...
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 捷徑視圖 -->
+      <div id="view-shortcuts" class="view-section hidden fade-in w-full">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+          <div>
+            <h2 class="font-serif text-3xl mb-2 text-white">我的控制中心</h2>
+            <p class="text-white/60 font-light">日常工具的快速傳送門。</p>
+          </div>
+          <button onclick="app.toggleEdit('shortcuts')" id="edit-btn-shortcuts" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6" id="shortcuts-container">
+          <!-- 內容由 JS 渲染 -->
+        </div>
+      </div>
+
+      <!-- 手札視圖 -->
+      <div id="view-stories" class="view-section hidden fade-in w-full">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+          <div>
+            <h2 class="font-serif text-3xl mb-2 text-white">常溫手札</h2>
+            <p class="text-white/60 font-light">記錄設計、生活與那些微小的不確定性。</p>
+          </div>
+          <button onclick="app.toggleEdit('stories')" id="edit-btn-stories" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容
+          </button>
+        </div>
+        
+        <div id="stories-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container">
+          <!-- 內容由 JS 渲染 -->
+        </div>
+      </div>
+
+      <!-- 選物視圖 -->
+      <div id="view-curation" class="view-section hidden fade-in w-full max-w-3xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+          <div>
+            <h2 class="font-serif text-3xl mb-2 text-white">常溫選物</h2>
+            <p class="text-white/60 font-light">篩選過濾後，留下真正喜歡的物件與觀點。</p>
+          </div>
+          <button onclick="app.toggleEdit('curation')" id="edit-btn-curation" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容
+          </button>
+        </div>
+
+        <div id="curation-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+        <div class="space-y-4" id="curation-container">
+          <!-- 內容由 JS 渲染 -->
+        </div>
+      </div>
+
+      <!-- 引力圈視圖 -->
+      <div id="view-connections" class="view-section hidden fade-in w-full">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+          <div>
+            <h2 class="font-serif text-3xl mb-2 text-white">引力圈</h2>
+            <p class="text-white/60 font-light">「我是一個很會傾聽的人。」<br/>用來管理與重要朋友的連結，不讓關係因為忙碌而降溫。</p>
+          </div>
+          <button onclick="app.toggleEdit('connections')" id="edit-btn-connections" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容
+          </button>
+        </div>
+
+        <div id="connections-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+        
+        <!-- 引力圈新增表單 (預設隱藏，編輯模式才顯示) -->
+        <div id="connections-add-form" class="hidden glass-panel p-6 rounded-2xl flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-8 max-w-2xl">
+            <div class="text-sm font-medium text-purple-300 mb-2">新增聯繫對象</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input type="text" id="conn-name" placeholder="姓名或暱稱" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50">
+              <input type="text" id="conn-tag" placeholder="身份標籤 (e.g. 大學死黨)" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50">
+              <input type="text" id="conn-lastMet" placeholder="上次見面時間" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50">
+              <select id="conn-status" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <option value="需聯繫" class="bg-slate-800">🟡 需聯繫</option>
+                <option value="已約好" class="bg-slate-800">🟢 已約好</option>
+                <option value="太久沒見" class="bg-slate-800">🔴 太久沒見</option>
+              </select>
+            </div>
+            <textarea id="conn-note" placeholder="筆記 (上次聊了什麼？下次要關心什麼？)" rows="2" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50 resize-none mt-3"></textarea>
+            <button onclick="app.addConnection()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm transition-colors text-white">建立檔案</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="connections-container">
+          <!-- 內容由 JS 渲染 -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 細節編輯 Modal (引力圈) -->
+  <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+    <div class="glass-panel w-full max-w-lg p-6 rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative">
+      <button onclick="app.closeModal()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-medium text-purple-300 mb-4 flex items-center gap-2" id="modal-title">
+        <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯細節
+      </h3>
+      <div class="space-y-4">
+        <input type="hidden" id="modal-id">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">姓名/暱稱</label>
+            <input type="text" id="modal-name" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+          </div>
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">狀態</label>
+            <select id="modal-status" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <option value="需聯繫">🟡 需聯繫</option>
+              <option value="已約好">🟢 已約好</option>
+              <option value="太久沒見">🔴 太久沒見</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">身份標籤</label>
+            <input type="text" id="modal-tag" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+          </div>
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">上次見面時間</label>
+            <input type="text" id="modal-lastMet" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-white/50 mb-1 block">筆記與細節</label>
+          <textarea id="modal-note" rows="4" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50 resize-none"></textarea>
+        </div>
+        <button onclick="app.saveModalEdit()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors mt-4 text-white">
+          儲存變更
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 預設資料設定 ---
+    const defaultData = {
+      shortcuts: [
+        { id: '1', title: 'Notion 工作區', desc: '專案管理與待辦', icon: '📝', color: 'bg-blue-500/20', url: 'https://www.notion.so/weichun0203/29068a880c078068903ed40fec3795f8?source=copy_link' },
+        { id: '2', title: '財務儀表板', desc: '理財與記帳檢視', icon: '💰', color: 'bg-green-500/20', url: 'https://docs.google.com/spreadsheets/d/12ay5kVQWChofYLFf3d2ID0fcHncPWpJty4RaE1JQvkA/edit?gid=749141122#gid=749141122' },
+        { id: '3', title: 'GitHub Repo', desc: '網頁開發練習', icon: '💻', color: 'bg-slate-500/20', url: 'https://github.com/' },
+        { id: '4', title: '常溫歌單', desc: 'Spotify 專注音樂', icon: '🎧', color: 'bg-purple-500/20', url: 'https://open.spotify.com/' }
+      ],
+      stories: [
+        { id: '1', title: '北美館：未來身體特展', date: '2026.03.15', tag: '設計展', img: 'https://images.unsplash.com/photo-1518998053401-878c735777a8?auto=format&fit=crop&q=80&w=600', url: '#' },
+        { id: '2', title: '街角的咖啡與底片', date: '2026.02.28', tag: '攝影', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=600', url: '#' },
+        { id: '3', title: '傾聽的藝術：讓對話留白', date: '2026.02.10', tag: '生活體悟', img: 'https://images.unsplash.com/photo-1516302752946-f564f014c564?auto=format&fit=crop&q=80&w=600', url: '#' }
+      ],
+      curation: [
+        { id: '1', title: 'JODOO：零程式碼架構思維', type: '文章', desc: '關於如何運用系統思維建立個人資料庫的筆記。', url: '#' },
+        { id: '2', title: 'Aesop 悟香水', type: '選物', desc: '帶有羅勒與柚子的沉靜木質調，工作時的安神劑。', url: '#' },
+        { id: '3', title: '原子習慣 (Atomic Habits)', type: '閱讀', desc: '重新覆盤今年的執行力，把改變縮小到每天的 1%。', url: '#' }
+      ],
+      connections: [
+        { id: '1', name: 'Ariel (設計師)', tag: '聊設計', lastMet: '2026-02-15', note: '上次聊到她想轉職，下個月可以關心一下進度。', status: '需聯繫', isPinned: true },
+        { id: '2', name: 'Jason', tag: '大學死黨', lastMet: '2026-03-01', note: '說好下次要去吃中山區那家新開的拉麵。', status: '已約好', isPinned: false },
+        { id: '3', name: '林老闆', tag: '前主管/貴人', lastMet: '2025-11-20', note: '很久沒見了，可以帶包咖啡豆去拜訪。', status: '太久沒見', isPinned: false }
+      ]
+    };
+
+    // --- 應用程式核心邏輯 ---
+    const app = {
+      state: {
+        activeTab: 'home',
+        isEditing: { shortcuts: false, stories: false, curation: false, connections: false },
+        filters: { stories: '全部', curation: '全部', connections: '全部' },
+        data: {
+          shortcuts: JSON.parse(localStorage.getItem('qw-shortcuts')) || defaultData.shortcuts,
+          stories: JSON.parse(localStorage.getItem('qw-stories')) || defaultData.stories,
+          curation: JSON.parse(localStorage.getItem('qw-curation')) || defaultData.curation,
+          connections: JSON.parse(localStorage.getItem('qw-connections')) || defaultData.connections
+        }
+      },
+
+      init() {
+        lucide.createIcons();
+        this.renderAll();
+      },
+
+      saveData(key) {
+        localStorage.setItem(`qw-${key}`, JSON.stringify(this.state.data[key]));
+      },
+
+      // --- 切換分頁 ---
+      switchTab(tabId) {
+        this.state.activeTab = tabId;
+        document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+        document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+          btn.classList.remove('text-purple-300', 'scale-110');
+          btn.classList.add('text-white/50');
+        });
+        const activeBtn = document.getElementById(`nav-${tabId}`);
+        activeBtn.classList.remove('text-white/50');
+        activeBtn.classList.add('text-purple-300', 'scale-110');
+      },
+
+      // --- 編輯模式切換 ---
+      toggleEdit(section) {
+        this.state.isEditing[section] = !this.state.isEditing[section];
+        const btn = document.getElementById(`edit-btn-${section}`);
+        
+        if (this.state.isEditing[section]) {
+          btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 完成編輯`;
+          btn.className = "glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border bg-purple-600/50 border-purple-400 text-white shadow-lg shadow-purple-900/50";
+        } else {
+          btn.innerHTML = `<i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容`;
+          btn.className = "glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20";
+        }
+        
+        if (section === 'connections') {
+          document.getElementById('connections-add-form').classList.toggle('hidden');
+          document.getElementById('connections-add-form').classList.toggle('flex');
+        }
+        
+        this.renderSection(section);
+        lucide.createIcons();
+      },
+
+      setFilter(section, val) {
+        this.state.filters[section] = val;
+        this.renderSection(section);
+        lucide.createIcons();
+      },
+
+      // --- 渲染共用過濾器 ---
+      renderFilterBar(section, options) {
+        const container = document.getElementById(`${section}-filter`);
+        const selected = this.state.filters[section];
+        const allOptions = ['全部', ...new Set(options)];
+        
+        container.innerHTML = allOptions.map(opt => `
+          <button onclick="app.setFilter('${section}', '${opt}')" 
+            class="px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors border ${selected === opt ? 'bg-purple-500/80 text-white border-purple-400' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white'}">
+            ${opt}
+          </button>
+        `).join('');
+      },
+
+      // --- 各區塊渲染邏輯 ---
+      renderAll() {
+        this.renderShortcuts();
+        this.renderStories();
+        this.renderCuration();
+        this.renderConnections();
+        lucide.createIcons();
+      },
+      renderSection(section) {
+        if(section === 'shortcuts') this.renderShortcuts();
+        if(section === 'stories') this.renderStories();
+        if(section === 'curation') this.renderCuration();
+        if(section === 'connections') this.renderConnections();
+      },
+
+      renderShortcuts() {
+        const container = document.getElementById('shortcuts-container');
+        const isEdit = this.state.isEditing.shortcuts;
+        let html = '';
+
+        if (isEdit) {
+          html += `
+            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10 col-span-2 md:col-span-1">
+              <div class="text-sm font-medium text-purple-300">新增捷徑</div>
+              <div class="flex gap-2">
+                <input type="text" id="sc-icon" placeholder="圖示" value="🔗" class="w-16 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <input type="text" id="sc-title" placeholder="標題" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              </div>
+              <input type="text" id="sc-desc" placeholder="描述" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <input type="text" id="sc-url" placeholder="網址連結" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <button onclick="app.addShortcut()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">確認新增</button>
+            </div>
+          `;
+        }
+
+        html += this.state.data.shortcuts.map(link => `
+          <div class="relative group">
+            ${isEdit ? `<button onclick="app.deleteItem('shortcuts', '${link.id}')" class="absolute -top-3 -right-3 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg transition-transform hover:scale-110"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+            <a href="${link.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="block glass-panel h-full p-6 rounded-2xl ${isEdit ? 'opacity-80' : 'hover:-translate-y-1'} transition-transform duration-300 flex flex-col items-start gap-4 ${link.color} border border-white/5 hover:border-white/20">
+              <div class="text-3xl">${link.icon}</div>
+              <div>
+                <h3 class="text-lg font-medium text-white/90">${link.title}</h3>
+                <p class="text-sm text-white/50">${link.desc}</p>
+              </div>
+              <i data-lucide="external-link" class="w-4 h-4 absolute top-6 right-6 text-white/20"></i>
+            </a>
+          </div>
+        `).join('');
+        container.innerHTML = html;
+      },
+
+      addShortcut() {
+        const title = document.getElementById('sc-title').value;
+        if (!title) return;
+        this.state.data.shortcuts.push({
+          id: Date.now().toString(),
+          title,
+          icon: document.getElementById('sc-icon').value || '🔗',
+          desc: document.getElementById('sc-desc').value,
+          url: document.getElementById('sc-url').value,
+          color: 'bg-purple-500/20'
+        });
+        this.saveData('shortcuts');
+        this.renderShortcuts();
+        lucide.createIcons();
+      },
+
+      renderStories() {
+        const container = document.getElementById('stories-container');
+        const isEdit = this.state.isEditing.stories;
+        const filter = this.state.filters.stories;
+        
+        this.renderFilterBar('stories', this.state.data.stories.map(s => s.tag));
+        
+        const filtered = filter === '全部' ? this.state.data.stories : this.state.data.stories.filter(s => s.tag === filter);
+        
+        let html = '';
+        if (isEdit) {
+          html += `
+            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10">
+              <div class="text-sm font-medium text-purple-300">寫篇新手札</div>
+              <input type="text" id="st-title" placeholder="標題" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <div class="flex gap-2">
+                <input type="text" id="st-date" placeholder="日期" class="w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <input type="text" id="st-tag" placeholder="標籤" value="日常" class="w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              </div>
+              <input type="text" id="st-img" placeholder="圖片 URL" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <input type="text" id="st-url" placeholder="文章連結 URL" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <button onclick="app.addStory()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">發佈手札</button>
+            </div>
+          `;
+        }
+
+        html += filtered.map(story => {
+          const hasUrl = story.url && story.url !== '#';
+          return `
+          <a href="${hasUrl ? story.url : 'javascript:void(0)'}" target="${hasUrl ? '_blank' : '_self'}" onclick="return ${isEdit || !hasUrl ? 'false' : 'true'}" class="relative glass-panel rounded-2xl overflow-hidden group border border-white/10 hover:border-purple-400/50 transition-colors duration-300 block">
+            ${isEdit ? `<button onclick="app.deleteItem('stories', '${story.id}'); event.preventDefault();" class="absolute top-2 right-2 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+            <div class="h-48 overflow-hidden ${isEdit ? 'opacity-50' : ''}">
+              <img src="${story.img}" alt="${story.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&q=80&w=600'">
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-200">${story.tag}</span>
+                <span class="text-xs text-white/40">${story.date}</span>
+              </div>
+              <h3 class="text-lg font-medium text-white/90 group-hover:text-purple-300 transition-colors flex items-center gap-2">
+                ${story.title}
+                ${hasUrl ? `<i data-lucide="external-link" class="w-3.5 h-3.5 text-white/30"></i>` : ''}
+              </h3>
+            </div>
+          </a>
+        `}).join('');
+        container.innerHTML = html;
+      },
+
+      addStory() {
+        const title = document.getElementById('st-title').value;
+        if (!title) return;
+        this.state.data.stories.unshift({
+          id: Date.now().toString(),
+          title,
+          date: document.getElementById('st-date').value,
+          tag: document.getElementById('st-tag').value || '日常',
+          img: document.getElementById('st-img').value,
+          url: document.getElementById('st-url').value
+        });
+        this.saveData('stories');
+        this.renderStories();
+        lucide.createIcons();
+      },
+
+      renderCuration() {
+        const container = document.getElementById('curation-container');
+        const isEdit = this.state.isEditing.curation;
+        const filter = this.state.filters.curation;
+        
+        this.renderFilterBar('curation', this.state.data.curation.map(c => c.type));
+        
+        const filtered = filter === '全部' ? this.state.data.curation : this.state.data.curation.filter(c => c.type === filter);
+        
+        let html = '';
+        if (isEdit) {
+          html += `
+            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-6">
+              <div class="text-sm font-medium text-purple-300">新增推薦選物</div>
+              <div class="flex gap-2">
+                <input type="text" id="cu-type" placeholder="分類" value="選物" class="w-1/4 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <input type="text" id="cu-title" placeholder="名稱" class="w-3/4 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              </div>
+              <input type="text" id="cu-desc" placeholder="簡短心得描述" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <input type="text" id="cu-url" placeholder="網址連結" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <button onclick="app.addCuration()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">新增至清單</button>
+            </div>
+          `;
+        }
+
+        html += filtered.map(item => `
+          <div class="glass-panel p-6 rounded-2xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center transition-colors border ${isEdit ? 'border-white/20 opacity-90' : 'border-white/5 hover:bg-white/10'}">
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                <span class="text-xs text-purple-300 border border-purple-300/30 px-2 py-0.5 rounded">${item.type}</span>
+                <h3 class="text-lg font-medium text-white">${item.title}</h3>
+              </div>
+              <p class="text-sm text-white/60">${item.desc}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <a href="${item.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="text-white/40 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors">
+                <i data-lucide="external-link" class="w-5 h-5"></i>
+              </a>
+              ${isEdit ? `<button onclick="app.deleteItem('curation', '${item.id}')" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>` : ''}
+            </div>
+          </div>
+        `).join('');
+        container.innerHTML = html;
+      },
+
+      addCuration() {
+        const title = document.getElementById('cu-title').value;
+        if (!title) return;
+        this.state.data.curation.unshift({
+          id: Date.now().toString(),
+          title,
+          type: document.getElementById('cu-type').value || '選物',
+          desc: document.getElementById('cu-desc').value,
+          url: document.getElementById('cu-url').value
+        });
+        this.saveData('curation');
+        this.renderCuration();
+        lucide.createIcons();
+      },
+
+      renderConnections() {
+        const container = document.getElementById('connections-container');
+        const isEdit = this.state.isEditing.connections;
+        const filter = this.state.filters.connections;
+        
+        this.renderFilterBar('connections', ['需聯繫', '已約好', '太久沒見']);
+        
+        const filtered = filter === '全部' ? this.state.data.connections : this.state.data.connections.filter(f => f.status === filter);
+        const sorted = [...filtered].sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return 0;
+        });
+
+        let html = sorted.map(friend => {
+          const statusColor = friend.status === '需聯繫' ? 'bg-yellow-400' : friend.status === '太久沒見' ? 'bg-rose-400' : 'bg-emerald-400';
+          const statusTextClass = friend.status === '需聯繫' ? 'text-yellow-400 border-yellow-400/30' : friend.status === '太久沒見' ? 'text-rose-400 border-rose-400/30' : 'text-emerald-400 border-emerald-400/30';
+          const truncatedNote = friend.note && friend.note.length > 150 ? friend.note.substring(0, 150) + '...' : (friend.note || '');
+
+          return `
+          <div class="glass-panel p-6 rounded-2xl border border-white/10 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-1 h-full ${statusColor}"></div>
+            ${isEdit ? `<button onclick="app.deleteItem('connections', '${friend.id}')" class="absolute top-4 right-4 text-rose-400 hover:bg-rose-500/20 p-2 rounded-full z-10 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+            
+            <div class="flex justify-between items-start mb-4 pr-6">
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-2">
+                  <h3 class="text-xl font-medium text-white">${friend.name}</h3>
+                  <button onclick="app.togglePin('${friend.id}')" class="p-1.5 rounded-full hover:bg-white/10 transition-colors group/pin" title="${friend.isPinned ? '取消置頂' : '設為置頂'}">
+                    <i data-lucide="pin" class="w-4 h-4 transition-all duration-300 ${friend.isPinned ? 'text-purple-400 fill-purple-400 scale-110 rotate-45' : 'text-white/30 group-hover/pin:text-white/70 rotate-0'}"></i>
+                  </button>
+                </div>
+                <span class="text-xs text-purple-300">${friend.tag}</span>
+              </div>
+              ${!isEdit ? `<span class="text-xs px-2 py-1 rounded-full bg-white/5 border ${statusTextClass}">${friend.status}</span>` : ''}
+            </div>
+            
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center gap-2 text-sm text-white/50">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i> 上次見面: ${friend.lastMet || '尚未記錄'}
+              </div>
+              <p class="text-sm text-white/80 bg-white/5 p-3 rounded-lg leading-relaxed min-h-[3rem] break-words">
+                ${truncatedNote}
+              </p>
+            </div>
+            
+            <div class="flex gap-2">
+              <button class="flex-1 py-2 rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${isEdit ? 'bg-white/5 text-white/20 cursor-not-allowed' : 'bg-purple-600/30 hover:bg-purple-600/50 text-purple-100'}">
+                <i data-lucide="message-circle-heart" class="w-4 h-4"></i> 傳送溫暖
+              </button>
+              ${!isEdit ? `
+              <button onclick="app.openModal('${friend.id}')" class="py-2 px-4 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-sm flex items-center gap-2 transition-colors border border-white/5">
+                <i data-lucide="edit-2" class="w-4 h-4"></i> 細節
+              </button>` : ''}
+            </div>
+          </div>
+        `}).join('');
+        container.innerHTML = html;
+      },
+
+      addConnection() {
+        const name = document.getElementById('conn-name').value;
+        if (!name) return;
+        this.state.data.connections.unshift({
+          id: Date.now().toString(),
+          name,
+          tag: document.getElementById('conn-tag').value,
+          lastMet: document.getElementById('conn-lastMet').value,
+          status: document.getElementById('conn-status').value,
+          note: document.getElementById('conn-note').value,
+          isPinned: false
+        });
+        this.saveData('connections');
+        // 清空表單
+        document.getElementById('conn-name').value = '';
+        document.getElementById('conn-tag').value = '';
+        document.getElementById('conn-lastMet').value = '';
+        document.getElementById('conn-note').value = '';
+        this.renderConnections();
+        lucide.createIcons();
+      },
+
+      deleteItem(section, id) {
+        this.state.data[section] = this.state.data[section].filter(item => item.id !== id);
+        this.saveData(section);
+        this.renderSection(section);
+        lucide.createIcons();
+      },
+
+      togglePin(id) {
+        this.state.data.connections = this.state.data.connections.map(f => f.id === id ? { ...f, isPinned: !f.isPinned } : f);
+        this.saveData('connections');
+        this.renderConnections();
+        lucide.createIcons();
+      },
+
+      // --- Modal 邏輯 ---
+      openModal(id) {
+        const friend = this.state.data.connections.find(f => f.id === id);
+        if(!friend) return;
+        
+        document.getElementById('modal-id').value = friend.id;
+        document.getElementById('modal-name').value = friend.name;
+        document.getElementById('modal-status').value = friend.status;
+        document.getElementById('modal-tag').value = friend.tag;
+        document.getElementById('modal-lastMet').value = friend.lastMet;
+        document.getElementById('modal-note').value = friend.note;
+        
+        document.getElementById('modal-title').innerHTML = `<i data-lucide="edit-2" class="w-4 h-4"></i> 編輯細節：${friend.name}`;
+        document.getElementById('edit-modal').classList.remove('hidden');
+        lucide.createIcons();
+      },
+
+      closeModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+      },
+
+      saveModalEdit() {
+        const id = document.getElementById('modal-id').value;
+        this.state.data.connections = this.state.data.connections.map(f => {
+          if(f.id === id) {
+            return {
+              ...f,
+              name: document.getElementById('modal-name').value,
+              status: document.getElementById('modal-status').value,
+              tag: document.getElementById('modal-tag').value,
+              lastMet: document.getElementById('modal-lastMet').value,
+              note: document.getElementById('modal-note').value
+            };
+          }
+          return f;
+        });
+        this.saveData('connections');
+        this.closeModal();
+        this.renderConnections();
+        lucide.createIcons();
+      },
+
+      // --- 彩蛋特效 ---
+      triggerEasterEgg() {
+        const emojis = ['🎵', '🎨', '✨', '👻', '🌿', '☕', '💡', '💜', '💙'];
+        const container = document.getElementById('emoji-container');
+        
+        for(let i=0; i<30; i++) {
+          const el = document.createElement('div');
+          el.className = 'falling-emoji';
+          el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+          el.style.left = `${Math.random() * 100}vw`;
+          el.style.animationDuration = `${Math.random() * 2 + 2}s`;
+          el.style.animationDelay = `${Math.random() * 0.5}s`;
+          el.style.fontSize = `${Math.random() * 1.5 + 1}rem`;
+          container.appendChild(el);
+          
+          setTimeout(() => { el.remove(); }, 5000);
+        }
+      }
+    };
+
+    // 啟動應用程式
+    document.addEventListener('DOMContentLoaded', () => {
+      app.init();
+    });
+  </script>
+</body>
+</html>
