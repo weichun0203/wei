@@ -1,472 +1,453 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>常溫編集 | 罕用 App 倉庫</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
-  
-  <style>
-    body {
-      font-family: 'Noto Sans TC', sans-serif;
-      background-color: #0f172a; 
-      color: #f8fafc;
-      overflow-x: hidden;
-    }
-
-    .font-serif {
-      font-family: 'Noto Serif TC', serif;
-    }
-
-    /* 流動漸層背景 */
-    .bg-fluid {
-      background: linear-gradient(-45deg, #0F4C81, #1e1b4b, #4c1d95, #8B5CF6);
-      background-size: 400% 400%;
-      animation: gradientBG 20s ease infinite;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* 玻璃擬態質感 */
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    /* 卷軸美化 */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.5); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.8); }
-
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-    /* 淡入動畫 */
-    .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
-</head>
-<body class="bg-fluid relative transition-colors duration-1000">
-
-  <script type="text/babel">
-    import React, { useState, useEffect, useMemo } from 'react';
-    import { initializeApp } from 'firebase/app';
-    import { 
-      getFirestore, collection, doc, setDoc, getDoc, 
-      onSnapshot, addDoc, deleteDoc, updateDoc
-    } from 'firebase/firestore';
-    import { 
-      getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged 
-    } from 'firebase/auth';
-    import { 
-      Plus, Trash2, Download, Search, Archive, 
-      Smartphone, Info, X, Loader2, CheckCircle2, 
-      AlertTriangle, Sparkles
-    } from 'lucide-react';
-
-    const firebaseConfig = JSON.parse(__firebase_config);
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'rare-app-vault';
-
-    const CATEGORIES = ["生活", "工具", "旅遊", "金融", "政府", "其他"];
-
-    export default function App() {
-      const [user, setUser] = useState(null);
-      const [apps, setApps] = useState([]);
-      const [loading, setLoading] = useState(true);
-      const [isModalOpen, setIsModalOpen] = useState(false);
-      const [isSaving, setIsSaving] = useState(false);
-      const [showSuccess, setShowSuccess] = useState(false);
-      const [deleteConfirmId, setDeleteConfirmId] = useState(null);
-      const [searchTerm, setSearchTerm] = useState('');
-      const [filterCategory, setFilterCategory] = useState('全部');
-      
-      const [formData, setFormData] = useState({
-        name: '', category: '生活', storeUrl: '', note: '', iconEmoji: '📱'
-      });
-
-      useEffect(() => {
-        const initAuth = async () => {
-          try {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-              await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-              await signInAnonymously(auth);
-            }
-          } catch (error) {
-            console.error("Auth error:", error);
-          }
-        };
-        initAuth();
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>罕用 App 倉庫</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         
-        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-          setUser(user);
-        });
-        return () => unsubscribeAuth();
-      }, []);
-
-      useEffect(() => {
-        if (!user) return;
-        const appsCollection = collection(db, 'artifacts', appId, 'users', user.uid, 'savedApps');
-        const unsubscribeData = onSnapshot(appsCollection, (snapshot) => {
-          const appList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          setApps(appList);
-          setLoading(false);
-        }, (error) => {
-          console.error("Firestore error:", error);
-          setLoading(false);
-        });
-        return () => unsubscribeData();
-      }, [user]);
-
-      const handleAddApp = async (e) => {
-        e.preventDefault();
-        if (!user || !formData.name || isSaving) return;
-        setIsSaving(true);
-        try {
-          const appsCollection = collection(db, 'artifacts', appId, 'users', user.uid, 'savedApps');
-          await addDoc(appsCollection, { ...formData, createdAt: new Date().toISOString() });
-          
-          setIsSaving(false);
-          setShowSuccess(true);
-          setTimeout(() => {
-            setShowSuccess(false);
-            setIsModalOpen(false);
-            setFormData({ name: '', category: '生活', storeUrl: '', note: '', iconEmoji: '📱' });
-          }, 1200);
-        } catch (error) {
-          console.error("Error adding app:", error);
-          setIsSaving(false);
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
         }
-      };
 
-      const confirmDelete = async () => {
-        if (!user || !deleteConfirmId) return;
-        try {
-          const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'savedApps', deleteConfirmId);
-          await deleteDoc(docRef);
-          setDeleteConfirmId(null);
-        } catch (error) {
-          console.error("Error deleting app:", error);
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-      };
 
-      const filteredApps = useMemo(() => {
-        return apps.filter(app => {
-          const matchesSearch = app.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                app.note.toLowerCase().includes(searchTerm.toLowerCase());
-          const matchesCategory = filterCategory === '全部' || app.category === filterCategory;
-          return matchesSearch && matchesCategory;
-        });
-      }, [apps, searchTerm, filterCategory]);
+        .bg-fluid {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e1b4b);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: fixed;
+            inset: 0;
+            z-index: -10;
+        }
 
-      if (loading) {
-        return (
-          <div className="flex flex-col items-center justify-center min-h-screen text-white">
-            <Loader2 className="w-10 h-10 animate-spin text-purple-400 mb-4" />
-            <p className="text-white/70 font-light tracking-widest">正在開啟您的常溫空間...</p>
-          </div>
-        );
-      }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-      const appBeingDeleted = apps.find(a => a.id === deleteConfirmId);
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-      return (
-        <div className="min-h-screen font-sans pb-20 text-slate-50">
-          {/* Header */}
-          <header className="glass-panel border-b border-white/10 sticky top-0 z-20">
-            <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="bg-purple-500/20 p-2 rounded-xl border border-purple-400/30">
-                  <Archive className="text-purple-300 w-6 h-6" />
-                </div>
-                <div>
-                  <h1 className="font-serif text-2xl text-white">罕用 App 倉庫</h1>
-                  <p className="text-xs text-white/50 font-light">不再佔用空間，需要時隨時找回</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setIsModalOpen(true)}
-                className="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border bg-purple-600/50 hover:bg-purple-600/80 border-purple-400/50 text-white shadow-lg shadow-purple-900/50 active:scale-95"
-              >
-                <Plus className="w-5 h-5" />
-                <span className="hidden sm:inline font-medium">存入新 App</span>
-              </button>
-            </div>
-          </header>
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-          <main className="max-w-4xl mx-auto px-4 py-6">
-            {/* Search & Filter */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 w-5 h-5" />
-                <input 
-                  type="text"
-                  placeholder="搜尋 App 名稱或備註..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-black/20 border border-white/10 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-transparent outline-none transition-all shadow-sm text-white placeholder-white/30"
-                />
-              </div>
-              <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 no-scrollbar">
-                {['全部', ...CATEGORIES].map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setFilterCategory(cat)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                      filterCategory === cat 
-                      ? 'bg-purple-500/80 text-white border border-purple-400 shadow-md' 
-                      : 'bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
+        input, select, textarea {
+            background: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+        }
 
-            {/* Apps List */}
-            {filteredApps.length === 0 ? (
-              <div className="text-center py-20 glass-panel rounded-3xl border border-white/10 fade-in">
-                <div className="bg-white/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
-                  <Smartphone className="text-purple-300 w-8 h-8" />
-                </div>
-                <h3 className="font-serif text-2xl text-white mb-2">倉庫空空如也</h3>
-                <p className="text-white/50 max-w-xs mx-auto mt-2 px-4 font-light">
-                  還沒有儲存任何 App。點擊右上角的按鈕開始記錄那些一年才用一次的程式吧！
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredApps.map(app => (
-                  <div key={app.id} className="glass-panel rounded-2xl p-6 border border-white/10 hover:border-purple-400/50 transition-colors duration-300 group relative flex flex-col fade-in">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="text-3xl bg-black/20 w-14 h-14 flex items-center justify-center rounded-2xl border border-white/10 group-hover:scale-105 transition-transform">
-                          {app.iconEmoji || '📱'}
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-lg text-white/90 group-hover:text-purple-300 transition-colors">{app.name}</h3>
-                          <span className="inline-block px-2 py-0.5 bg-purple-500/20 text-purple-200 border border-purple-300/30 text-[10px] rounded mt-1 tracking-wider">
-                            {app.category}
-                          </span>
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => setDeleteConfirmId(app.id)}
-                        className="absolute top-4 right-4 text-rose-400 hover:bg-rose-500/20 p-2 rounded-full z-10 transition-colors opacity-0 group-hover:opacity-100"
-                        title="移除紀錄"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
+        input:focus, select:focus, textarea:focus {
+            border-color: #8b5cf6 !important;
+            ring: 2px rgba(139, 92, 246, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-fluid"></div>
 
-                    {app.note && (
-                      <div className="bg-white/5 p-3 rounded-xl mb-4 text-sm text-white/70 flex items-start gap-2 border border-white/10 flex-1">
-                        <Info className="w-4 h-4 mt-0.5 flex-shrink-0 text-white/40" />
-                        <p className="leading-relaxed font-light">「{app.note}」</p>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/10">
-                      <span className="text-[10px] text-white/40 font-medium">
-                        {new Date(app.createdAt).toLocaleDateString()}
-                      </span>
-                      {app.storeUrl ? (
-                        <a 
-                          href={app.storeUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="glass-panel hover:bg-white/10 text-white/80 hover:text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors border border-white/20 active:scale-95"
-                        >
-                          <Download className="w-4 h-4" />
-                          立即下載
-                        </a>
-                      ) : (
-                        <span className="text-white/30 text-xs font-light italic">
-                          未提供下載連結
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Footer */}
-            <div className="mt-12 text-center text-white/30 text-xs pb-10">
-              <p className="font-mono">User: {user?.uid}</p>
-              <div className="mt-2 flex items-center justify-center gap-1.5">
-                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
-                <span>常溫同步中</span>
-              </div>
-            </div>
-          </main>
-
-          {/* Add Modal */}
-          {isModalOpen && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 fade-in">
-              <div className="glass-panel w-full max-w-lg rounded-t-3xl sm:rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative overflow-hidden transition-all duration-300">
-                
-                {showSuccess ? (
-                  <div className="p-12 flex flex-col items-center justify-center text-center fade-in">
-                    <div className="bg-emerald-500/20 border border-emerald-400/50 w-24 h-24 rounded-full flex items-center justify-center mb-6 relative">
-                      <CheckCircle2 className="text-emerald-400 w-12 h-12" />
-                      <Sparkles className="absolute -top-1 -right-1 text-purple-300 animate-bounce" />
-                    </div>
-                    <h2 className="font-serif text-2xl text-white mb-2">存入成功！</h2>
-                    <p className="text-white/50 font-light italic">已將您的罕用 App 妥善存入雲端倉庫</p>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between p-6 border-b border-white/10">
-                      <h2 className="font-serif text-xl text-white">存入新 App</h2>
-                      <button 
-                        disabled={isSaving}
-                        onClick={() => setIsModalOpen(false)} 
-                        className="text-white/40 hover:text-white p-1 disabled:opacity-30 transition-colors"
-                      >
-                        <X className="w-6 h-6" />
-                      </button>
-                    </div>
-                    
-                    <form onSubmit={handleAddApp} className="p-6 space-y-4">
-                      <div>
-                        <label className="block text-xs text-white/50 mb-1.5">App 名稱 *</label>
-                        <input 
-                          required
-                          disabled={isSaving}
-                          type="text"
-                          placeholder="例如：台北通、報稅快易通..."
-                          value={formData.name}
-                          onChange={e => setFormData({...formData, name: e.target.value})}
-                          className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white placeholder-white/30 focus:ring-2 focus:ring-purple-500/50 focus:border-transparent outline-none transition-all disabled:opacity-50"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs text-white/50 mb-1.5">分類</label>
-                          <select 
-                            disabled={isSaving}
-                            value={formData.category}
-                            onChange={e => setFormData({...formData, category: e.target.value})}
-                            className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:ring-2 focus:ring-purple-500/50 focus:border-transparent outline-none appearance-none cursor-pointer disabled:opacity-50"
-                          >
-                            {CATEGORIES.map(c => <option key={c} value={c} className="bg-slate-800">{c}</option>)}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-xs text-white/50 mb-1.5">代表 Emoji</label>
-                          <input 
-                            disabled={isSaving}
-                            type="text"
-                            placeholder="📱"
-                            value={formData.iconEmoji}
-                            onChange={e => setFormData({...formData, iconEmoji: e.target.value})}
-                            className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-center text-white focus:ring-2 focus:ring-purple-500/50 focus:border-transparent outline-none disabled:opacity-50"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs text-white/50 mb-1.5">商店連結</label>
-                        <input 
-                          disabled={isSaving}
-                          type="url"
-                          placeholder="https://..."
-                          value={formData.storeUrl}
-                          onChange={e => setFormData({...formData, storeUrl: e.target.value})}
-                          className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white placeholder-white/30 focus:ring-2 focus:ring-purple-500/50 focus:border-transparent outline-none transition-all disabled:opacity-50"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs text-white/50 mb-1.5">為什麼存這？ (備註)</label>
-                        <textarea 
-                          disabled={isSaving}
-                          rows="2"
-                          placeholder="例如：一年一次的房屋稅、或出國旅遊專用..."
-                          value={formData.note}
-                          onChange={e => setFormData({...formData, note: e.target.value})}
-                          className="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white placeholder-white/30 focus:ring-2 focus:ring-purple-500/50 focus:border-transparent outline-none resize-none transition-all disabled:opacity-50"
-                        />
-                      </div>
-
-                      <button 
-                        type="submit"
-                        disabled={isSaving}
-                        className={`w-full py-4 rounded-lg text-sm font-medium transition-colors mt-4 flex items-center justify-center ${
-                          isSaving 
-                          ? 'bg-white/5 text-white/20 cursor-not-allowed border border-white/10' 
-                          : 'bg-purple-600/50 hover:bg-purple-600/80 text-white border border-purple-400/50 shadow-lg shadow-purple-900/50 active:scale-[0.98]'
-                        }`}
-                      >
-                        {isSaving ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                            存入中...
-                          </>
-                        ) : (
-                          '存入倉庫'
-                        )}
-                      </button>
-                    </form>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Delete Confirmation Modal */}
-          {deleteConfirmId && (
-            <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[60] flex items-center justify-center p-4 fade-in">
-              <div className="glass-panel bg-slate-900/95 border-rose-500/30 w-full max-w-sm rounded-3xl p-6 shadow-2xl">
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-rose-500/20 border border-rose-500/30 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                    <AlertTriangle className="text-rose-400 w-8 h-8" />
-                  </div>
-                  <h3 className="font-serif text-xl text-white mb-2">確定要移除嗎？</h3>
-                  <p className="text-white/60 font-light mb-6">
-                    您正準備移除 <span className="font-medium text-white">「{appBeingDeleted?.name}」</span> 的記錄。此操作無法復原。
-                  </p>
-                  
-                  <div className="flex flex-col w-full gap-3">
-                    <button 
-                      onClick={confirmDelete}
-                      className="w-full bg-rose-500/80 hover:bg-rose-500 border border-rose-400 text-white py-3 rounded-xl font-medium transition-colors active:scale-95"
-                    >
-                      確認移除
-                    </button>
-                    <button 
-                      onClick={() => setDeleteConfirmId(null)}
-                      className="w-full glass-panel hover:bg-white/10 text-white/70 hover:text-white py-3 rounded-xl font-medium transition-colors active:scale-95"
-                    >
-                      取消
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+    <div id="app" class="min-h-screen pb-20">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center">
+            <i data-lucide="loader-2" class="w-10 h-10 animate-spin text-purple-500 mb-4"></i>
+            <p class="text-purple-200/60 tracking-widest font-light">正在開啟倉庫資料...</p>
         </div>
-      );
-    }
-  </script>
+
+        <!-- Header -->
+        <header class="glass-panel sticky top-0 z-40 border-b border-white/5">
+            <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-3 w-full sm:w-auto">
+                    <div class="bg-purple-600/20 p-2 rounded-2xl border border-purple-500/30">
+                        <i data-lucide="archive" class="text-purple-400 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight">罕用 App 倉庫</h1>
+                        <p class="text-[10px] text-white/40 uppercase tracking-tighter">Rare App Vault</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <!-- Quick Demo Import -->
+                    <button onclick="handleQuickImport()" title="快捷導入您的清單" class="glass-panel p-2.5 rounded-xl hover:bg-purple-500/20 transition-all text-purple-400 hover:text-purple-300 border-purple-500/20 active:scale-95">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    </button>
+                    <!-- Export Button -->
+                    <button onclick="handleExportCSV()" title="匯出 CSV" class="glass-panel p-2.5 rounded-xl hover:bg-white/10 transition-all text-white/60 hover:text-white border-white/10 active:scale-95">
+                        <i data-lucide="download-cloud" class="w-5 h-5"></i>
+                    </button>
+                    <!-- Import Button -->
+                    <button onclick="triggerImport()" title="匯入 CSV" class="glass-panel p-2.5 rounded-xl hover:bg-white/10 transition-all text-white/60 hover:text-white border-white/10 active:scale-95">
+                        <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                    </button>
+                    <input type="file" id="csv-import-input" accept=".csv" class="hidden" onchange="handleImportCSV(event)">
+                    
+                    <div class="w-px h-6 bg-white/10 mx-1"></div>
+                    
+                    <button onclick="toggleModal(true)" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-purple-900/40 active:scale-95 text-sm font-semibold whitespace-nowrap">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>存入新 App</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-4 py-6">
+            <!-- Search & Filter -->
+            <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                <div class="relative flex-1">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 w-5 h-5"></i>
+                    <input id="search-input" type="text" placeholder="搜尋名稱或備註..." oninput="handleSearch()" class="w-full pl-10 pr-4 py-3 rounded-xl outline-none transition-all">
+                </div>
+                <div id="category-filters" class="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
+                    <!-- Categories will be injected here -->
+                </div>
+            </div>
+
+            <!-- Apps List -->
+            <div id="apps-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- App cards will be injected here -->
+            </div>
+        </main>
+
+        <footer class="mt-10 pb-10"></footer>
+
+        <!-- Add Modal -->
+        <div id="add-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
+            <div class="glass-panel w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-slate-900/90 shadow-2xl relative overflow-hidden">
+                <div id="modal-form-content">
+                    <div class="flex items-center justify-between p-6 border-b border-white/5">
+                        <h2 class="text-xl font-bold">存入新 App</h2>
+                        <button onclick="toggleModal(false)" class="text-white/40 hover:text-white transition-colors">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                    <form id="app-form" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+                        <div class="grid grid-cols-4 gap-4">
+                            <div class="col-span-3">
+                                <label class="block text-[10px] font-bold text-white/40 uppercase mb-1">App 名稱 *</label>
+                                <input name="name" required type="text" placeholder="例如：台北通" class="w-full px-4 py-3 rounded-xl outline-none">
+                            </div>
+                            <div class="col-span-1">
+                                <label class="block text-[10px] font-bold text-white/40 uppercase mb-1 text-center">Emoji</label>
+                                <input name="iconEmoji" type="text" value="📱" class="w-full px-4 py-3 rounded-xl outline-none text-center">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-white/40 uppercase mb-1">分類</label>
+                            <select name="category" class="w-full px-4 py-3 rounded-xl outline-none cursor-pointer">
+                                <option value="生活">生活</option>
+                                <option value="工具">工具</option>
+                                <option value="旅遊">旅遊</option>
+                                <option value="金融">金融</option>
+                                <option value="政府">政府</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-white/40 uppercase mb-1">商店連結</label>
+                            <input name="storeUrl" type="url" placeholder="https://..." class="w-full px-4 py-3 rounded-xl outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-white/40 uppercase mb-1">備註</label>
+                            <textarea name="note" rows="2" placeholder="一年一次的需求..." class="w-full px-4 py-3 rounded-xl outline-none resize-none"></textarea>
+                        </div>
+                        <button type="submit" id="submit-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center">
+                            <span>存入倉庫</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div id="modal-success-content" class="hidden p-12 flex flex-col items-center justify-center text-center fade-in">
+                    <div class="bg-emerald-500/20 border border-emerald-500/30 w-24 h-24 rounded-full flex items-center justify-center mb-6 relative">
+                        <i data-lucide="check-circle-2" class="text-emerald-400 w-12 h-12"></i>
+                        <i data-lucide="sparkles" class="absolute -top-1 -right-1 text-yellow-400 w-6 h-6 animate-bounce"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mb-2">存入成功！</h2>
+                    <p class="text-white/40 italic font-light">已妥善將資料存入雲端倉庫</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirm Modal -->
+        <div id="delete-modal" class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+            <div class="glass-panel bg-slate-900/95 border-rose-500/30 w-full max-w-sm rounded-3xl p-6 shadow-2xl fade-in text-center">
+                <div class="bg-rose-500/20 border border-rose-500/30 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <i data-lucide="alert-triangle" class="text-rose-400 w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">確定要移除嗎？</h3>
+                <p id="delete-app-name" class="text-white/60 text-sm mb-6"></p>
+                <div class="flex flex-col gap-2">
+                    <button onclick="executeDelete()" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-3 rounded-xl font-bold transition-all">確認移除</button>
+                    <button onclick="toggleDeleteModal(null)" class="w-full glass-panel hover:bg-white/10 text-white/70 py-3 rounded-xl font-bold transition-all">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, addDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'rare-app-vault';
+
+        let currentUser = null;
+        let allApps = [];
+        let currentFilter = '全部';
+        let deleteId = null;
+
+        const CATEGORIES = ["全部", "生活", "工具", "旅遊", "金融", "政府", "其他"];
+
+        window.addEventListener('load', async () => {
+            initAuth();
+            renderCategoryFilters();
+            lucide.createIcons();
+        });
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) { console.error(err); }
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUser = user;
+                    subscribeToApps();
+                }
+            });
+        }
+
+        function subscribeToApps() {
+            if (!currentUser) return;
+            const appsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'savedApps');
+            onSnapshot(appsRef, (snapshot) => {
+                allApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderApps();
+                document.getElementById('loading-screen').classList.add('hidden');
+            }, (error) => {
+                console.error(error);
+                document.getElementById('loading-screen').classList.add('hidden');
+            });
+        }
+
+        window.renderCategoryFilters = () => {
+            const container = document.getElementById('category-filters');
+            container.innerHTML = CATEGORIES.map(cat => `
+                <button onclick="handleCategoryChange('${cat}')" 
+                    class="filter-btn px-4 py-2 rounded-full text-xs font-semibold transition-all border 
+                    ${currentFilter === cat ? 'bg-purple-600 border-purple-400 text-white shadow-lg' : 'glass-panel text-white/60 border-white/10 hover:bg-white/10'}">
+                    ${cat}
+                </button>
+            `).join('');
+        };
+
+        window.renderApps = () => {
+            const container = document.getElementById('apps-container');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const filtered = allApps.filter(app => {
+                const matchesSearch = app.name.toLowerCase().includes(searchTerm) || (app.note && app.note.toLowerCase().includes(searchTerm));
+                const matchesCategory = currentFilter === '全部' || app.category === currentFilter;
+                return matchesSearch && matchesCategory;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-20 glass-panel rounded-3xl text-center border-dashed border-2 border-white/5"><p class="text-white/30 text-sm italic">無相關紀錄</p></div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(app => `
+                <div class="glass-panel rounded-2xl p-5 border-l-2 border-l-transparent hover:border-l-purple-500 transition-all group fade-in relative flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-2xl bg-black/30 w-12 h-12 flex items-center justify-center rounded-xl border border-white/5 group-hover:scale-110 transition-transform">
+                                ${app.iconEmoji || '📱'}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white/90 group-hover:text-purple-300 transition-colors">${app.name}</h3>
+                                <span class="inline-block px-2 py-0.5 bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[8px] font-bold rounded mt-1 uppercase">
+                                    ${app.category}
+                                </span>
+                            </div>
+                        </div>
+                        <button onclick="toggleDeleteModal('${app.id}', '${app.name}')" class="text-white/20 hover:text-rose-500 p-2 opacity-0 group-hover:opacity-100 transition-all">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    ${app.note ? `<div class="bg-black/20 p-3 rounded-lg mb-4 text-xs text-white/60 border border-white/5 italic flex-1 font-light">「${app.note}」</div>` : '<div class="flex-1"></div>'}
+                    <div class="flex items-center justify-between mt-auto pt-3 border-t border-white/5">
+                        <span class="text-[9px] text-white/20">${new Date(app.createdAt).toLocaleDateString()}</span>
+                        ${app.storeUrl ? `<a href="${app.storeUrl}" target="_blank" class="bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg text-xs text-white/80 border border-white/10">下載</a>` : '<span class="text-[9px] text-white/10">無連結</span>'}
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        };
+
+        window.toggleModal = (show) => {
+            const modal = document.getElementById('add-modal');
+            modal.classList.toggle('hidden', !show);
+            document.getElementById('modal-form-content').classList.remove('hidden');
+            document.getElementById('modal-success-content').classList.add('hidden');
+        };
+
+        window.handleSearch = () => renderApps();
+        window.handleCategoryChange = (cat) => { currentFilter = cat; renderCategoryFilters(); renderApps(); };
+
+        window.handleFormSubmit = async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+            const btn = document.getElementById('submit-btn');
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = {
+                name: formData.get('name'), category: formData.get('category'),
+                iconEmoji: formData.get('iconEmoji'), storeUrl: formData.get('storeUrl'),
+                note: formData.get('note'), createdAt: new Date().toISOString()
+            };
+            btn.disabled = true;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'savedApps'), data);
+                document.getElementById('modal-form-content').classList.add('hidden');
+                document.getElementById('modal-success-content').classList.remove('hidden');
+                lucide.createIcons();
+                setTimeout(() => { toggleModal(false); form.reset(); btn.disabled = false; }, 1200);
+            } catch (err) { btn.disabled = false; }
+        };
+
+        window.toggleDeleteModal = (id, name = '') => {
+            const modal = document.getElementById('delete-modal');
+            if (id) {
+                deleteId = id;
+                document.getElementById('delete-app-name').textContent = `您準備移除 「${name}」 的紀錄。此操作無法復原。`;
+                modal.classList.remove('hidden');
+            } else {
+                deleteId = null;
+                modal.classList.add('hidden');
+            }
+        };
+
+        window.executeDelete = async () => {
+            if (!currentUser || !deleteId) return;
+            await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'savedApps', deleteId));
+            toggleDeleteModal(null);
+        };
+
+        // --- CSV Logic ---
+        window.handleExportCSV = () => {
+            if (!allApps.length) return alert("倉庫無資料");
+            const headers = ["App名稱", "分類", "Emoji", "連結", "備註", "日期"];
+            const rows = allApps.map(app => [app.name, app.category, app.iconEmoji, app.storeUrl, app.note, new Date(app.createdAt).toLocaleDateString()]);
+            const csv = "\ufeff" + headers.join(",") + "\n" + rows.map(r => r.map(c => `"${(c||"").replace(/"/g, '""')}"`).join(",")).join("\n");
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `RareApps_${new Date().getTime()}.csv`;
+            link.click();
+        };
+
+        window.triggerImport = () => document.getElementById('csv-import-input').click();
+        window.handleImportCSV = (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const rows = event.target.result.split(/\n/).slice(1);
+                for (const row of rows) {
+                    const m = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                    if (!m) continue;
+                    const clean = (s) => (s||"").replace(/^"|"$/g, '').replace(/""/g, '"');
+                    await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'savedApps'), {
+                        name: clean(m[0]), category: clean(m[1]), iconEmoji: clean(m[2]),
+                        storeUrl: clean(m[3]), note: clean(m[4]), createdAt: new Date().toISOString()
+                    });
+                }
+                alert("匯入完成");
+            };
+            reader.readAsText(file);
+        };
+
+        // --- 快捷導入清單 ---
+        window.handleQuickImport = async () => {
+            if (!currentUser) return;
+            if (!confirm("即將導入 29 個 App 清單，確定要繼續嗎？")) return;
+            
+            const list = [
+                { name: "Sora", cat: "其他", emoji: "🎬", note: "AI 影片生成工具" },
+                { name: "Muse Score", cat: "工具", emoji: "🎼", note: "樂譜編輯工具" },
+                { name: "Remixlive", cat: "其他", emoji: "🎧", note: "音樂混音工具" },
+                { name: "PChome24H", cat: "購物", emoji: "📦", note: "電商平台" },
+                { name: "LinkedIN", cat: "工具", emoji: "💼", note: "職場社群" },
+                { name: "環保集點", cat: "生活", emoji: "♻️", note: "環保點數紀錄" },
+                { name: "Lalamove啦啦快送", cat: "生活", emoji: "🚚", note: "即時物流服務" },
+                { name: "Mercari", cat: "購物", emoji: "🛍️", note: "二手交易平台" },
+                { name: "Epop", cat: "其他", emoji: "📱", note: "社群/資訊" },
+                { name: "Payple", cat: "金融", emoji: "💳", note: "支付工具" },
+                { name: "Workly", cat: "工具", emoji: "📅", note: "工作管理" },
+                { name: "Flexii", cat: "其他", emoji: "🤸", note: "生活應用" },
+                { name: "Ridey", cat: "旅遊", emoji: "🚗", note: "共乘服務" },
+                { name: "SamsungShop", cat: "購物", emoji: "📱", note: "三星官方商城" },
+                { name: "Members", cat: "生活", emoji: "👥", note: "三星會員服務" },
+                { name: "NotebookLM", cat: "工具", emoji: "📓", note: "Google AI 筆記" },
+                { name: "MOMO購物", cat: "購物", emoji: "🍑", note: "電商平台" },
+                { name: "停車大聲公", cat: "生活", emoji: "🅿️", note: "停車位搜尋" },
+                { name: "Obsidian", cat: "工具", emoji: "💎", note: "知識管理筆記" },
+                { name: "酷澎", cat: "購物", emoji: "🚀", note: "快速到貨電商" },
+                { name: "SpiderCard", cat: "工具", emoji: "📇", note: "數位名片" },
+                { name: "FreeArt", cat: "其他", emoji: "🎨", note: "藝術創作" },
+                { name: "Weplay", cat: "其他", emoji: "🎮", note: "社交遊戲平台" },
+                { name: "Be My Eyes", cat: "生活", emoji: "👁️", note: "助盲應用" },
+                { name: "宜家家具", cat: "生活", emoji: "🛋️", note: "IKEA 購物" },
+                { name: "MUJI PASSPORT", cat: "生活", emoji: "⛩️", note: "無印良品會員" },
+                { name: "GU", cat: "購物", emoji: "👕", note: "服飾購物" },
+                { name: "UNIQLO", cat: "購物", emoji: "🧥", note: "服飾購物" },
+                { name: "ECOCO", cat: "生活", emoji: "🌿", note: "循環經濟回收" }
+            ];
+
+            const appsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'savedApps');
+            
+            document.getElementById('loading-screen').classList.remove('hidden');
+            document.querySelector('#loading-screen p').textContent = "正在批次導入中...";
+
+            try {
+                for (const item of list) {
+                    await addDoc(appsRef, {
+                        name: item.name, category: item.cat, iconEmoji: item.emoji,
+                        storeUrl: "", note: item.note, createdAt: new Date().toISOString()
+                    });
+                }
+                alert("成功導入清單資料！");
+            } catch (err) {
+                console.error(err);
+                alert("導入過程中發生錯誤");
+            } finally {
+                document.getElementById('loading-screen').classList.add('hidden');
+            }
+        };
+    </script>
 </body>
 </html>
