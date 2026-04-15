@@ -8,7 +8,6 @@
   <!-- PWA 核心設定 (Meta Tags & Icons) -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
-  <link rel="apple-touch-icon" href="icon-192x192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="常溫編集">
@@ -67,7 +66,7 @@
       to { transform: translateY(120vh) rotate(360deg); }
     }
 
-    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
     ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.5); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.8); }
@@ -97,36 +96,38 @@
   <div id="emoji-container"></div>
 
   <!-- 導覽列 -->
-  <nav class="fixed bottom-0 w-full md:w-24 md:h-screen md:left-0 glass-panel z-50 flex md:flex-col items-center justify-around md:justify-center md:space-y-8 py-3 md:py-0">
+  <nav class="fixed bottom-0 w-full md:w-24 md:h-screen md:left-0 glass-panel z-50 flex md:flex-col items-center justify-around md:justify-center md:space-y-8 py-3 md:py-0 px-2 md:px-0">
     <button onclick="app.switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-purple-300 scale-110" title="首頁">
       <i data-lucide="home" class="w-6 h-6"></i>
       <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">首頁</span>
-    </button>
-    <button onclick="app.switchTab('shortcuts')" id="nav-shortcuts" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="捷徑">
-      <i data-lucide="link" class="w-6 h-6"></i>
-      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">捷徑</span>
-    </button>
-    <button onclick="app.switchTab('stories')" id="nav-stories" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="手札">
-      <i data-lucide="book-open" class="w-6 h-6"></i>
-      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">手札</span>
-    </button>
-    <button onclick="app.switchTab('curation')" id="nav-curation" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="選物">
-      <i data-lucide="coffee" class="w-6 h-6"></i>
-      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">選物</span>
     </button>
     <button onclick="app.switchTab('connections')" id="nav-connections" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="引力圈">
       <i data-lucide="users" class="w-6 h-6"></i>
       <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">引力圈</span>
     </button>
+    <button onclick="app.switchTab('goals')" id="nav-goals" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="常溫目標">
+      <i data-lucide="target" class="w-6 h-6"></i>
+      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">目標</span>
+    </button>
+    <button onclick="app.switchTab('collections')" id="nav-collections" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="常溫選集">
+      <i data-lucide="layers" class="w-6 h-6"></i>
+      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">選集</span>
+    </button>
+    <button onclick="app.switchTab('more')" id="nav-more" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="更多功能">
+      <i data-lucide="grid" class="w-6 h-6"></i>
+      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">更多</span>
+    </button>
   </nav>
 
   <!-- 主要內容區 -->
-  <main class="md:ml-24 pb-24 md:pb-0 min-h-screen flex flex-col items-center justify-center p-6 md:p-12">
+  <main class="md:ml-24 pb-24 md:pb-16 min-h-screen p-6 md:p-12 flex flex-col items-center justify-start pt-12 md:pt-20">
     <div class="w-full max-w-5xl">
       
-      <!-- 首頁視圖 -->
-      <div id="view-home" class="view-section flex flex-col items-center justify-center text-center fade-in">
-        <div class="glass-panel p-10 md:p-16 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl w-full">
+      <!-- 首頁視圖 (首頁Hero + 控制中心) -->
+      <div id="view-home" class="view-section flex flex-col items-center fade-in w-full gap-16">
+        
+        <!-- Hero Section -->
+        <div class="glass-panel p-10 md:p-16 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl w-full text-center">
           <span class="text-purple-300/80 text-sm tracking-[0.3em] uppercase mb-4 block font-light">Quiet Ripples Dashboard</span>
           <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 leading-tight tracking-wide text-white">
             在這裡，我們慢慢說<br />我靜靜聽。
@@ -144,58 +145,21 @@
             </button>
           </div>
         </div>
-      </div>
 
-      <!-- 捷徑視圖 -->
-      <div id="view-shortcuts" class="view-section hidden fade-in w-full">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-          <div>
-            <h2 class="font-serif text-3xl mb-2 text-white">我的控制中心</h2>
-            <p class="text-white/60 font-light">日常工具的快速傳送門。</p>
+        <!-- 捷徑 / 控制中心 Section -->
+        <div class="w-full mt-4">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+            <div>
+              <h2 class="font-serif text-3xl mb-2 text-white">我的控制中心</h2>
+              <p class="text-white/60 font-light">日常工具的快速傳送門。</p>
+            </div>
+            <button onclick="app.toggleEdit('home')" id="edit-btn-home" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+              <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容
+            </button>
           </div>
-          <button onclick="app.toggleEdit('shortcuts')" id="edit-btn-shortcuts" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
-            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容
-          </button>
-        </div>
-        
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6" id="shortcuts-container">
-          <!-- 內容由 JS 渲染 -->
-        </div>
-      </div>
-
-      <!-- 手札視圖 -->
-      <div id="view-stories" class="view-section hidden fade-in w-full">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-          <div>
-            <h2 class="font-serif text-3xl mb-2 text-white">常溫手札</h2>
-            <p class="text-white/60 font-light">記錄設計、生活與那些微小的不確定性。</p>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6" id="shortcuts-container">
+            <!-- 內容由 JS 渲染 -->
           </div>
-          <button onclick="app.toggleEdit('stories')" id="edit-btn-stories" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
-            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容
-          </button>
-        </div>
-        
-        <div id="stories-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container">
-          <!-- 內容由 JS 渲染 -->
-        </div>
-      </div>
-
-      <!-- 選物視圖 -->
-      <div id="view-curation" class="view-section hidden fade-in w-full max-w-3xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-          <div>
-            <h2 class="font-serif text-3xl mb-2 text-white">常溫選物</h2>
-            <p class="text-white/60 font-light">篩選過濾後，留下真正喜歡的物件與觀點。</p>
-          </div>
-          <button onclick="app.toggleEdit('curation')" id="edit-btn-curation" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
-            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容
-          </button>
-        </div>
-
-        <div id="curation-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
-        <div class="space-y-4" id="curation-container">
-          <!-- 內容由 JS 渲染 -->
         </div>
       </div>
 
@@ -213,7 +177,7 @@
 
         <div id="connections-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
         
-        <!-- 引力圈新增表單 (預設隱藏，編輯模式才顯示) -->
+        <!-- 引力圈新增表單 -->
         <div id="connections-add-form" class="hidden glass-panel p-6 rounded-2xl flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-8 max-w-2xl">
             <div class="text-sm font-medium text-purple-300 mb-2">新增聯繫對象</div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -232,6 +196,117 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="connections-container">
           <!-- 內容由 JS 渲染 -->
+        </div>
+      </div>
+
+      <!-- 常溫目標視圖 (全新) -->
+      <div id="view-goals" class="view-section hidden fade-in w-full max-w-4xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+          <div>
+            <h2 class="font-serif text-3xl mb-2 text-white">常溫目標</h2>
+            <p class="text-white/60 font-light">把大夢想拆解成小行動，按部就班地完成。</p>
+          </div>
+          <button onclick="app.toggleEdit('goals')" id="edit-btn-goals" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯目標
+          </button>
+        </div>
+
+        <div id="goals-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+
+        <!-- 目標新增表單 -->
+        <div id="goals-add-form" class="hidden glass-panel p-6 rounded-2xl flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-8 max-w-2xl">
+          <div class="text-sm font-medium text-purple-300 mb-2">設定新目標</div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input type="text" id="gl-title" placeholder="目標內容 (e.g. 考取日檢 N3)" class="w-full md:col-span-2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50">
+            <select id="gl-type" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <option value="短期專案" class="bg-slate-800">短期專案</option>
+              <option value="習慣養成" class="bg-slate-800">習慣養成</option>
+              <option value="長期里程碑" class="bg-slate-800">長期里程碑</option>
+            </select>
+          </div>
+          <input type="text" id="gl-date" placeholder="預期達成日期 (e.g. 2026.12.31 或是 持續)" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50 mt-1">
+          <button onclick="app.addGoal()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm transition-colors text-white">新增目標</button>
+        </div>
+
+        <div class="space-y-4" id="goals-container">
+          <!-- 內容由 JS 渲染 -->
+        </div>
+      </div>
+
+      <!-- 常溫選集視圖 (手札 + 選物合併) -->
+      <div id="view-collections" class="view-section hidden fade-in w-full">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
+          <div>
+            <h2 class="font-serif text-3xl mb-2 text-white">常溫選集</h2>
+            <p class="text-white/60 font-light">收納那些觸動靈感的圖文手札與嚴選好物。</p>
+          </div>
+          <button onclick="app.toggleEdit('collections')" id="edit-btn-collections" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯選集
+          </button>
+        </div>
+        
+        <!-- 手札區塊 -->
+        <div class="mb-16">
+          <div class="flex items-center gap-3 mb-6">
+            <i data-lucide="book-open" class="w-6 h-6 text-purple-400"></i>
+            <h3 class="text-2xl font-serif text-white/90">常溫手札</h3>
+          </div>
+          <div id="stories-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container">
+            <!-- 內容由 JS 渲染 -->
+          </div>
+        </div>
+
+        <!--  Divider -->
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-16"></div>
+
+        <!-- 選物區塊 -->
+        <div class="max-w-3xl">
+          <div class="flex items-center gap-3 mb-6">
+            <i data-lucide="coffee" class="w-6 h-6 text-purple-400"></i>
+            <h3 class="text-2xl font-serif text-white/90">常溫選物</h3>
+          </div>
+          <div id="curation-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+          <div class="space-y-4" id="curation-container">
+            <!-- 內容由 JS 渲染 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 更多功能視圖 (全新) -->
+      <div id="view-more" class="view-section hidden fade-in w-full max-w-4xl mx-auto">
+        <div class="mb-8">
+          <h2 class="font-serif text-3xl mb-2 text-white">更多功能</h2>
+          <p class="text-white/60 font-light">擴充模組與實驗室，未來陸續上線。</p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <!-- 佔位卡片 1 -->
+          <div class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group">
+            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="kanban" class="w-6 h-6 text-blue-300"></i>
+            </div>
+            <h3 class="text-lg font-medium text-white mb-2">專案看板 (開發中)</h3>
+            <p class="text-sm text-white/50">用視覺化方式管理大型專案與任務進度。</p>
+          </div>
+          
+          <!-- 佔位卡片 2 -->
+          <div class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group">
+            <div class="w-12 h-12 bg-rose-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="timer" class="w-6 h-6 text-rose-300"></i>
+            </div>
+            <h3 class="text-lg font-medium text-white mb-2">番茄鐘 (準備中)</h3>
+            <p class="text-sm text-white/50">結合白噪音的專注力計時器，提升深度工作效率。</p>
+          </div>
+          
+          <!-- 佔位卡片 3 -->
+          <div class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group">
+            <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="lightbulb" class="w-6 h-6 text-emerald-300"></i>
+            </div>
+            <h3 class="text-lg font-medium text-white mb-2">靈感白板 (規劃中)</h3>
+            <p class="text-sm text-white/50">隨手畫畫、貼便利貼的無邊際自由畫布。</p>
+          </div>
         </div>
       </div>
 
@@ -288,10 +363,21 @@
     // --- 預設資料設定 ---
     const defaultData = {
       shortcuts: [
-        { id: '1', title: 'Notion 工作區', desc: '專案管理與待辦', icon: '📝', color: 'bg-blue-500/20', url: 'https://www.notion.so/weichun0203/29068a880c078068903ed40fec3795f8?source=copy_link' },
-        { id: '2', title: '財務儀表板', desc: '理財與記帳檢視', icon: '💰', color: 'bg-green-500/20', url: 'https://docs.google.com/spreadsheets/d/12ay5kVQWChofYLFf3d2ID0fcHncPWpJty4RaE1JQvkA/edit?gid=749141122#gid=749141122' },
+        { id: '1', title: 'Notion 工作區', desc: '專案管理與待辦', icon: '📝', color: 'bg-blue-500/20', url: '#' },
+        { id: '2', title: '財務儀表板', desc: '理財與記帳檢視', icon: '💰', color: 'bg-green-500/20', url: '#' },
         { id: '3', title: 'GitHub Repo', desc: '網頁開發練習', icon: '💻', color: 'bg-slate-500/20', url: 'https://github.com/' },
         { id: '4', title: '常溫歌單', desc: 'Spotify 專注音樂', icon: '🎧', color: 'bg-purple-500/20', url: 'https://open.spotify.com/' }
+      ],
+      connections: [
+        { id: '1', name: 'Ariel (設計師)', tag: '聊設計', lastMet: '2026-02-15', note: '上次聊到她想轉職，下個月可以關心一下進度。', status: '需聯繫', isPinned: true },
+        { id: '2', name: 'Jason', tag: '大學死黨', lastMet: '2026-03-01', note: '說好下次要去吃中山區那家新開的拉麵。', status: '已約好', isPinned: false },
+        { id: '3', name: '林老闆', tag: '前主管/貴人', lastMet: '2025-11-20', note: '很久沒見了，可以帶包咖啡豆去拜訪。', status: '太久沒見', isPinned: false }
+      ],
+      goals: [
+        { id: '1', title: '完成個人網站全新改版', type: '短期專案', date: '2026.04.30', status: '進行中' },
+        { id: '2', title: '每週閱讀一本書並寫下心得', type: '習慣養成', date: '持續', status: '進行中' },
+        { id: '3', title: '報考日文檢定 N3 級別', type: '長期里程碑', date: '2026.12.01', status: '未開始' },
+        { id: '4', title: '更新 2026 年最新履歷', type: '短期專案', date: '2026.02.15', status: '已達成' }
       ],
       stories: [
         { id: '1', title: '北美館：未來身體特展', date: '2026.03.15', tag: '設計展', img: 'https://images.unsplash.com/photo-1518998053401-878c735777a8?auto=format&fit=crop&q=80&w=600', url: '#' },
@@ -302,11 +388,6 @@
         { id: '1', title: 'JODOO：零程式碼架構思維', type: '文章', desc: '關於如何運用系統思維建立個人資料庫的筆記。', url: '#' },
         { id: '2', title: 'Aesop 悟香水', type: '選物', desc: '帶有羅勒與柚子的沉靜木質調，工作時的安神劑。', url: '#' },
         { id: '3', title: '原子習慣 (Atomic Habits)', type: '閱讀', desc: '重新覆盤今年的執行力，把改變縮小到每天的 1%。', url: '#' }
-      ],
-      connections: [
-        { id: '1', name: 'Ariel (設計師)', tag: '聊設計', lastMet: '2026-02-15', note: '上次聊到她想轉職，下個月可以關心一下進度。', status: '需聯繫', isPinned: true },
-        { id: '2', name: 'Jason', tag: '大學死黨', lastMet: '2026-03-01', note: '說好下次要去吃中山區那家新開的拉麵。', status: '已約好', isPinned: false },
-        { id: '3', name: '林老闆', tag: '前主管/貴人', lastMet: '2025-11-20', note: '很久沒見了，可以帶包咖啡豆去拜訪。', status: '太久沒見', isPinned: false }
       ]
     };
 
@@ -314,13 +395,14 @@
     const app = {
       state: {
         activeTab: 'home',
-        isEditing: { shortcuts: false, stories: false, curation: false, connections: false },
-        filters: { stories: '全部', curation: '全部', connections: '全部' },
+        isEditing: { home: false, connections: false, goals: false, collections: false },
+        filters: { stories: '全部', curation: '全部', connections: '全部', goals: '全部' },
         data: {
           shortcuts: JSON.parse(localStorage.getItem('qw-shortcuts')) || defaultData.shortcuts,
+          connections: JSON.parse(localStorage.getItem('qw-connections')) || defaultData.connections,
+          goals: JSON.parse(localStorage.getItem('qw-goals')) || defaultData.goals,
           stories: JSON.parse(localStorage.getItem('qw-stories')) || defaultData.stories,
-          curation: JSON.parse(localStorage.getItem('qw-curation')) || defaultData.curation,
-          connections: JSON.parse(localStorage.getItem('qw-connections')) || defaultData.connections
+          curation: JSON.parse(localStorage.getItem('qw-curation')) || defaultData.curation
         }
       },
 
@@ -361,18 +443,31 @@
           btn.className = "glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20";
         }
         
+        // 依照不同區塊切換表單顯示與渲染
         if (section === 'connections') {
           document.getElementById('connections-add-form').classList.toggle('hidden');
           document.getElementById('connections-add-form').classList.toggle('flex');
+          this.renderConnections();
+        } else if (section === 'home') {
+          this.renderShortcuts();
+        } else if (section === 'goals') {
+          document.getElementById('goals-add-form').classList.toggle('hidden');
+          document.getElementById('goals-add-form').classList.toggle('flex');
+          this.renderGoals();
+        } else if (section === 'collections') {
+          this.renderStories();
+          this.renderCuration();
         }
         
-        this.renderSection(section);
         lucide.createIcons();
       },
 
       setFilter(section, val) {
         this.state.filters[section] = val;
-        this.renderSection(section);
+        if(section === 'stories') this.renderStories();
+        if(section === 'curation') this.renderCuration();
+        if(section === 'connections') this.renderConnections();
+        if(section === 'goals') this.renderGoals();
         lucide.createIcons();
       },
 
@@ -393,21 +488,17 @@
       // --- 各區塊渲染邏輯 ---
       renderAll() {
         this.renderShortcuts();
+        this.renderConnections();
+        this.renderGoals();
         this.renderStories();
         this.renderCuration();
-        this.renderConnections();
         lucide.createIcons();
       },
-      renderSection(section) {
-        if(section === 'shortcuts') this.renderShortcuts();
-        if(section === 'stories') this.renderStories();
-        if(section === 'curation') this.renderCuration();
-        if(section === 'connections') this.renderConnections();
-      },
 
+      // === 控制中心 (Shortcuts) ===
       renderShortcuts() {
         const container = document.getElementById('shortcuts-container');
-        const isEdit = this.state.isEditing.shortcuts;
+        const isEdit = this.state.isEditing.home;
         let html = '';
 
         if (isEdit) {
@@ -457,131 +548,7 @@
         lucide.createIcons();
       },
 
-      renderStories() {
-        const container = document.getElementById('stories-container');
-        const isEdit = this.state.isEditing.stories;
-        const filter = this.state.filters.stories;
-        
-        this.renderFilterBar('stories', this.state.data.stories.map(s => s.tag));
-        
-        const filtered = filter === '全部' ? this.state.data.stories : this.state.data.stories.filter(s => s.tag === filter);
-        
-        let html = '';
-        if (isEdit) {
-          html += `
-            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10">
-              <div class="text-sm font-medium text-purple-300">寫篇新手札</div>
-              <input type="text" id="st-title" placeholder="標題" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <div class="flex gap-2">
-                <input type="text" id="st-date" placeholder="日期" class="w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-                <input type="text" id="st-tag" placeholder="標籤" value="日常" class="w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              </div>
-              <input type="text" id="st-img" placeholder="圖片 URL" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <input type="text" id="st-url" placeholder="文章連結 URL" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <button onclick="app.addStory()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">發佈手札</button>
-            </div>
-          `;
-        }
-
-        html += filtered.map(story => {
-          const hasUrl = story.url && story.url !== '#';
-          return `
-          <a href="${hasUrl ? story.url : 'javascript:void(0)'}" target="${hasUrl ? '_blank' : '_self'}" onclick="return ${isEdit || !hasUrl ? 'false' : 'true'}" class="relative glass-panel rounded-2xl overflow-hidden group border border-white/10 hover:border-purple-400/50 transition-colors duration-300 block">
-            ${isEdit ? `<button onclick="app.deleteItem('stories', '${story.id}'); event.preventDefault();" class="absolute top-2 right-2 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
-            <div class="h-48 overflow-hidden ${isEdit ? 'opacity-50' : ''}">
-              <img src="${story.img}" alt="${story.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&q=80&w=600'">
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-center mb-3">
-                <span class="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-200">${story.tag}</span>
-                <span class="text-xs text-white/40">${story.date}</span>
-              </div>
-              <h3 class="text-lg font-medium text-white/90 group-hover:text-purple-300 transition-colors flex items-center gap-2">
-                ${story.title}
-                ${hasUrl ? `<i data-lucide="external-link" class="w-3.5 h-3.5 text-white/30"></i>` : ''}
-              </h3>
-            </div>
-          </a>
-        `}).join('');
-        container.innerHTML = html;
-      },
-
-      addStory() {
-        const title = document.getElementById('st-title').value;
-        if (!title) return;
-        this.state.data.stories.unshift({
-          id: Date.now().toString(),
-          title,
-          date: document.getElementById('st-date').value,
-          tag: document.getElementById('st-tag').value || '日常',
-          img: document.getElementById('st-img').value,
-          url: document.getElementById('st-url').value
-        });
-        this.saveData('stories');
-        this.renderStories();
-        lucide.createIcons();
-      },
-
-      renderCuration() {
-        const container = document.getElementById('curation-container');
-        const isEdit = this.state.isEditing.curation;
-        const filter = this.state.filters.curation;
-        
-        this.renderFilterBar('curation', this.state.data.curation.map(c => c.type));
-        
-        const filtered = filter === '全部' ? this.state.data.curation : this.state.data.curation.filter(c => c.type === filter);
-        
-        let html = '';
-        if (isEdit) {
-          html += `
-            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-6">
-              <div class="text-sm font-medium text-purple-300">新增推薦選物</div>
-              <div class="flex gap-2">
-                <input type="text" id="cu-type" placeholder="分類" value="選物" class="w-1/4 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-                <input type="text" id="cu-title" placeholder="名稱" class="w-3/4 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              </div>
-              <input type="text" id="cu-desc" placeholder="簡短心得描述" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <input type="text" id="cu-url" placeholder="網址連結" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <button onclick="app.addCuration()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">新增至清單</button>
-            </div>
-          `;
-        }
-
-        html += filtered.map(item => `
-          <div class="glass-panel p-6 rounded-2xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center transition-colors border ${isEdit ? 'border-white/20 opacity-90' : 'border-white/5 hover:bg-white/10'}">
-            <div>
-              <div class="flex items-center gap-3 mb-1">
-                <span class="text-xs text-purple-300 border border-purple-300/30 px-2 py-0.5 rounded">${item.type}</span>
-                <h3 class="text-lg font-medium text-white">${item.title}</h3>
-              </div>
-              <p class="text-sm text-white/60">${item.desc}</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <a href="${item.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="text-white/40 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors">
-                <i data-lucide="external-link" class="w-5 h-5"></i>
-              </a>
-              ${isEdit ? `<button onclick="app.deleteItem('curation', '${item.id}')" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>` : ''}
-            </div>
-          </div>
-        `).join('');
-        container.innerHTML = html;
-      },
-
-      addCuration() {
-        const title = document.getElementById('cu-title').value;
-        if (!title) return;
-        this.state.data.curation.unshift({
-          id: Date.now().toString(),
-          title,
-          type: document.getElementById('cu-type').value || '選物',
-          desc: document.getElementById('cu-desc').value,
-          url: document.getElementById('cu-url').value
-        });
-        this.saveData('curation');
-        this.renderCuration();
-        lucide.createIcons();
-      },
-
+      // === 引力圈 (Connections) ===
       renderConnections() {
         const container = document.getElementById('connections-container');
         const isEdit = this.state.isEditing.connections;
@@ -655,7 +622,6 @@
           isPinned: false
         });
         this.saveData('connections');
-        // 清空表單
         document.getElementById('conn-name').value = '';
         document.getElementById('conn-tag').value = '';
         document.getElementById('conn-lastMet').value = '';
@@ -664,17 +630,217 @@
         lucide.createIcons();
       },
 
-      deleteItem(section, id) {
-        this.state.data[section] = this.state.data[section].filter(item => item.id !== id);
-        this.saveData(section);
-        this.renderSection(section);
-        lucide.createIcons();
-      },
-
       togglePin(id) {
         this.state.data.connections = this.state.data.connections.map(f => f.id === id ? { ...f, isPinned: !f.isPinned } : f);
         this.saveData('connections');
         this.renderConnections();
+        lucide.createIcons();
+      },
+
+      // === 常溫目標 (Goals) ===
+      renderGoals() {
+        const container = document.getElementById('goals-container');
+        const isEdit = this.state.isEditing.goals;
+        const filter = this.state.filters.goals;
+        
+        this.renderFilterBar('goals', ['進行中', '未開始', '已達成']);
+        
+        const filtered = filter === '全部' ? this.state.data.goals : this.state.data.goals.filter(g => g.status === filter);
+        
+        let html = filtered.map(goal => {
+          const isDone = goal.status === '已達成';
+          return `
+          <div class="glass-panel p-5 rounded-2xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center transition-all duration-300 border ${isDone ? 'border-emerald-500/30 bg-emerald-900/10 opacity-70' : 'border-white/10 hover:border-white/30'}">
+            <div class="flex items-start gap-4">
+              <button onclick="app.toggleGoalStatus('${goal.id}')" class="mt-1 flex-shrink-0 text-white/40 hover:text-white transition-colors" ${isEdit ? 'disabled' : ''}>
+                <i data-lucide="${isDone ? 'check-circle-2' : 'circle'}" class="w-6 h-6 ${isDone ? 'text-emerald-400' : ''}"></i>
+              </button>
+              <div>
+                <div class="flex items-center gap-3 mb-1">
+                  <h3 class="text-lg font-medium ${isDone ? 'text-white/50 line-through' : 'text-white'} transition-colors">${goal.title}</h3>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full border border-purple-300/30 text-purple-300 whitespace-nowrap">${goal.type}</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-white/50">
+                  <i data-lucide="flag" class="w-3 h-3"></i> 期限: ${goal.date}
+                </div>
+              </div>
+            </div>
+            ${isEdit ? `
+              <button onclick="app.deleteItem('goals', '${goal.id}')" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors self-end md:self-center">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+              </button>
+            ` : ''}
+          </div>
+        `}).join('');
+        container.innerHTML = html;
+      },
+
+      addGoal() {
+        const title = document.getElementById('gl-title').value;
+        if (!title) return;
+        this.state.data.goals.unshift({
+          id: Date.now().toString(),
+          title,
+          type: document.getElementById('gl-type').value,
+          date: document.getElementById('gl-date').value || '持續',
+          status: '進行中'
+        });
+        this.saveData('goals');
+        document.getElementById('gl-title').value = '';
+        document.getElementById('gl-date').value = '';
+        this.renderGoals();
+        lucide.createIcons();
+      },
+
+      toggleGoalStatus(id) {
+        if(this.state.isEditing.goals) return;
+        this.state.data.goals = this.state.data.goals.map(g => {
+          if (g.id === id) {
+            return { ...g, status: g.status === '已達成' ? '進行中' : '已達成' };
+          }
+          return g;
+        });
+        this.saveData('goals');
+        this.renderGoals();
+        lucide.createIcons();
+      },
+
+      // === 常溫選集：手札 (Stories) ===
+      renderStories() {
+        const container = document.getElementById('stories-container');
+        const isEdit = this.state.isEditing.collections;
+        const filter = this.state.filters.stories;
+        
+        this.renderFilterBar('stories', this.state.data.stories.map(s => s.tag));
+        
+        const filtered = filter === '全部' ? this.state.data.stories : this.state.data.stories.filter(s => s.tag === filter);
+        
+        let html = '';
+        if (isEdit) {
+          html += `
+            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10">
+              <div class="text-sm font-medium text-purple-300">寫篇新手札</div>
+              <input type="text" id="st-title" placeholder="標題" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <div class="flex gap-2">
+                <input type="text" id="st-date" placeholder="日期" class="w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <input type="text" id="st-tag" placeholder="標籤" value="日常" class="w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              </div>
+              <input type="text" id="st-img" placeholder="圖片 URL" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <input type="text" id="st-url" placeholder="文章連結 URL" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <button onclick="app.addStory()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">發佈手札</button>
+            </div>
+          `;
+        }
+
+        html += filtered.map(story => {
+          const hasUrl = story.url && story.url !== '#';
+          return `
+          <a href="${hasUrl ? story.url : 'javascript:void(0)'}" target="${hasUrl ? '_blank' : '_self'}" onclick="return ${isEdit || !hasUrl ? 'false' : 'true'}" class="relative glass-panel rounded-2xl overflow-hidden group border border-white/10 hover:border-purple-400/50 transition-colors duration-300 block">
+            ${isEdit ? `<button onclick="app.deleteItem('stories', '${story.id}'); event.preventDefault();" class="absolute top-2 right-2 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+            <div class="h-48 overflow-hidden ${isEdit ? 'opacity-50' : ''}">
+              <img src="${story.img}" alt="${story.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&q=80&w=600'">
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-200">${story.tag}</span>
+                <span class="text-xs text-white/40">${story.date}</span>
+              </div>
+              <h3 class="text-lg font-medium text-white/90 group-hover:text-purple-300 transition-colors flex items-center gap-2">
+                ${story.title}
+                ${hasUrl ? `<i data-lucide="external-link" class="w-3.5 h-3.5 text-white/30"></i>` : ''}
+              </h3>
+            </div>
+          </a>
+        `}).join('');
+        container.innerHTML = html;
+      },
+
+      addStory() {
+        const title = document.getElementById('st-title').value;
+        if (!title) return;
+        this.state.data.stories.unshift({
+          id: Date.now().toString(),
+          title,
+          date: document.getElementById('st-date').value,
+          tag: document.getElementById('st-tag').value || '日常',
+          img: document.getElementById('st-img').value,
+          url: document.getElementById('st-url').value
+        });
+        this.saveData('stories');
+        this.renderStories();
+        lucide.createIcons();
+      },
+
+      // === 常溫選集：選物 (Curation) ===
+      renderCuration() {
+        const container = document.getElementById('curation-container');
+        const isEdit = this.state.isEditing.collections;
+        const filter = this.state.filters.curation;
+        
+        this.renderFilterBar('curation', this.state.data.curation.map(c => c.type));
+        
+        const filtered = filter === '全部' ? this.state.data.curation : this.state.data.curation.filter(c => c.type === filter);
+        
+        let html = '';
+        if (isEdit) {
+          html += `
+            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-6">
+              <div class="text-sm font-medium text-purple-300">新增推薦選物</div>
+              <div class="flex gap-2">
+                <input type="text" id="cu-type" placeholder="分類" value="選物" class="w-1/4 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <input type="text" id="cu-title" placeholder="名稱" class="w-3/4 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              </div>
+              <input type="text" id="cu-desc" placeholder="簡短心得描述" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <input type="text" id="cu-url" placeholder="網址連結" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <button onclick="app.addCuration()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">新增至清單</button>
+            </div>
+          `;
+        }
+
+        html += filtered.map(item => `
+          <div class="glass-panel p-6 rounded-2xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center transition-colors border ${isEdit ? 'border-white/20 opacity-90' : 'border-white/5 hover:bg-white/10'}">
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                <span class="text-xs text-purple-300 border border-purple-300/30 px-2 py-0.5 rounded">${item.type}</span>
+                <h3 class="text-lg font-medium text-white">${item.title}</h3>
+              </div>
+              <p class="text-sm text-white/60">${item.desc}</p>
+            </div>
+            <div class="flex items-center gap-2 self-end md:self-center">
+              <a href="${item.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="text-white/40 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors">
+                <i data-lucide="external-link" class="w-5 h-5"></i>
+              </a>
+              ${isEdit ? `<button onclick="app.deleteItem('curation', '${item.id}')" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>` : ''}
+            </div>
+          </div>
+        `).join('');
+        container.innerHTML = html;
+      },
+
+      addCuration() {
+        const title = document.getElementById('cu-title').value;
+        if (!title) return;
+        this.state.data.curation.unshift({
+          id: Date.now().toString(),
+          title,
+          type: document.getElementById('cu-type').value || '選物',
+          desc: document.getElementById('cu-desc').value,
+          url: document.getElementById('cu-url').value
+        });
+        this.saveData('curation');
+        this.renderCuration();
+        lucide.createIcons();
+      },
+
+      // --- 刪除共用邏輯 ---
+      deleteItem(section, id) {
+        this.state.data[section] = this.state.data[section].filter(item => item.id !== id);
+        this.saveData(section);
+        if (section === 'shortcuts') this.renderShortcuts();
+        else if (section === 'stories') this.renderStories();
+        else if (section === 'curation') this.renderCuration();
+        else if (section === 'connections') this.renderConnections();
+        else if (section === 'goals') this.renderGoals();
         lucide.createIcons();
       },
 
@@ -722,7 +888,7 @@
 
       // --- 彩蛋特效 ---
       triggerEasterEgg() {
-        const emojis = ['🎵', '🎨', '✨', '👻', '🌿', '☕', '💡', '💜', '💙'];
+        const emojis = ['🎵', '🎨', '✨', '👻', '🌿', '☕', '💡', '💜', '💙', '🎯'];
         const container = document.getElementById('emoji-container');
         
         for(let i=0; i<30; i++) {
@@ -743,19 +909,6 @@
     // 啟動應用程式
     document.addEventListener('DOMContentLoaded', () => {
       app.init();
-
-      // 註冊 Service Worker (PWA 離線與安裝核心)
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(registration => {
-              console.log('ServiceWorker 註冊成功，範圍:', registration.scope);
-            })
-            .catch(err => {
-              console.log('ServiceWorker 註冊失敗:', err);
-            });
-        });
-      }
     });
   </script>
 </body>
