@@ -241,9 +241,9 @@
         </div>
       </div>
 
-      <!-- 常溫選集視圖 (手札 + 選物合併) -->
+      <!-- 常溫選集視圖 (全螢幕左右滑動切換) -->
       <div id="view-collections" class="view-section hidden fade-in w-full">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
           <div>
             <h2 class="font-serif text-3xl mb-2 text-white">常溫選集</h2>
             <p class="text-white/60 font-light">收納那些觸動靈感的圖文手札與嚴選好物。</p>
@@ -252,68 +252,73 @@
             <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯選集
           </button>
         </div>
-        
-        <!-- 手札區塊 -->
-        <div class="mb-16">
-          <div class="flex items-center gap-3 mb-6">
-            <i data-lucide="book-open" class="w-6 h-6 text-purple-400"></i>
-            <h3 class="text-2xl font-serif text-white/90">常溫手札</h3>
-          </div>
-          <div id="stories-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container">
-            <!-- 內容由 JS 渲染 -->
-          </div>
+
+        <!-- 螢幕滑動切換指示器 / Tab -->
+        <div class="flex gap-2 mb-6 bg-black/20 p-1.5 rounded-xl w-fit border border-white/10 mx-auto md:mx-0 relative z-10">
+          <button onclick="app.scrollToCollection('stories')" id="tab-btn-stories" class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm">
+            常溫手札
+          </button>
+          <button onclick="app.scrollToCollection('curation')" id="tab-btn-curation" class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white">
+            常溫選物
+          </button>
         </div>
-
-        <!--  Divider -->
-        <div class="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-16"></div>
-
-        <!-- 選物區塊 -->
-        <div class="max-w-3xl">
-          <div class="flex items-center gap-3 mb-6">
-            <i data-lucide="coffee" class="w-6 h-6 text-purple-400"></i>
-            <h3 class="text-2xl font-serif text-white/90">常溫選物</h3>
+        
+        <!-- 左右滑動主容器 (Swipe Container) -->
+        <div id="collection-swipe-container" class="flex w-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth pb-8" onscroll="app.handleCollectionScroll(this)">
+          
+          <!-- 第一屏：手札區塊 -->
+          <div class="w-full min-w-full flex-shrink-0 snap-start pr-0 md:pr-4" id="slide-stories">
+            <div id="stories-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container">
+              <!-- 內容由 JS 渲染 -->
+            </div>
           </div>
-          <div id="curation-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
-          <div class="space-y-4" id="curation-container">
-            <!-- 內容由 JS 渲染 -->
+
+          <!-- 第二屏：選物區塊 -->
+          <div class="w-full min-w-full flex-shrink-0 snap-start pl-0 md:pl-4" id="slide-curation">
+            <div id="curation-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+            <div class="space-y-4" id="curation-container">
+              <!-- 內容由 JS 渲染 -->
+            </div>
           </div>
+
         </div>
       </div>
 
-      <!-- 更多功能視圖 (全新) -->
+      <!-- 更多功能視圖 (改為手機板三欄式設計) -->
       <div id="view-more" class="view-section hidden fade-in w-full max-w-4xl mx-auto">
         <div class="mb-8">
           <h2 class="font-serif text-3xl mb-2 text-white">更多功能</h2>
           <p class="text-white/60 font-light">擴充模組與實驗室，未來陸續上線。</p>
         </div>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <!-- 卡片 1：罕用 App 倉庫 (新加入) -->
-          <a href="https://weichun0203.github.io/wei/app" target="_blank" class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block">
-            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <i data-lucide="archive" class="w-6 h-6 text-blue-300"></i>
+        <!-- Grid 更新為 grid-cols-3，並縮小卡片間距與內容大小 -->
+        <div class="grid grid-cols-3 gap-3 md:gap-6">
+          <!-- 卡片 1：罕用 App 倉庫 -->
+          <a href="https://weichun0203.github.io/wei/app" target="_blank" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="archive" class="w-5 h-5 md:w-6 md:h-6 text-blue-300"></i>
             </div>
-            <h3 class="text-lg font-medium text-white mb-2">罕用 App 倉庫</h3>
-            <p class="text-sm text-white/50">不再佔用手機空間，需要時隨時找回。</p>
+            <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">罕用 App</h3>
+            <p class="hidden md:block text-sm text-white/50">不再佔用手機空間，需要時隨時找回。</p>
           </a>
           
-          <!-- 卡片 2：番茄鐘 (加入點擊事件) -->
-          <div onclick="app.openPomodoro()" class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group">
-            <div class="w-12 h-12 bg-rose-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <i data-lucide="timer" class="w-6 h-6 text-rose-300"></i>
+          <!-- 卡片 2：番茄鐘 -->
+          <div onclick="app.openPomodoro()" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group flex flex-col items-center md:items-start text-center md:text-left">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-rose-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="timer" class="w-5 h-5 md:w-6 md:h-6 text-rose-300"></i>
             </div>
-            <h3 class="text-lg font-medium text-white mb-2">番茄鐘</h3>
-            <p class="text-sm text-white/50">設定專注時間，時間到將有驚喜獎勵。</p>
+            <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">番茄鐘</h3>
+            <p class="hidden md:block text-sm text-white/50">設定專注時間，時間到將有驚喜獎勵。</p>
           </div>
           
           <!-- 卡片 3：靈感白板 -->
-          <div class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group">
-            <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <i data-lucide="lightbulb" class="w-6 h-6 text-emerald-300"></i>
+          <div class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group flex flex-col items-center md:items-start text-center md:text-left">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="lightbulb" class="w-5 h-5 md:w-6 md:h-6 text-emerald-300"></i>
             </div>
-            <h3 class="text-lg font-medium text-white mb-2">靈感白板 (規劃中)</h3>
-            <p class="text-sm text-white/50">隨手畫畫、貼便利貼的無邊際自由畫布。</p>
+            <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">靈感白板</h3>
+            <p class="hidden md:block text-sm text-white/50">隨手畫畫、貼便利貼的無邊際自由畫布。</p>
           </div>
         </div>
       </div>
@@ -529,7 +534,7 @@
         
         container.innerHTML = allOptions.map(opt => `
           <button onclick="app.setFilter('${section}', '${opt}')" 
-            class="px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors border ${selected === opt ? 'bg-purple-500/80 text-white border-purple-400' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white'}">
+            class="px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors border flex-shrink-0 ${selected === opt ? 'bg-purple-500/80 text-white border-purple-400' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white'}">
             ${opt}
           </button>
         `).join('');
@@ -768,7 +773,7 @@
         let html = '';
         if (isEdit) {
           html += `
-            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10">
+            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-6 md:col-span-3">
               <div class="text-sm font-medium text-purple-300">寫篇新手札</div>
               <input type="text" id="st-title" placeholder="標題" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
               <div class="flex gap-2">
@@ -849,12 +854,12 @@
 
         html += filtered.map(item => `
           <div class="glass-panel p-6 rounded-2xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center transition-colors border ${isEdit ? 'border-white/20 opacity-90' : 'border-white/5 hover:bg-white/10'}">
-            <div>
+            <div class="w-full md:w-auto">
               <div class="flex items-center gap-3 mb-1">
                 <span class="text-xs text-purple-300 border border-purple-300/30 px-2 py-0.5 rounded">${item.type}</span>
-                <h3 class="text-lg font-medium text-white">${item.title}</h3>
+                <h3 class="text-lg font-medium text-white line-clamp-2">${item.title}</h3>
               </div>
-              <p class="text-sm text-white/60">${item.desc}</p>
+              <p class="text-sm text-white/60 line-clamp-3">${item.desc}</p>
             </div>
             <div class="flex items-center gap-2 self-end md:self-center">
               <a href="${item.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="text-white/40 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors">
@@ -880,6 +885,43 @@
         this.saveData('curation');
         this.renderCuration();
         lucide.createIcons();
+      },
+
+      // --- 常溫選集滑動切換邏輯 ---
+      scrollToCollection(type) {
+        const container = document.getElementById('collection-swipe-container');
+        const target = document.getElementById(`slide-${type}`);
+        if (!container || !target) return;
+        
+        container.scrollTo({
+          left: target.offsetLeft - container.offsetLeft,
+          behavior: 'smooth'
+        });
+        this.updateCollectionTabs(type);
+      },
+
+      handleCollectionScroll(el) {
+        // 利用滾動位置判斷目前顯示的是哪個區塊
+        const scrollLeft = el.scrollLeft;
+        const width = el.clientWidth;
+        if (scrollLeft > width / 2) {
+          this.updateCollectionTabs('curation');
+        } else {
+          this.updateCollectionTabs('stories');
+        }
+      },
+
+      updateCollectionTabs(activeType) {
+        const btnStories = document.getElementById('tab-btn-stories');
+        const btnCuration = document.getElementById('tab-btn-curation');
+        
+        if (activeType === 'stories') {
+          btnStories.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm";
+          btnCuration.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white";
+        } else {
+          btnCuration.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm";
+          btnStories.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white";
+        }
       },
 
       // --- 刪除共用邏輯 ---
