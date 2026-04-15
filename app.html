@@ -84,12 +84,15 @@
                 </div>
 
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <!-- Quick Demo Import -->
                     <button id="quick-import-btn" onclick="togglePromptModal(true, 'quick-import')" title="快捷導入您的清單" class="glass-panel p-2.5 rounded-xl hover:bg-purple-500/20 transition-all text-purple-400 hover:text-purple-300 border-purple-500/20 active:scale-95">
                         <i data-lucide="sparkles" class="w-5 h-5"></i>
                     </button>
+                    <!-- Export Button -->
                     <button onclick="handleExportCSV()" title="匯出 CSV" class="glass-panel p-2.5 rounded-xl hover:bg-white/10 transition-all text-white/60 hover:text-white border-white/10 active:scale-95">
                         <i data-lucide="download-cloud" class="w-5 h-5"></i>
                     </button>
+                    <!-- Import Button -->
                     <button onclick="triggerImport()" title="匯入 CSV" class="glass-panel p-2.5 rounded-xl hover:bg-white/10 transition-all text-white/60 hover:text-white border-white/10 active:scale-95">
                         <i data-lucide="upload-cloud" class="w-5 h-5"></i>
                     </button>
@@ -126,20 +129,20 @@
             </div>
         </footer>
 
-        <!-- Detail Modal -->
-        <div id="detail-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 transition-all">
+        <!-- Detail Modal - 加入點擊背景關閉 -->
+        <div id="detail-modal" onclick="if(event.target === this) toggleDetailModal(false)" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 transition-all">
             <div class="glass-panel w-full max-w-sm rounded-3xl bg-slate-900/95 shadow-2xl relative overflow-hidden fade-in">
                 <div class="p-6">
                     <div class="flex flex-col items-center text-center mb-6">
                         <div id="detail-emoji" class="text-5xl bg-black/30 w-20 h-20 flex items-center justify-center rounded-3xl border border-white/10 mb-4">📱</div>
-                        <h2 id="detail-name" class="text-2xl font-bold text-white mb-1">App 名稱</h2>
+                        <h2 id="detail-name" class="text-2xl font-bold text-white mb-1 tracking-tight">App 名稱</h2>
                         <span id="detail-category" class="px-3 py-1 bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold rounded-full uppercase tracking-wider">分類</span>
                     </div>
                     <div id="detail-note-container" class="bg-white/5 p-4 rounded-2xl border border-white/5 mb-6">
                         <p id="detail-note" class="text-white/70 text-sm leading-relaxed italic font-light"></p>
                     </div>
                     <div class="flex flex-col gap-3">
-                        <a id="detail-link" href="#" target="_blank" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-xl font-bold text-center flex items-center justify-center gap-2 transition-all active:scale-95">
+                        <a id="detail-link" href="#" target="_blank" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-xl font-bold text-center flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg shadow-purple-900/40">
                             <i data-lucide="external-link" class="w-5 h-5"></i>開啟商店 / 網頁
                         </a>
                         <div class="flex gap-2">
@@ -153,8 +156,8 @@
             </div>
         </div>
 
-        <!-- Add Modal -->
-        <div id="add-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
+        <!-- Add Modal - 加入點擊背景關閉 -->
+        <div id="add-modal" onclick="if(event.target === this) toggleModal(false)" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
             <div class="glass-panel w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-slate-900/90 shadow-2xl relative overflow-hidden">
                 <div id="modal-form-content">
                     <div class="flex items-center justify-between p-6 border-b border-white/5">
@@ -164,29 +167,29 @@
                     <form id="app-form" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
                         <div class="grid grid-cols-4 gap-4">
                             <div class="col-span-3">
-                                <label class="block text-[10px] font-bold text-white/40 uppercase mb-1">App 名稱 *</label>
+                                <label class="block text-[10px] font-bold text-white/40 uppercase mb-1 tracking-widest">App 名稱 *</label>
                                 <input name="name" required type="text" placeholder="例如：台北通" class="w-full px-4 py-3 rounded-xl outline-none">
                             </div>
                             <div class="col-span-1">
-                                <label class="block text-[10px] font-bold text-white/40 uppercase mb-1 text-center">Emoji</label>
+                                <label class="block text-[10px] font-bold text-white/40 uppercase mb-1 text-center tracking-widest">Emoji</label>
                                 <input name="iconEmoji" type="text" value="📱" class="w-full px-4 py-3 rounded-xl outline-none text-center">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-white/40 uppercase mb-1">分類</label>
+                            <label class="block text-[10px] font-bold text-white/40 uppercase mb-1 tracking-widest">分類</label>
                             <select name="category" class="w-full px-4 py-3 rounded-xl outline-none cursor-pointer">
                                 <option value="生活">生活</option><option value="工具">工具</option><option value="旅遊">旅遊</option><option value="金融">金融</option><option value="政府">政府</option><option value="購物">購物</option><option value="其他">其他</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-white/40 uppercase mb-1">商店連結</label>
+                            <label class="block text-[10px] font-bold text-white/40 uppercase mb-1 tracking-widest">商店連結</label>
                             <input name="storeUrl" type="url" placeholder="https://..." class="w-full px-4 py-3 rounded-xl outline-none">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-white/40 uppercase mb-1">備註</label>
-                            <textarea name="note" rows="2" placeholder="備註用途..." class="w-full px-4 py-3 rounded-xl outline-none resize-none"></textarea>
+                            <label class="block text-[10px] font-bold text-white/40 uppercase mb-1 tracking-widest">備註</label>
+                            <textarea name="note" rows="2" placeholder="一年一次的需求原因..." class="w-full px-4 py-3 rounded-xl outline-none resize-none"></textarea>
                         </div>
-                        <button type="submit" id="submit-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center"><span>存入倉庫</span></button>
+                        <button type="submit" id="submit-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center shadow-lg shadow-purple-900/40"><span>存入倉庫</span></button>
                     </form>
                 </div>
                 <div id="modal-success-content" class="hidden p-12 flex flex-col items-center justify-center text-center fade-in">
@@ -196,26 +199,27 @@
             </div>
         </div>
 
-        <!-- Delete Confirm Modal -->
-        <div id="delete-modal" class="fixed inset-0 z-[80] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <!-- Delete Confirm Modal - 加入點擊背景關閉 -->
+        <div id="delete-modal" onclick="if(event.target === this) toggleDeleteModal(null)" class="fixed inset-0 z-[80] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
             <div class="glass-panel bg-slate-900/95 border-rose-500/30 w-full max-sm rounded-3xl p-6 shadow-2xl fade-in text-center">
                 <div class="bg-rose-500/20 border border-rose-500/30 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto"><i data-lucide="alert-triangle" class="text-rose-400 w-8 h-8"></i></div>
                 <h3 class="text-xl font-bold mb-2 text-white">確定要移除嗎？</h3>
                 <p id="delete-app-name" class="text-white/60 text-sm mb-6"></p>
                 <div class="flex flex-col gap-2">
-                    <button onclick="executeDelete()" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-3 rounded-xl font-bold transition-all">確認移除</button>
+                    <button onclick="executeDelete()" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-3 rounded-xl font-bold transition-all active:scale-95">確認移除</button>
                     <button onclick="toggleDeleteModal(null)" class="w-full glass-panel hover:bg-white/10 text-white/70 py-3 rounded-xl font-bold transition-all">取消</button>
                 </div>
             </div>
         </div>
 
-        <!-- Prompt Modal -->
-        <div id="prompt-modal" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <!-- Prompt Modal - 加入點擊背景關閉 -->
+        <div id="prompt-modal" onclick="if(event.target === this) togglePromptModal(false)" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
             <div class="glass-panel bg-slate-900/95 border-purple-500/30 w-full max-w-sm rounded-3xl p-6 shadow-2xl fade-in text-center">
-                <h3 id="prompt-title" class="text-xl font-bold mb-2 text-white">確認操作</h3>
-                <p id="prompt-message" class="text-white/60 text-sm mb-6 leading-relaxed"></p>
+                <div class="bg-purple-500/20 border border-purple-500/30 w-14 h-14 rounded-full flex items-center justify-center mb-4 mx-auto"><i data-lucide="help-circle" class="text-purple-400 w-7 h-7"></i></div>
+                <h3 id="prompt-title" class="text-xl font-bold mb-2 text-white tracking-tight">確認操作</h3>
+                <p id="prompt-message" class="text-white/60 text-sm mb-6 leading-relaxed px-4"></p>
                 <div class="flex flex-col gap-2">
-                    <button id="prompt-confirm-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl font-bold transition-all active:scale-95">確定</button>
+                    <button id="prompt-confirm-btn" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-purple-900/40">確定</button>
                     <button onclick="togglePromptModal(false)" class="w-full glass-panel hover:bg-white/10 text-white/70 py-3 rounded-xl font-bold transition-all">取消</button>
                 </div>
             </div>
@@ -241,7 +245,15 @@
         window.addEventListener('load', async () => {
             renderCategoryFilters();
             lucide.createIcons();
-            setTimeout(() => { document.getElementById('loading-screen').classList.add('hidden'); updateSyncStatus(isCloudMode); }, 5000);
+            
+            // 安全逾時機制
+            setTimeout(() => { 
+                const loader = document.getElementById('loading-screen');
+                if (!loader.classList.contains('hidden')) {
+                    loader.classList.add('hidden'); 
+                    updateSyncStatus(isCloudMode);
+                }
+            }, 5000);
 
             try {
                 if (typeof __firebase_config !== 'undefined' && __firebase_config) {
@@ -262,7 +274,7 @@
         function updateSyncStatus(isCloud) {
             const dot = document.getElementById('status-dot');
             const text = document.getElementById('status-text');
-            dot.className = `w-1.5 h-1.5 rounded-full ${isCloud ? 'bg-emerald-500' : 'bg-orange-500'}`;
+            dot.className = `w-1.5 h-1.5 rounded-full ${isCloud ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]'}`;
             text.textContent = isCloud ? "雲端同步模式" : "本機儲存模式 (離線)";
         }
 
@@ -323,9 +335,9 @@
 
         window.handleDeleteFromDetail = () => {
             if (!selectedAppId) return;
-            const targetId = selectedAppId; // 暫存 ID
+            const targetId = selectedAppId;
             const app = allApps.find(a => a.id === targetId);
-            toggleDetailModal(false); // 這會清空 selectedAppId
+            toggleDetailModal(false);
             toggleDeleteModal(targetId, app ? app.name : '');
         };
 
@@ -406,13 +418,14 @@
         window.togglePromptModal = (show, type = '', msg = '') => {
             const modal = document.getElementById('prompt-modal');
             if (!show) { modal.classList.add('hidden'); return; }
-            document.getElementById('prompt-message').textContent = msg || (type === 'quick-import' ? "即將導入您的清單（共 28 個應用程式），確定要繼續嗎？" : "");
+            document.getElementById('prompt-message').textContent = msg || (type === 'quick-import' ? "即將導入您的清單（共 27 個應用程式），確定要繼續嗎？" : "");
             document.getElementById('prompt-confirm-btn').onclick = () => { if (type === 'quick-import') executeQuickImport(); togglePromptModal(false); };
             modal.classList.remove('hidden');
+            lucide.createIcons();
         };
 
         window.handleExportCSV = () => {
-            if (!allApps.length) return alert("無資料");
+            if (!allApps.length) return togglePromptModal(true, 'info', '目前倉庫無資料可以匯出。');
             const headers = ["App名稱", "分類", "Emoji", "連結", "備註", "日期"];
             const rows = allApps.map(a => [a.name, a.category, a.iconEmoji, a.storeUrl, a.note, new Date(a.createdAt).toLocaleDateString()]);
             const csv = "\ufeff" + headers.join(",") + "\n" + rows.map(r => r.map(c => `"${(c||"").replace(/"/g, '""')}"`).join(",")).join("\n");
@@ -436,7 +449,8 @@
                     else { item.id = Date.now().toString() + Math.random(); allApps.unshift(item); }
                 }
                 if (!isCloudMode) saveLocally();
-                alert("匯入完成");
+                togglePromptModal(true, 'info', 'CSV 匯入完成！');
+                e.target.value = "";
             };
             reader.readAsText(file);
         };
@@ -484,6 +498,7 @@
                 allApps = [...local, ...allApps]; saveLocally();
             }
             loader.classList.add('hidden');
+            togglePromptModal(true, 'info', '導入成功！');
         };
     </script>
 </body>
