@@ -101,9 +101,9 @@
       <i data-lucide="home" class="w-6 h-6"></i>
       <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">首頁</span>
     </button>
-    <button onclick="app.switchTab('connections')" id="nav-connections" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="引力圈">
+    <button onclick="app.switchTab('connections')" id="nav-connections" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="朋友圈">
       <i data-lucide="users" class="w-6 h-6"></i>
-      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">引力圈</span>
+      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">朋友圈</span>
     </button>
     <button onclick="app.switchTab('goals')" id="nav-goals" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="常溫目標">
       <i data-lucide="target" class="w-6 h-6"></i>
@@ -126,7 +126,7 @@
       <!-- 首頁視圖 (首頁Hero + 控制中心) -->
       <div id="view-home" class="view-section flex flex-col items-center fade-in w-full">
         
-        <!-- Hero Section (手機板全屏高度設計) -->
+        <!-- Hero Section -->
         <div class="w-full min-h-[85vh] md:min-h-0 flex flex-col justify-center items-center relative mb-24 md:mb-16">
           <div class="glass-panel p-10 md:p-16 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl w-full text-center">
             <span class="text-purple-300/80 text-sm tracking-[0.3em] uppercase mb-4 block font-light">Quiet Ripples Dashboard</span>
@@ -147,14 +147,13 @@
             </div>
           </div>
           
-          <!-- 手機板專屬：向下滑動提示 -->
           <button onclick="document.getElementById('mobile-shortcuts-section').scrollIntoView({behavior: 'smooth', block: 'start'})" class="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 flex flex-col items-center gap-1 animate-bounce transition-colors hover:text-white">
             <span class="text-[10px] tracking-widest font-light">向下滑動至控制中心</span>
             <i data-lucide="chevron-down" class="w-5 h-5"></i>
           </button>
         </div>
 
-        <!-- 捷徑 / 控制中心 Section -->
+        <!-- 控制中心 -->
         <div id="mobile-shortcuts-section" class="w-full scroll-mt-6">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
             <div>
@@ -171,43 +170,48 @@
         </div>
       </div>
 
-      <!-- 引力圈視圖 -->
-      <div id="view-connections" class="view-section hidden fade-in w-full">
+      <!-- 朋友圈視圖 -->
+      <div id="view-connections" class="view-section hidden fade-in w-full max-w-3xl mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
           <div>
-            <h2 class="font-serif text-3xl mb-2 text-white">引力圈</h2>
+            <h2 class="font-serif text-3xl mb-2 text-white">朋友圈</h2>
             <p class="text-white/60 font-light">「我是一個很會傾聽的人。」<br/>用來管理與重要朋友的連結，不讓關係因為忙碌而降溫。</p>
           </div>
           <button onclick="app.toggleEdit('connections')" id="edit-btn-connections" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
-            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容
+            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯列表
           </button>
         </div>
 
-        <div id="connections-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
+          <div id="connections-filter" class="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar w-full md:w-auto"></div>
+          
+          <select id="connections-sort" onchange="app.setConnectionsSort(this.value)" class="bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50 shrink-0">
+            <option value="time-desc" class="bg-slate-800">時間 (近到遠)</option>
+            <option value="time-asc" class="bg-slate-800">時間 (遠到近)</option>
+            <option value="type-meet" class="bg-slate-800">上次聯絡：見面</option>
+            <option value="type-phone" class="bg-slate-800">上次聯絡：電話</option>
+            <option value="type-text" class="bg-slate-800">上次聯絡：文字</option>
+          </select>
+        </div>
         
-        <!-- 引力圈新增表單 -->
-        <div id="connections-add-form" class="hidden glass-panel p-6 rounded-2xl flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-8 max-w-2xl">
-            <div class="text-sm font-medium text-purple-300 mb-2">新增聯繫對象</div>
+        <!-- 朋友圈新增表單 -->
+        <div id="connections-add-form" class="hidden glass-panel p-6 rounded-2xl flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-8 w-full">
+            <div class="text-sm font-medium text-purple-300 mb-2">新增朋友</div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input type="text" id="conn-name" placeholder="姓名或暱稱" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50">
               <input type="text" id="conn-tag" placeholder="身份標籤 (e.g. 大學死黨)" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50">
-              <input type="text" id="conn-lastMet" placeholder="上次見面時間" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50">
-              <select id="conn-status" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-                <option value="需聯繫" class="bg-slate-800">🟡 需聯繫</option>
-                <option value="已約好" class="bg-slate-800">🟢 已約好</option>
-                <option value="太久沒見" class="bg-slate-800">🔴 太久沒見</option>
-              </select>
             </div>
-            <textarea id="conn-note" placeholder="筆記 (上次聊了什麼？下次要關心什麼？)" rows="2" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50 resize-none mt-3"></textarea>
+            <textarea id="conn-note" placeholder="筆記 (喜好、備註等...)" rows="2" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50 resize-none mt-3"></textarea>
             <button onclick="app.addConnection()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm transition-colors text-white">建立檔案</button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="connections-container">
+        <!-- 列表容器 -->
+        <div class="flex flex-col gap-3" id="connections-container">
           <!-- 內容由 JS 渲染 -->
         </div>
       </div>
 
-      <!-- 常溫目標視圖 (全新) -->
+      <!-- 常溫目標視圖 -->
       <div id="view-goals" class="view-section hidden fade-in w-full max-w-4xl mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
           <div>
@@ -221,18 +225,17 @@
 
         <div id="goals-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
 
-        <!-- 目標新增表單 -->
         <div id="goals-add-form" class="hidden glass-panel p-6 rounded-2xl flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-8 max-w-2xl">
           <div class="text-sm font-medium text-purple-300 mb-2">設定新目標</div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input type="text" id="gl-title" placeholder="目標內容 (e.g. 考取日檢 N3)" class="w-full md:col-span-2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50">
+            <input type="text" id="gl-title" placeholder="目標內容" class="w-full md:col-span-2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
             <select id="gl-type" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
               <option value="短期專案" class="bg-slate-800">短期專案</option>
               <option value="習慣養成" class="bg-slate-800">習慣養成</option>
               <option value="長期里程碑" class="bg-slate-800">長期里程碑</option>
             </select>
           </div>
-          <input type="text" id="gl-date" placeholder="預期達成日期 (e.g. 2026.12.31 或是 持續)" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50 mt-1">
+          <input type="text" id="gl-date" placeholder="預期達成日期" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50 mt-1">
           <button onclick="app.addGoal()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm transition-colors text-white">新增目標</button>
         </div>
 
@@ -241,7 +244,7 @@
         </div>
       </div>
 
-      <!-- 常溫選集視圖 (全螢幕左右滑動切換) -->
+      <!-- 常溫選集視圖 -->
       <div id="view-collections" class="view-section hidden fade-in w-full">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
           <div>
@@ -253,7 +256,6 @@
           </button>
         </div>
 
-        <!-- 螢幕滑動切換指示器 / Tab -->
         <div class="flex gap-2 mb-6 bg-black/20 p-1.5 rounded-xl w-fit border border-white/10 mx-auto md:mx-0 relative z-10">
           <button onclick="app.scrollToCollection('stories')" id="tab-btn-stories" class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm">
             常溫手札
@@ -263,86 +265,68 @@
           </button>
         </div>
         
-        <!-- 左右滑動主容器 (Swipe Container) -->
         <div id="collection-swipe-container" class="flex w-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth pb-8" onscroll="app.handleCollectionScroll(this)">
-          
           <!-- 第一屏：手札區塊 -->
           <div class="w-full min-w-full flex-shrink-0 snap-start pr-0 md:pr-4" id="slide-stories">
             <div id="stories-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container">
-              <!-- 內容由 JS 渲染 -->
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container"></div>
           </div>
-
           <!-- 第二屏：選物區塊 -->
           <div class="w-full min-w-full flex-shrink-0 snap-start pl-0 md:pl-4" id="slide-curation">
             <div id="curation-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
-            <div class="space-y-4" id="curation-container">
-              <!-- 內容由 JS 渲染 -->
-            </div>
+            <div class="space-y-4" id="curation-container"></div>
           </div>
-
         </div>
       </div>
 
-      <!-- 更多功能視圖 (改為手機板三欄式設計) -->
+      <!-- 更多功能視圖 -->
       <div id="view-more" class="view-section hidden fade-in w-full max-w-4xl mx-auto">
         <div class="mb-8">
           <h2 class="font-serif text-3xl mb-2 text-white">更多功能</h2>
           <p class="text-white/60 font-light">擴充模組與實驗室，未來陸續上線。</p>
         </div>
-        
-        <!-- Grid 更新為 grid-cols-3，並縮小卡片間距與內容大小 -->
         <div class="grid grid-cols-3 gap-3 md:gap-6">
-          <a href="https://weichun0203.github.io/YSA-institute/" target="_self" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
+          <a href="#" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
               <i data-lucide="graduation-cap" class="w-5 h-5 md:w-6 md:h-6 text-indigo-300"></i>
             </div>
             <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">單成中心</h3>
             <p class="hidden md:block text-sm text-white/50">桃園年輕單成聚集場所。</p>
           </a>
-        
-          <a href="https://www.ambientedit.com/" target="_self" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
+          <a href="#" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
               <i data-lucide="edit-3" class="w-5 h-5 md:w-6 md:h-6 text-cyan-300"></i>
             </div>
             <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">常溫編集所</h3>
             <p class="hidden md:block text-sm text-white/50">設計與文字的實驗品牌。</p>
           </a>
-
-          <a href="https://weichun0203.github.io/liao_family/" target="_self" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
+          <a href="#" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
               <i data-lucide="wallet" class="w-5 h-5 md:w-6 md:h-6 text-amber-300"></i>
             </div>
             <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">家庭支出</h3>
             <p class="hidden md:block text-sm text-white/50">追蹤家庭共同開銷。</p>
           </a>
-          
-          <!-- 卡片 1：罕用 App 倉庫 -->
-          <a href="https://weichun0203.github.io/wei/app" target="_self" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
+          <a href="#" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
               <i data-lucide="archive" class="w-5 h-5 md:w-6 md:h-6 text-blue-300"></i>
             </div>
             <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">罕用 App</h3>
-            <p class="hidden md:block text-sm text-white/50">不再佔用手機空間，需要時隨時找回。</p>
+            <p class="hidden md:block text-sm text-white/50">不再佔用手機空間。</p>
           </a>
-          
-          <!-- 卡片 2：番茄鐘 -->
           <div onclick="app.openPomodoro()" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group flex flex-col items-center md:items-start text-center md:text-left">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-rose-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
               <i data-lucide="timer" class="w-5 h-5 md:w-6 md:h-6 text-rose-300"></i>
             </div>
             <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">番茄鐘</h3>
-            <p class="hidden md:block text-sm text-white/50">設定專注時間，時間到將有驚喜獎勵。</p>
+            <p class="hidden md:block text-sm text-white/50">設定專注時間與驚喜。</p>
           </div>
-          
-          <!-- 卡片 3：靈感白板 -->
           <div class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group flex flex-col items-center md:items-start text-center md:text-left">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
               <i data-lucide="lightbulb" class="w-5 h-5 md:w-6 md:h-6 text-emerald-300"></i>
             </div>
             <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">靈感白板</h3>
-            <p class="hidden md:block text-sm text-white/50">隨手畫畫、貼便利貼的無邊際自由畫布。</p>
+            <p class="hidden md:block text-sm text-white/50">無邊際自由畫布。</p>
           </div>
         </div>
       </div>
@@ -350,14 +334,14 @@
     </div>
   </main>
 
-  <!-- 細節編輯 Modal (引力圈) -->
+  <!-- 細節編輯 Modal (朋友圈) -->
   <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
-    <div class="glass-panel w-full max-w-lg p-6 rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative">
+    <div class="glass-panel w-full max-w-lg p-6 rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
       <button onclick="app.closeModal()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
       <h3 class="text-xl font-medium text-purple-300 mb-4 flex items-center gap-2" id="modal-title">
-        <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯細節
+        <i data-lucide="user" class="w-5 h-5"></i> 朋友詳情
       </h3>
       <div class="space-y-4">
         <input type="hidden" id="modal-id">
@@ -367,27 +351,47 @@
             <input type="text" id="modal-name" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
           </div>
           <div>
-            <label class="text-xs text-white/50 mb-1 block">狀態</label>
-            <select id="modal-status" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <option value="需聯繫">🟡 需聯繫</option>
-              <option value="已約好">🟢 已約好</option>
-              <option value="太久沒見">🔴 太久沒見</option>
-            </select>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
             <label class="text-xs text-white/50 mb-1 block">身份標籤</label>
             <input type="text" id="modal-tag" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
           </div>
-          <div>
-            <label class="text-xs text-white/50 mb-1 block">上次見面時間</label>
-            <input type="text" id="modal-lastMet" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+        </div>
+        
+        <!-- 狀態 Checkboxes -->
+        <div class="flex flex-wrap gap-4 py-2">
+          <label class="flex items-center gap-2 text-sm text-white cursor-pointer group">
+            <input type="checkbox" id="modal-oftenContacted" class="w-4 h-4 accent-emerald-500 bg-black/20 border-white/10 rounded">
+            <span class="group-hover:text-emerald-400 transition-colors">時常聯絡 (綠標)</span>
+          </label>
+        </div>
+
+        <div class="border-t border-white/5 pt-3">
+          <label class="text-xs text-white/50 mb-1 block">聯絡與見面紀錄 <span class="text-[10px] ml-1">(新增後自動更新上次見面時間)</span></label>
+          <div class="flex gap-2 mb-2">
+            <input type="date" id="new-event-date" class="w-24 shrink-0 bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50">
+            <select id="new-event-type" class="w-20 shrink-0 bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <option value="見面" class="bg-slate-800">見面</option>
+              <option value="電話" class="bg-slate-800">電話</option>
+              <option value="文字" class="bg-slate-800">文字</option>
+            </select>
+            <input type="text" id="new-event-desc" placeholder="發生什麼事？" class="w-full bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50">
+            <button onclick="app.addFriendEvent()" class="px-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm text-white transition-colors flex-shrink-0">
+              新增
+            </button>
+          </div>
+          <div id="modal-events-list" class="space-y-1.5 max-h-32 overflow-y-auto no-scrollbar pr-1 mb-2">
+            <!-- 動態渲染事件 -->
           </div>
         </div>
-        <div>
-          <label class="text-xs text-white/50 mb-1 block">筆記與細節</label>
-          <textarea id="modal-note" rows="4" class="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50 resize-none"></textarea>
+
+        <div class="border-t border-white/5 pt-3">
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="text-xs text-white/50 block">其他筆記細節 (喜好、提醒等)</label>
+            <button onclick="app.toggleNoteEdit()" id="modal-note-edit-btn" class="text-white/50 hover:text-purple-400 transition-colors p-1" title="編輯筆記">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <div id="modal-note-display" class="w-full bg-black/10 border border-white/5 rounded-lg px-3 py-2 text-sm text-white/90 min-h-[3rem] whitespace-pre-wrap leading-relaxed break-words"></div>
+          <textarea id="modal-note" rows="3" class="hidden w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50 resize-none leading-relaxed"></textarea>
         </div>
         <button onclick="app.saveModalEdit()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors mt-4 text-white">
           儲存變更
@@ -396,7 +400,22 @@
     </div>
   </div>
 
-  <!-- 番茄鐘設定 Modal -->
+  <!-- 確認刪除 Modal -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+    <div class="glass-panel w-full max-w-xs p-6 rounded-2xl border border-rose-400/50 bg-slate-900/95 shadow-2xl relative text-center">
+      <div class="w-12 h-12 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="alert-triangle" class="w-6 h-6 text-rose-400"></i>
+      </div>
+      <h3 class="text-lg font-medium text-white mb-2">確定要刪除嗎？</h3>
+      <p class="text-sm text-white/50 mb-6">資料刪除後將無法復原喔。</p>
+      <div class="flex gap-3">
+        <button onclick="app.closeConfirm()" class="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors text-sm">取消</button>
+        <button onclick="app.executeDelete()" class="flex-1 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition-colors text-sm">確定刪除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 番茄鐘 Modal -->
   <div id="pomodoro-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
     <div class="glass-panel w-full max-w-sm p-6 rounded-2xl border border-rose-400/50 bg-slate-900/95 shadow-2xl relative text-center">
       <button onclick="app.closePomodoro()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
@@ -427,7 +446,6 @@
     </div>
   </div>
 
-  <!-- 番茄鐘懸浮計時器 (收起 Modal 時顯示) -->
   <div id="floating-timer" onclick="app.openPomodoro()" class="hidden fixed bottom-24 md:bottom-6 right-6 z-[90] glass-panel px-4 py-2.5 rounded-full border border-rose-400/50 flex items-center gap-2.5 cursor-pointer hover:scale-105 transition-transform bg-slate-900/80 shadow-lg shadow-rose-900/20">
     <i data-lucide="timer" class="w-4 h-4 text-rose-400 animate-pulse"></i>
     <span id="floating-timer-display" class="text-sm font-mono text-white font-medium tabular-nums">15:00</span>
@@ -435,6 +453,12 @@
 
   <script>
     // --- 預設資料設定 ---
+    const getPastDate = (days) => {
+        const d = new Date();
+        d.setDate(d.getDate() - days);
+        return d.toISOString().split('T')[0];
+    };
+
     const defaultData = {
       shortcuts: [
         { id: '1', title: 'Notion 工作區', desc: '專案管理與待辦', icon: '📝', color: 'bg-blue-500/20', url: '#' },
@@ -443,27 +467,30 @@
         { id: '4', title: '常溫歌單', desc: 'Spotify 專注音樂', icon: '🎧', color: 'bg-purple-500/20', url: 'https://open.spotify.com/' }
       ],
       connections: [
-        { id: '1', name: 'Ariel (設計師)', tag: '聊設計', lastMet: '2026-02-15', note: '上次聊到她想轉職，下個月可以關心一下進度。', status: '需聯繫', isPinned: true },
-        { id: '2', name: 'Jason', tag: '大學死黨', lastMet: '2026-03-01', note: '說好下次要去吃中山區那家新開的拉麵。', status: '已約好', isPinned: false },
-        { id: '3', name: '林老闆', tag: '前主管/貴人', lastMet: '2025-11-20', note: '很久沒見了，可以帶包咖啡豆去拜訪。', status: '太久沒見', isPinned: false }
+        { id: '1', name: '新認識的 Alex', tag: '讀書會', lastMet: getPastDate(5), lastMetType: '見面', note: '是個很健談的人，喜歡看心理學的書。', events: [{id: 'e1', date: getPastDate(5), type: '見面', desc: '交流了原子習慣的心得，是很棒的對談。'}], isOftenContacted: false, createdAt: getPastDate(10), isPinned: true },
+        { id: '2', name: 'Jason', tag: '大學死黨', lastMet: getPastDate(15), lastMetType: '文字', note: '最近剛換新工作，可以多關心。', events: [{id: 'e2', date: getPastDate(15), type: '文字', desc: '說好下次要去吃中山區那家新開的拉麵。'}], isOftenContacted: true, createdAt: '2023-05-10', isPinned: false },
+        { id: '3', name: '林老闆', tag: '前主管/貴人', lastMet: '2025-11-20', lastMetType: '見面', note: '喜歡喝手沖咖啡，特別是衣索比亞的豆子。', events: [{id: 'e3', date: '2025-11-20', type: '見面', desc: '帶包咖啡豆去拜訪，聊了職涯規劃。'}], isOftenContacted: false, createdAt: '2020-01-01', isPinned: false },
+        { id: '4', name: 'Ariel (設計師)', tag: '聊設計', lastMet: getPastDate(20), lastMetType: '電話', note: '對 UI/UX 很有熱情。', events: [{id: 'e4', date: getPastDate(20), type: '電話', desc: '上次電話聊到她想轉職，下個月可以關心一下進度。'}], isOftenContacted: false, createdAt: '2024-06-15', isPinned: false }
       ],
       goals: [
         { id: '1', title: '完成個人網站全新改版', type: '短期專案', date: '2026.04.30', status: '進行中' },
         { id: '2', title: '每週閱讀一本書並寫下心得', type: '習慣養成', date: '持續', status: '進行中' },
-        { id: '3', title: '報考日文檢定 N3 級別', type: '長期里程碑', date: '2026.12.01', status: '未開始' },
-        { id: '4', title: '更新 2026 年最新履歷', type: '短期專案', date: '2026.02.15', status: '已達成' }
+        { id: '3', title: '報考日文檢定 N3 級別', type: '長期里程碑', date: '2026.12.01', status: '未開始' }
       ],
       stories: [
         { id: '1', title: '北美館：未來身體特展', date: '2026.03.15', tag: '設計展', img: 'https://images.unsplash.com/photo-1518998053401-878c735777a8?auto=format&fit=crop&q=80&w=600', url: '#' },
-        { id: '2', title: '街角的咖啡與底片', date: '2026.02.28', tag: '攝影', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=600', url: '#' },
-        { id: '3', title: '傾聽的藝術：讓對話留白', date: '2026.02.10', tag: '生活體悟', img: 'https://images.unsplash.com/photo-1516302752946-f564f014c564?auto=format&fit=crop&q=80&w=600', url: '#' }
+        { id: '2', title: '街角的咖啡與底片', date: '2026.02.28', tag: '攝影', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=600', url: '#' }
       ],
       curation: [
         { id: '1', title: 'JODOO：零程式碼架構思維', type: '文章', desc: '關於如何運用系統思維建立個人資料庫的筆記。', url: '#' },
-        { id: '2', title: 'Aesop 悟香水', type: '選物', desc: '帶有羅勒與柚子的沉靜木質調，工作時的安神劑。', url: '#' },
-        { id: '3', title: '原子習慣 (Atomic Habits)', type: '閱讀', desc: '重新覆盤今年的執行力，把改變縮小到每天的 1%。', url: '#' }
+        { id: '2', title: 'Aesop 悟香水', type: '選物', desc: '帶有羅勒與柚子的沉靜木質調，工作時的安神劑。', url: '#' }
       ]
     };
+
+    let touchStartX = 0;
+    let touchCurrentX = 0;
+    let activeSwipeCard = null;
+    let itemToDelete = null;
 
     // --- 應用程式核心邏輯 ---
     const app = {
@@ -471,6 +498,7 @@
         activeTab: 'home',
         isEditing: { home: false, connections: false, goals: false, collections: false },
         filters: { stories: '全部', curation: '全部', connections: '全部', goals: '全部' },
+        sorts: { connections: 'time-desc' },
         data: {
           shortcuts: JSON.parse(localStorage.getItem('qw-shortcuts')) || defaultData.shortcuts,
           connections: JSON.parse(localStorage.getItem('qw-connections')) || defaultData.connections,
@@ -494,7 +522,6 @@
         localStorage.setItem(`qw-${key}`, JSON.stringify(this.state.data[key]));
       },
 
-      // --- 切換分頁 ---
       switchTab(tabId) {
         this.state.activeTab = tabId;
         document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
@@ -509,7 +536,6 @@
         activeBtn.classList.add('text-purple-300', 'scale-110');
       },
 
-      // --- 編輯模式切換 ---
       toggleEdit(section) {
         this.state.isEditing[section] = !this.state.isEditing[section];
         const btn = document.getElementById(`edit-btn-${section}`);
@@ -522,7 +548,6 @@
           btn.className = "glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20";
         }
         
-        // 依照不同區塊切換表單顯示與渲染
         if (section === 'connections') {
           document.getElementById('connections-add-form').classList.toggle('hidden');
           document.getElementById('connections-add-form').classList.toggle('flex');
@@ -550,7 +575,12 @@
         lucide.createIcons();
       },
 
-      // --- 渲染共用過濾器 ---
+      setConnectionsSort(val) {
+        this.state.sorts.connections = val;
+        this.renderConnections();
+        lucide.createIcons();
+      },
+
       renderFilterBar(section, options) {
         const container = document.getElementById(`${section}-filter`);
         const selected = this.state.filters[section];
@@ -564,7 +594,6 @@
         `).join('');
       },
 
-      // --- 各區塊渲染邏輯 ---
       renderAll() {
         this.renderShortcuts();
         this.renderConnections();
@@ -574,7 +603,6 @@
         lucide.createIcons();
       },
 
-      // === 控制中心 (Shortcuts) ===
       renderShortcuts() {
         const container = document.getElementById('shortcuts-container');
         const isEdit = this.state.isEditing.home;
@@ -597,7 +625,7 @@
 
         html += this.state.data.shortcuts.map(link => `
           <div class="relative group">
-            ${isEdit ? `<button onclick="app.deleteItem('shortcuts', '${link.id}')" class="absolute -top-3 -right-3 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg transition-transform hover:scale-110"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+            ${isEdit ? `<button onclick="app.confirmDelete('shortcuts', '${link.id}'); event.preventDefault(); event.stopPropagation();" class="absolute -top-3 -right-3 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg transition-transform hover:scale-110"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
             <a href="${link.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="block glass-panel h-full p-6 rounded-2xl ${isEdit ? 'opacity-80' : 'hover:-translate-y-1'} transition-transform duration-300 flex flex-col items-start gap-4 ${link.color} border border-white/5 hover:border-white/20">
               <div class="text-3xl">${link.icon}</div>
               <div>
@@ -627,93 +655,408 @@
         lucide.createIcons();
       },
 
-      // === 引力圈 (Connections) ===
+      // === 刪除防呆確認 ===
+      confirmDelete(section, id) {
+        itemToDelete = { section, id };
+        document.getElementById('confirm-modal').classList.remove('hidden');
+      },
+
+      closeConfirm() {
+        itemToDelete = null;
+        document.getElementById('confirm-modal').classList.add('hidden');
+      },
+
+      executeDelete() {
+        if (itemToDelete && itemToDelete.section && itemToDelete.id) {
+          this.deleteItem(itemToDelete.section, itemToDelete.id);
+          this.closeConfirm();
+        }
+      },
+
+      // === 朋友圈 (Connections) - 滑動置頂與事件邏輯 ===
+      resetSwipes() {
+        document.querySelectorAll('.swipe-card').forEach(c => {
+          c.style.transform = 'translateX(0px)';
+        });
+      },
+
+      handleTouchStart(e, el) {
+        this.resetSwipes();
+        touchStartX = e.touches[0].clientX;
+        touchCurrentX = touchStartX;
+        activeSwipeCard = el;
+        el.style.transition = 'none';
+      },
+
+      handleTouchMove(e, el) {
+        if (!activeSwipeCard || activeSwipeCard !== el) return;
+        touchCurrentX = e.touches[0].clientX;
+        let diffX = touchCurrentX - touchStartX;
+        
+        // 只能往左滑動 (0 到 -80px)
+        if (diffX < 0 && diffX >= -80) {
+          el.style.transform = `translateX(${diffX}px)`;
+        } else if (diffX < -80) {
+          el.style.transform = `translateX(-80px)`;
+        }
+      },
+
+      handleTouchEnd(e, el) {
+        if (!activeSwipeCard || activeSwipeCard !== el) return;
+        let diffX = touchCurrentX - touchStartX;
+        el.style.transition = 'transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)';
+        
+        if (diffX < -40) {
+          // 滑動超過一半，自動展開
+          el.style.transform = `translateX(-80px)`;
+          // 設定 3 秒後自動收回
+          setTimeout(() => {
+            if (el.style.transform === 'translateX(-80px)') {
+              el.style.transform = 'translateX(0px)';
+            }
+          }, 3000);
+        } else {
+          // 彈回
+          el.style.transform = `translateX(0px)`;
+        }
+        activeSwipeCard = null;
+      },
+
+      togglePin(id) {
+        const index = this.state.data.connections.findIndex(f => f.id === id);
+        if (index > -1) {
+          this.state.data.connections[index].isPinned = !this.state.data.connections[index].isPinned;
+          this.saveData('connections');
+          this.renderConnections();
+          lucide.createIcons(); // 修復：重新生成 ICON，解決點選後不穩定的問題
+        }
+      },
+
       renderConnections() {
         const container = document.getElementById('connections-container');
         const isEdit = this.state.isEditing.connections;
         const filter = this.state.filters.connections;
+        const sortVal = this.state.sorts.connections;
         
-        this.renderFilterBar('connections', ['需聯繫', '已約好', '太久沒見']);
+        this.renderFilterBar('connections', ['新朋友', '時常聯絡', '太久沒見']);
         
-        const filtered = filter === '全部' ? this.state.data.connections : this.state.data.connections.filter(f => f.status === filter);
-        const sorted = [...filtered].sort((a, b) => {
+        const now = new Date();
+        const oneMonthMs = 30 * 24 * 60 * 60 * 1000;
+
+        const mappedFriends = this.state.data.connections.map(friend => {
+          const created = new Date(friend.createdAt || now);
+          const lastMetDate = friend.lastMet ? new Date(friend.lastMet) : created;
+          
+          const isNew = (now - created) < oneMonthMs; 
+          const isNoUpdate = (now - lastMetDate) > oneMonthMs; 
+
+          let status = '保持聯繫';
+          let color = 'bg-purple-400';
+          let textClass = 'text-purple-400 border-purple-400/30';
+
+          if (isNew) {
+            status = '新朋友';
+            color = 'bg-yellow-400';
+            textClass = 'text-yellow-400 border-yellow-400/30';
+          } else if (friend.isOftenContacted) {
+            status = '時常聯絡';
+            color = 'bg-emerald-400';
+            textClass = 'text-emerald-400 border-emerald-400/30';
+          } else if (isNoUpdate) {
+            status = '太久沒見';
+            color = 'bg-blue-400';
+            textClass = 'text-blue-400 border-blue-400/30';
+          }
+
+          return { ...friend, status, color, textClass };
+        });
+        
+        // 1. 執行上方 Filter 篩選
+        const filtered = filter === '全部' ? mappedFriends : mappedFriends.filter(f => f.status === filter);
+        
+        // 2. 執行下拉 Sort 篩選
+        let finalFiltered = filtered;
+        if (sortVal === 'type-meet') finalFiltered = finalFiltered.filter(f => f.lastMetType === '見面');
+        if (sortVal === 'type-phone') finalFiltered = finalFiltered.filter(f => f.lastMetType === '電話');
+        if (sortVal === 'type-text') finalFiltered = finalFiltered.filter(f => f.lastMetType === '文字');
+
+        // 3. 排序 (置頂優先，接著判斷時間)
+        const sorted = [...finalFiltered].sort((a, b) => {
           if (a.isPinned && !b.isPinned) return -1;
           if (!a.isPinned && b.isPinned) return 1;
-          return 0;
+          
+          const dateA = new Date(a.lastMet || a.createdAt).getTime();
+          const dateB = new Date(b.lastMet || b.createdAt).getTime();
+          if (sortVal === 'time-asc') return dateA - dateB;
+          return dateB - dateA; // 預設降冪(近到遠)
         });
 
         let html = sorted.map(friend => {
-          const statusColor = friend.status === '需聯繫' ? 'bg-yellow-400' : friend.status === '太久沒見' ? 'bg-rose-400' : 'bg-emerald-400';
-          const statusTextClass = friend.status === '需聯繫' ? 'text-yellow-400 border-yellow-400/30' : friend.status === '太久沒見' ? 'text-rose-400 border-rose-400/30' : 'text-emerald-400 border-emerald-400/30';
-          const truncatedNote = friend.note && friend.note.length > 150 ? friend.note.substring(0, 150) + '...' : (friend.note || '');
+          const typeIconMap = { '見面': '🤝', '電話': '📞', '文字': '💬' };
+          const typeIcon = friend.lastMetType ? typeIconMap[friend.lastMetType] : '';
 
           return `
-          <div class="glass-panel p-6 rounded-2xl border border-white/10 relative overflow-hidden group">
-            <div class="absolute top-0 left-0 w-1 h-full ${statusColor}"></div>
-            ${isEdit ? `<button onclick="app.deleteItem('connections', '${friend.id}')" class="absolute top-4 right-4 text-rose-400 hover:bg-rose-500/20 p-2 rounded-full z-10 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
-            
-            <div class="flex justify-between items-start mb-4 pr-6">
-              <div class="flex flex-col gap-1">
-                <div class="flex items-center gap-2">
-                  <h3 class="text-xl font-medium text-white">${friend.name}</h3>
-                  <button onclick="app.togglePin('${friend.id}')" class="p-1.5 rounded-full hover:bg-white/10 transition-colors group/pin" title="${friend.isPinned ? '取消置頂' : '設為置頂'}">
-                    <i data-lucide="pin" class="w-4 h-4 transition-all duration-300 ${friend.isPinned ? 'text-purple-400 fill-purple-400 scale-110 rotate-45' : 'text-white/30 group-hover/pin:text-white/70 rotate-0'}"></i>
-                  </button>
-                </div>
-                <span class="text-xs text-purple-300">${friend.tag}</span>
-              </div>
-              ${!isEdit ? `<span class="text-xs px-2 py-1 rounded-full bg-white/5 border ${statusTextClass}">${friend.status}</span>` : ''}
-            </div>
-            
-            <div class="space-y-2 mb-4">
-              <div class="flex items-center gap-2 text-sm text-white/50">
-                <i data-lucide="calendar" class="w-3.5 h-3.5"></i> 上次見面: ${friend.lastMet || '尚未記錄'}
-              </div>
-              <p class="text-sm text-white/80 bg-white/5 p-3 rounded-lg leading-relaxed min-h-[3rem] break-words">
-                ${truncatedNote}
-              </p>
-            </div>
-            
-            <div class="flex gap-2">
-              <button class="flex-1 py-2 rounded-lg text-sm flex items-center justify-center gap-2 transition-colors ${isEdit ? 'bg-white/5 text-white/20 cursor-not-allowed' : 'bg-purple-600/30 hover:bg-purple-600/50 text-purple-100'}">
-                <i data-lucide="message-circle-heart" class="w-4 h-4"></i> 傳送溫暖
+          <div class="relative w-full rounded-xl overflow-hidden mb-1">
+            <!-- 底層動作按鈕 (滑動後顯示) -->
+            <div class="absolute inset-y-0 right-0 w-24 flex justify-end bg-purple-600 rounded-xl z-0">
+              <button onclick="app.togglePin('${friend.id}'); event.stopPropagation();" class="w-[80px] h-full flex flex-col items-center justify-center text-white hover:bg-purple-500 transition-colors">
+                <i data-lucide="${friend.isPinned ? 'pin-off' : 'pin'}" class="w-5 h-5 mb-1"></i>
+                <span class="text-[10px]">${friend.isPinned ? '取消置頂' : '置頂'}</span>
               </button>
-              ${!isEdit ? `
-              <button onclick="app.openModal('${friend.id}')" class="py-2 px-4 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-sm flex items-center gap-2 transition-colors border border-white/5">
-                <i data-lucide="edit-2" class="w-4 h-4"></i> 細節
-              </button>` : ''}
+            </div>
+
+            <!-- 前景卡片 (可滑動) -->
+            <div class="swipe-card relative z-10 w-full p-4 rounded-xl border border-white/10 flex items-center justify-between transition-transform duration-300 ease-out bg-[#0f172a]/95 backdrop-blur-xl group cursor-pointer hover:bg-white/5" style="touch-action: pan-y;"
+                 onclick="if(!${isEdit}) { app.resetSwipes(); app.openModal('${friend.id}'); }"
+                 ontouchstart="app.handleTouchStart(event, this)"
+                 ontouchmove="app.handleTouchMove(event, this)"
+                 ontouchend="app.handleTouchEnd(event, this)">
+              
+              <!-- 側邊狀態顏色條 -->
+              <div class="absolute left-0 top-0 bottom-0 w-1.5 ${friend.color}"></div>
+              
+              <div class="flex items-center gap-4 pl-3">
+                <div class="flex flex-col gap-1">
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-lg font-medium text-white">${friend.name}</h3>
+                    ${friend.isPinned ? `<i data-lucide="pin" class="w-3.5 h-3.5 text-purple-400 fill-purple-400 rotate-45"></i>` : ''}
+                  </div>
+                  <span class="text-xs text-purple-300">${friend.tag}</span>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-3 md:gap-4">
+                <span class="hidden md:flex items-center gap-1.5 text-xs text-white/40"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${typeIcon} ${friend.lastMet || '尚未記錄'}</span>
+                <span class="text-xs px-2 py-1 rounded-full bg-white/5 border whitespace-nowrap ${friend.textClass}">${friend.status}</span>
+                
+                ${isEdit ? `
+                <button onclick="app.confirmDelete('connections', '${friend.id}'); event.stopPropagation();" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors z-20">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+                ` : `
+                <!-- 網頁版 Hover 顯示置頂按鈕 -->
+                <button onclick="app.togglePin('${friend.id}'); event.stopPropagation();" class="hidden md:flex items-center justify-center p-1.5 rounded-full text-white/20 hover:bg-white/10 hover:text-purple-400 group-hover:text-white/50 transition-all z-20" title="${friend.isPinned ? '取消置頂' : '置頂'}">
+                  <i data-lucide="pin" class="w-4 h-4 ${friend.isPinned ? 'text-purple-400 fill-purple-400 rotate-45' : ''}"></i>
+                </button>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors"></i>
+                `}
+              </div>
             </div>
           </div>
-        `}).join('');
+          `;
+        }).join('');
         container.innerHTML = html;
       },
 
       addConnection() {
         const name = document.getElementById('conn-name').value;
         if (!name) return;
+
+        const note = document.getElementById('conn-note').value;
+        const today = new Date().toISOString().split('T')[0];
+        const events = [{ id: Date.now().toString(), date: today, type: '文字', desc: '建立朋友檔案' }];
+
         this.state.data.connections.unshift({
           id: Date.now().toString(),
           name,
           tag: document.getElementById('conn-tag').value,
-          lastMet: document.getElementById('conn-lastMet').value,
-          status: document.getElementById('conn-status').value,
-          note: document.getElementById('conn-note').value,
+          lastMet: today,
+          lastMetType: '文字',
+          note: note || '',
+          events: events,
+          createdAt: new Date().toISOString(),
+          isOftenContacted: false,
           isPinned: false
         });
         this.saveData('connections');
         document.getElementById('conn-name').value = '';
         document.getElementById('conn-tag').value = '';
-        document.getElementById('conn-lastMet').value = '';
         document.getElementById('conn-note').value = '';
         this.renderConnections();
         lucide.createIcons();
       },
 
-      togglePin(id) {
-        this.state.data.connections = this.state.data.connections.map(f => f.id === id ? { ...f, isPinned: !f.isPinned } : f);
+      openModal(id) {
+        const friend = this.state.data.connections.find(f => f.id === id);
+        if(!friend) return;
+        
+        document.getElementById('modal-id').value = friend.id;
+        document.getElementById('modal-name').value = friend.name;
+        document.getElementById('modal-tag').value = friend.tag;
+        
+        // 筆記重設為顯示狀態
+        document.getElementById('modal-note').value = friend.note || '';
+        document.getElementById('modal-note-display').innerText = friend.note || '尚無筆記...';
+        document.getElementById('modal-note-display').classList.remove('hidden');
+        document.getElementById('modal-note').classList.add('hidden');
+        document.getElementById('modal-note-edit-btn').classList.remove('text-purple-400');
+        
+        document.getElementById('modal-oftenContacted').checked = friend.isOftenContacted || false;
+
+        // 預設事件日期為當天
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('new-event-date').value = today;
+        document.getElementById('new-event-type').value = '見面';
+        
+        this.renderModalEvents(friend);
+        
+        document.getElementById('edit-modal').classList.remove('hidden');
+        lucide.createIcons();
+      },
+
+      toggleNoteEdit() {
+        const display = document.getElementById('modal-note-display');
+        const input = document.getElementById('modal-note');
+        const btn = document.getElementById('modal-note-edit-btn');
+        
+        if (input.classList.contains('hidden')) {
+          // 切換為編輯狀態
+          display.classList.add('hidden');
+          input.classList.remove('hidden');
+          btn.classList.add('text-purple-400');
+          input.focus();
+        } else {
+          // 切換為顯示狀態 (不直接儲存，僅更新顯示)
+          display.classList.remove('hidden');
+          input.classList.add('hidden');
+          btn.classList.remove('text-purple-400');
+          display.innerText = input.value || '尚無筆記...';
+        }
+      },
+
+      renderModalEvents(friend) {
+        const container = document.getElementById('modal-events-list');
+        if (!friend.events || friend.events.length === 0) {
+          container.innerHTML = `<div class="text-xs text-white/30 text-center py-3 bg-black/10 rounded border border-white/5">目前無聯絡紀錄，來新增第一筆吧！</div>`;
+          return;
+        }
+        
+        // 確保按時間新到舊排序
+        const sortedEvents = [...friend.events].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const typeIconMap = { '見面': '🤝', '電話': '📞', '文字': '💬' };
+        
+        container.innerHTML = sortedEvents.map(ev => `
+          <div class="flex items-start gap-2 p-2.5 bg-black/20 rounded-lg border border-white/5 relative group hover:border-purple-500/30 transition-colors">
+            <div class="text-xs font-mono text-purple-300 w-20 flex-shrink-0 pt-0.5">${ev.date}</div>
+            <div class="text-sm text-white/80 pr-6 flex-1 break-words"><span class="mr-1">${typeIconMap[ev.type] || ''}</span>${ev.desc}</div>
+            <button onclick="app.confirmDelete('friendEvent', '${friend.id}_${ev.id}'); event.stopPropagation();" class="absolute right-2 top-2.5 opacity-0 md:group-hover:opacity-100 text-rose-400 hover:text-rose-300 transition-opacity bg-slate-800 rounded p-0.5">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `).join('');
+        lucide.createIcons();
+      },
+
+      addFriendEvent() {
+        const id = document.getElementById('modal-id').value;
+        const dateInput = document.getElementById('new-event-date');
+        const typeInput = document.getElementById('new-event-type');
+        const descInput = document.getElementById('new-event-desc');
+        
+        if (!dateInput.value || !descInput.value) return;
+
+        const friend = this.state.data.connections.find(f => f.id === id);
+        if (friend) {
+          if (!friend.events) friend.events = [];
+          
+          friend.events.push({
+            id: Date.now().toString(),
+            date: dateInput.value,
+            type: typeInput.value,
+            desc: descInput.value
+          });
+          
+          // 重新排序並更新最後見面時間與類型
+          friend.events.sort((a, b) => new Date(b.date) - new Date(a.date));
+          friend.lastMet = friend.events[0].date;
+          friend.lastMetType = friend.events[0].type;
+
+          this.saveData('connections');
+          this.renderModalEvents(friend);
+          this.renderConnections(); // 同步更新背景的列表
+          lucide.createIcons(); 
+          
+          // 清空輸入框，日期保留當天
+          dateInput.value = new Date().toISOString().split('T')[0];
+          descInput.value = '';
+        }
+      },
+
+      // 拆分刪除邏輯供 ConfirmModal 使用，並加入極嚴格的安全防護
+      deleteItem(section, id) {
+        if (!section || !id) return;
+        
+        if (section === 'friendEvent') {
+          // 特殊處理事件刪除 id 格式為 friendId_eventId
+          const parts = id.split('_');
+          const friendId = parts[0];
+          const eventId = parts[1];
+          const friend = this.state.data.connections.find(f => f.id === friendId);
+          if (friend && Array.isArray(friend.events)) {
+            friend.events = friend.events.filter(e => e.id !== eventId);
+            if (friend.events.length > 0) {
+              friend.lastMet = friend.events[0].date;
+              friend.lastMetType = friend.events[0].type;
+            } else {
+              friend.lastMet = ''; 
+              friend.lastMetType = '';
+            }
+            this.saveData('connections');
+            this.renderModalEvents(friend);
+            this.renderConnections();
+            lucide.createIcons();
+          }
+          return;
+        }
+
+        // 核心安全防護：如果 localStorage 的資料有異常，直接中斷執行以防止報錯
+        if (!this.state.data[section] || !Array.isArray(this.state.data[section])) {
+            console.warn(`刪除失敗：找不到對應的資料區塊 [${section}]`);
+            return;
+        }
+
+        this.state.data[section] = this.state.data[section].filter(item => item.id !== id);
+        this.saveData(section);
+        
+        // 更新對應畫面
+        if (section === 'shortcuts') this.renderShortcuts();
+        else if (section === 'stories') this.renderStories();
+        else if (section === 'curation') this.renderCuration();
+        else if (section === 'connections') this.renderConnections();
+        else if (section === 'goals') this.renderGoals();
+        
+        lucide.createIcons();
+      },
+
+      saveModalEdit() {
+        const id = document.getElementById('modal-id').value;
+        
+        // 如果目前是編輯狀態，需確保先將 textarea 同步到 display 並取值
+        const input = document.getElementById('modal-note');
+        if (!input.classList.contains('hidden')) {
+           document.getElementById('modal-note-display').innerText = input.value || '尚無筆記...';
+        }
+
+        this.state.data.connections = this.state.data.connections.map(f => {
+          if(f.id === id) {
+            return {
+              ...f,
+              name: document.getElementById('modal-name').value,
+              tag: document.getElementById('modal-tag').value,
+              note: input.value,
+              isOftenContacted: document.getElementById('modal-oftenContacted').checked
+            };
+          }
+          return f;
+        });
         this.saveData('connections');
+        this.closeModal();
         this.renderConnections();
         lucide.createIcons();
+      },
+
+      closeModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
       },
 
       // === 常溫目標 (Goals) ===
@@ -745,7 +1088,7 @@
               </div>
             </div>
             ${isEdit ? `
-              <button onclick="app.deleteItem('goals', '${goal.id}')" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors self-end md:self-center">
+              <button onclick="app.confirmDelete('goals', '${goal.id}'); event.stopPropagation();" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors self-end md:self-center">
                 <i data-lucide="trash-2" class="w-5 h-5"></i>
               </button>
             ` : ''}
@@ -815,7 +1158,7 @@
           const hasUrl = story.url && story.url !== '#';
           return `
           <a href="${hasUrl ? story.url : 'javascript:void(0)'}" target="${hasUrl ? '_blank' : '_self'}" onclick="return ${isEdit || !hasUrl ? 'false' : 'true'}" class="relative glass-panel rounded-2xl overflow-hidden group border border-white/10 hover:border-purple-400/50 transition-colors duration-300 block">
-            ${isEdit ? `<button onclick="app.deleteItem('stories', '${story.id}'); event.preventDefault();" class="absolute top-2 right-2 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+            ${isEdit ? `<button onclick="app.confirmDelete('stories', '${story.id}'); event.preventDefault(); event.stopPropagation();" class="absolute top-2 right-2 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
             <div class="h-48 overflow-hidden ${isEdit ? 'opacity-50' : ''}">
               <img src="${story.img}" alt="${story.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&q=80&w=600'">
             </div>
@@ -889,7 +1232,7 @@
               <a href="${item.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="text-white/40 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors">
                 <i data-lucide="external-link" class="w-5 h-5"></i>
               </a>
-              ${isEdit ? `<button onclick="app.deleteItem('curation', '${item.id}')" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>` : ''}
+              ${isEdit ? `<button onclick="app.confirmDelete('curation', '${item.id}'); event.preventDefault(); event.stopPropagation();" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>` : ''}
             </div>
           </div>
         `).join('');
@@ -911,7 +1254,6 @@
         lucide.createIcons();
       },
 
-      // --- 常溫選集滑動切換邏輯 ---
       scrollToCollection(type) {
         const container = document.getElementById('collection-swipe-container');
         const target = document.getElementById(`slide-${type}`);
@@ -925,7 +1267,6 @@
       },
 
       handleCollectionScroll(el) {
-        // 利用滾動位置判斷目前顯示的是哪個區塊
         const scrollLeft = el.scrollLeft;
         const width = el.clientWidth;
         if (scrollLeft > width / 2) {
@@ -946,60 +1287,6 @@
           btnCuration.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm";
           btnStories.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white";
         }
-      },
-
-      // --- 刪除共用邏輯 ---
-      deleteItem(section, id) {
-        this.state.data[section] = this.state.data[section].filter(item => item.id !== id);
-        this.saveData(section);
-        if (section === 'shortcuts') this.renderShortcuts();
-        else if (section === 'stories') this.renderStories();
-        else if (section === 'curation') this.renderCuration();
-        else if (section === 'connections') this.renderConnections();
-        else if (section === 'goals') this.renderGoals();
-        lucide.createIcons();
-      },
-
-      // --- Modal 邏輯 ---
-      openModal(id) {
-        const friend = this.state.data.connections.find(f => f.id === id);
-        if(!friend) return;
-        
-        document.getElementById('modal-id').value = friend.id;
-        document.getElementById('modal-name').value = friend.name;
-        document.getElementById('modal-status').value = friend.status;
-        document.getElementById('modal-tag').value = friend.tag;
-        document.getElementById('modal-lastMet').value = friend.lastMet;
-        document.getElementById('modal-note').value = friend.note;
-        
-        document.getElementById('modal-title').innerHTML = `<i data-lucide="edit-2" class="w-4 h-4"></i> 編輯細節：${friend.name}`;
-        document.getElementById('edit-modal').classList.remove('hidden');
-        lucide.createIcons();
-      },
-
-      closeModal() {
-        document.getElementById('edit-modal').classList.add('hidden');
-      },
-
-      saveModalEdit() {
-        const id = document.getElementById('modal-id').value;
-        this.state.data.connections = this.state.data.connections.map(f => {
-          if(f.id === id) {
-            return {
-              ...f,
-              name: document.getElementById('modal-name').value,
-              status: document.getElementById('modal-status').value,
-              tag: document.getElementById('modal-tag').value,
-              lastMet: document.getElementById('modal-lastMet').value,
-              note: document.getElementById('modal-note').value
-            };
-          }
-          return f;
-        });
-        this.saveData('connections');
-        this.closeModal();
-        this.renderConnections();
-        lucide.createIcons();
       },
 
       // --- 番茄鐘邏輯 ---
@@ -1029,7 +1316,6 @@
         
         this.updatePomodoroDisplay();
         
-        // 清除舊的計時器
         if (this.state.pomodoro.interval) clearInterval(this.state.pomodoro.interval);
         
         this.state.pomodoro.interval = setInterval(() => {
@@ -1066,20 +1352,15 @@
       },
 
       celebratePomodoro() {
-        // 連續 10 秒觸發 EMOJI 瀑布 (每秒掉落一次，持續 10 次)
         let count = 0;
-        this.triggerEasterEgg(); // 先噴發第一次
+        this.triggerEasterEgg();
         const interval = setInterval(() => {
           count++;
-          if (count >= 10) {
-            clearInterval(interval);
-          } else {
-            this.triggerEasterEgg();
-          }
+          if (count >= 10) clearInterval(interval);
+          else this.triggerEasterEgg();
         }, 1000);
       },
 
-      // --- 彩蛋特效 ---
       triggerEasterEgg() {
         const emojis = ['🎵', '🎨', '✨', '👻', '🌿', '☕', '💡', '💜', '💙', '🎯'];
         const container = document.getElementById('emoji-container');
@@ -1093,13 +1374,11 @@
           el.style.animationDelay = `${Math.random() * 0.5}s`;
           el.style.fontSize = `${Math.random() * 1.5 + 1}rem`;
           container.appendChild(el);
-          
           setTimeout(() => { el.remove(); }, 5000);
         }
       }
     };
 
-    // 啟動應用程式
     document.addEventListener('DOMContentLoaded', () => {
       app.init();
     });
