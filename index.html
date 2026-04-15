@@ -123,10 +123,8 @@
   <main class="md:ml-24 pb-24 md:pb-16 min-h-screen p-6 md:p-12 flex flex-col items-center justify-start pt-12 md:pt-20">
     <div class="w-full max-w-5xl">
       
-      <!-- 首頁視圖 (首頁Hero + 控制中心) -->
+      <!-- 首頁視圖 -->
       <div id="view-home" class="view-section flex flex-col items-center fade-in w-full">
-        
-        <!-- Hero Section -->
         <div class="w-full min-h-[85vh] md:min-h-0 flex flex-col justify-center items-center relative mb-24 md:mb-16">
           <div class="glass-panel p-10 md:p-16 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl w-full text-center">
             <span class="text-purple-300/80 text-sm tracking-[0.3em] uppercase mb-4 block font-light">Quiet Ripples Dashboard</span>
@@ -153,7 +151,6 @@
           </button>
         </div>
 
-        <!-- 控制中心 -->
         <div id="mobile-shortcuts-section" class="w-full scroll-mt-6">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
             <div>
@@ -164,9 +161,7 @@
               <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯內容
             </button>
           </div>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6" id="shortcuts-container">
-            <!-- 內容由 JS 渲染 -->
-          </div>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6" id="shortcuts-container"></div>
         </div>
       </div>
 
@@ -177,14 +172,13 @@
             <h2 class="font-serif text-3xl mb-2 text-white">朋友圈</h2>
             <p class="text-white/60 font-light">「我是一個很會傾聽的人。」<br/>用來管理與重要朋友的連結，不讓關係因為忙碌而降溫。</p>
           </div>
-          <button onclick="app.toggleEdit('connections')" id="edit-btn-connections" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
-            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯列表
+          <button onclick="app.openAddConnectionModal()" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="user-plus" class="w-4 h-4"></i> 新增人物
           </button>
         </div>
 
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
           <div id="connections-filter" class="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar w-full md:w-auto"></div>
-          
           <select id="connections-sort" onchange="app.setConnectionsSort(this.value)" class="bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50 shrink-0">
             <option value="time-desc" class="bg-slate-800">時間 (近到遠)</option>
             <option value="time-asc" class="bg-slate-800">時間 (遠到近)</option>
@@ -194,21 +188,8 @@
           </select>
         </div>
         
-        <!-- 朋友圈新增表單 -->
-        <div id="connections-add-form" class="hidden glass-panel p-6 rounded-2xl flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-8 w-full">
-            <div class="text-sm font-medium text-purple-300 mb-2">新增朋友</div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <input type="text" id="conn-name" placeholder="姓名或暱稱" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50">
-              <input type="text" id="conn-tag" placeholder="身份標籤 (e.g. 大學死黨)" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50">
-            </div>
-            <textarea id="conn-note" placeholder="筆記 (喜好、備註等...)" rows="2" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-400/50 resize-none mt-3"></textarea>
-            <button onclick="app.addConnection()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm transition-colors text-white">建立檔案</button>
-        </div>
-
         <!-- 列表容器 -->
-        <div class="flex flex-col gap-3" id="connections-container">
-          <!-- 內容由 JS 渲染 -->
-        </div>
+        <div class="flex flex-col gap-3" id="connections-container"></div>
       </div>
 
       <!-- 常溫目標視圖 -->
@@ -218,30 +199,20 @@
             <h2 class="font-serif text-3xl mb-2 text-white">常溫目標</h2>
             <p class="text-white/60 font-light">把大夢想拆解成小行動，按部就班地完成。</p>
           </div>
-          <button onclick="app.toggleEdit('goals')" id="edit-btn-goals" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
-            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯目標
+          <button onclick="app.openAddGoalModal()" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="plus" class="w-4 h-4"></i> 新增目標
           </button>
         </div>
 
-        <div id="goals-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
-
-        <div id="goals-add-form" class="hidden glass-panel p-6 rounded-2xl flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-8 max-w-2xl">
-          <div class="text-sm font-medium text-purple-300 mb-2">設定新目標</div>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input type="text" id="gl-title" placeholder="目標內容" class="w-full md:col-span-2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-            <select id="gl-type" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <option value="短期專案" class="bg-slate-800">短期專案</option>
-              <option value="習慣養成" class="bg-slate-800">習慣養成</option>
-              <option value="長期里程碑" class="bg-slate-800">長期里程碑</option>
-            </select>
-          </div>
-          <input type="text" id="gl-date" placeholder="預期達成日期" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50 mt-1">
-          <button onclick="app.addGoal()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm transition-colors text-white">新增目標</button>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
+          <div id="goals-filter" class="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar w-full md:w-auto"></div>
+          <select id="goals-sort" onchange="app.setGoalsSort(this.value)" class="bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50 shrink-0">
+            <option value="time-desc" class="bg-slate-800">時間 (近到遠)</option>
+            <option value="time-asc" class="bg-slate-800">時間 (遠到近)</option>
+          </select>
         </div>
 
-        <div class="space-y-4" id="goals-container">
-          <!-- 內容由 JS 渲染 -->
-        </div>
+        <div class="space-y-3" id="goals-container"></div>
       </div>
 
       <!-- 常溫選集視圖 -->
@@ -266,12 +237,10 @@
         </div>
         
         <div id="collection-swipe-container" class="flex w-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth pb-8" onscroll="app.handleCollectionScroll(this)">
-          <!-- 第一屏：手札區塊 -->
           <div class="w-full min-w-full flex-shrink-0 snap-start pr-0 md:pr-4" id="slide-stories">
             <div id="stories-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container"></div>
           </div>
-          <!-- 第二屏：選物區塊 -->
           <div class="w-full min-w-full flex-shrink-0 snap-start pl-0 md:pl-4" id="slide-curation">
             <div id="curation-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
             <div class="space-y-4" id="curation-container"></div>
@@ -334,6 +303,30 @@
     </div>
   </main>
 
+  <!-- ==================== Modals ==================== -->
+
+  <!-- 新增人物 Modal -->
+  <div id="add-connection-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+    <div class="glass-panel w-full max-w-lg p-6 rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative">
+      <button onclick="app.closeAddConnectionModal()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-medium text-purple-300 mb-4 flex items-center gap-2">
+        <i data-lucide="user-plus" class="w-5 h-5"></i> 新增人物
+      </h3>
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input type="text" id="add-conn-name" placeholder="姓名或暱稱" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+          <input type="text" id="add-conn-tag" placeholder="身份標籤 (e.g. 大學死黨)" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+        </div>
+        <textarea id="add-conn-note" placeholder="筆記 (喜好、備註等...)" rows="3" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50 resize-none"></textarea>
+        <button onclick="app.addConnection()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors text-white mt-2">
+          建立檔案
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- 細節編輯 Modal (朋友圈) -->
   <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
     <div class="glass-panel w-full max-w-lg p-6 rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
@@ -356,27 +349,31 @@
           </div>
         </div>
         
-        <!-- 狀態 Checkboxes -->
+        <!-- 狀態 按鈕 (取代 Checkboxes) -->
         <div class="flex flex-wrap gap-4 py-2">
-          <label class="flex items-center gap-2 text-sm text-white cursor-pointer group">
-            <input type="checkbox" id="modal-oftenContacted" class="w-4 h-4 accent-emerald-500 bg-black/20 border-white/10 rounded">
-            <span class="group-hover:text-emerald-400 transition-colors">時常聯絡 (綠標)</span>
-          </label>
+          <button id="btn-oftenContacted" type="button" onclick="app.toggleOftenContacted()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors border bg-black/20 border-white/10 text-white/50">
+            <i data-lucide="star" class="w-4 h-4"></i>
+            <span>時常聯絡 (綠標)</span>
+          </button>
         </div>
 
         <div class="border-t border-white/5 pt-3">
-          <label class="text-xs text-white/50 mb-1 block">聯絡與見面紀錄 <span class="text-[10px] ml-1">(新增後自動更新上次見面時間)</span></label>
-          <div class="flex gap-2 mb-2">
-            <input type="date" id="new-event-date" class="w-24 shrink-0 bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50">
-            <select id="new-event-type" class="w-20 shrink-0 bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <option value="見面" class="bg-slate-800">見面</option>
-              <option value="電話" class="bg-slate-800">電話</option>
-              <option value="文字" class="bg-slate-800">文字</option>
-            </select>
-            <input type="text" id="new-event-desc" placeholder="發生什麼事？" class="w-full bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50">
-            <button onclick="app.addFriendEvent()" class="px-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm text-white transition-colors flex-shrink-0">
-              新增
-            </button>
+          <label class="text-xs text-white/50 mb-2 block">聯絡與見面紀錄 <span class="text-[10px] ml-1">(新增後自動更新上次見面時間)</span></label>
+          <div class="flex flex-col gap-2 mb-3">
+            <div class="flex gap-2 w-full">
+              <input type="date" id="new-event-date" class="flex-1 bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <select id="new-event-type" class="flex-1 bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <option value="見面" class="bg-slate-800">見面</option>
+                <option value="電話" class="bg-slate-800">電話</option>
+                <option value="文字" class="bg-slate-800">文字</option>
+              </select>
+            </div>
+            <div class="flex gap-2 w-full">
+              <textarea id="new-event-desc" rows="2" placeholder="發生什麼事？" class="flex-1 bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50 resize-none"></textarea>
+              <button onclick="app.addFriendEvent()" class="px-4 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm text-white transition-colors flex-shrink-0">
+                新增
+              </button>
+            </div>
           </div>
           <div id="modal-events-list" class="space-y-1.5 max-h-32 overflow-y-auto no-scrollbar pr-1 mb-2">
             <!-- 動態渲染事件 -->
@@ -393,9 +390,110 @@
           <div id="modal-note-display" class="w-full bg-black/10 border border-white/5 rounded-lg px-3 py-2 text-sm text-white/90 min-h-[3rem] whitespace-pre-wrap leading-relaxed break-words"></div>
           <textarea id="modal-note" rows="3" class="hidden w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50 resize-none leading-relaxed"></textarea>
         </div>
-        <button onclick="app.saveModalEdit()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors mt-4 text-white">
-          儲存變更
+        
+        <div class="flex gap-3 mt-4">
+          <button onclick="app.saveModalEdit()" class="flex-1 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors text-white">
+            儲存變更
+          </button>
+          <button onclick="app.confirmDeleteFromModal()" class="px-4 py-3 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg transition-colors text-rose-400 flex items-center justify-center" title="刪除此人物">
+            <i data-lucide="trash-2" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新增目標 Modal -->
+  <div id="add-goal-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+    <div class="glass-panel w-full max-w-lg p-6 rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative">
+      <button onclick="app.closeAddGoalModal()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-medium text-purple-300 mb-4 flex items-center gap-2">
+        <i data-lucide="target" class="w-5 h-5"></i> 新增常溫目標
+      </h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs text-white/50 mb-1 block">目標內容</label>
+          <input type="text" id="add-gl-title" placeholder="例如：考取日檢 N3" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">目標類型</label>
+            <select id="add-gl-type" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <option value="短期目標" class="bg-slate-800">短期目標</option>
+              <option value="習慣養成" class="bg-slate-800">習慣養成</option>
+              <option value="長期里程碑" class="bg-slate-800">長期里程碑</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">預期達成日期</label>
+            <input type="text" id="add-gl-date" placeholder="例如：2026.12.31 或 持續" value="持續" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+          </div>
+        </div>
+        <button onclick="app.addGoal()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors text-white mt-2">
+          建立目標
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 編輯目標 Modal -->
+  <div id="edit-goal-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+    <div class="glass-panel w-full max-w-lg p-6 rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative">
+      <button onclick="app.closeGoalModal()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-medium text-purple-300 mb-4 flex items-center gap-2">
+        <i data-lucide="edit-2" class="w-5 h-5"></i> 編輯目標
+      </h3>
+      <div class="space-y-4">
+        <input type="hidden" id="edit-gl-id">
+        <div>
+          <label class="text-xs text-white/50 mb-1 block">目標內容</label>
+          <input type="text" id="edit-gl-title" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">目標類型</label>
+            <select id="edit-gl-type" onchange="app.handleGoalTypeChange(this.value)" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <option value="短期目標" class="bg-slate-800">短期目標</option>
+              <option value="習慣養成" class="bg-slate-800">習慣養成</option>
+              <option value="長期里程碑" class="bg-slate-800">長期里程碑</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">預期達成日期</label>
+            <input type="text" id="edit-gl-date" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-white/50 mb-1 block">目前狀態</label>
+          <select id="edit-gl-status" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+            <option value="進行中" class="bg-slate-800">進行中</option>
+            <option value="未開始" class="bg-slate-800">未開始</option>
+            <option value="已完成" class="bg-slate-800">已完成</option>
+          </select>
+        </div>
+
+        <!-- 習慣打卡區塊 -->
+        <div id="edit-gl-tracker-section" class="hidden border-t border-white/5 pt-4 mt-2">
+          <label class="text-xs text-emerald-400 mb-3 flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> 近期執行紀錄 (點擊打卡)</span>
+          </label>
+          <div class="flex justify-between items-center gap-1.5" id="edit-gl-tracker-list">
+            <!-- 圓形按鈕將由 JS 渲染 -->
+          </div>
+        </div>
+        
+        <div class="flex gap-3 mt-4">
+          <button onclick="app.saveGoalEdit()" class="flex-1 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors text-white">
+            儲存變更
+          </button>
+          <button onclick="app.confirmDeleteGoalFromModal()" class="px-4 py-3 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg transition-colors text-rose-400 flex items-center justify-center" title="刪除此目標">
+            <i data-lucide="trash-2" class="w-5 h-5"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -461,10 +559,11 @@
 
     const defaultData = {
       shortcuts: [
-        { id: '1', title: 'Notion 工作區', desc: '專案管理與待辦', icon: '📝', color: 'bg-blue-500/20', url: '#' },
+        { id: '1', title: 'Notion 工作區', desc: '專案管理與待辦', icon: '📝', color: 'bg-blue-500/20', url: 'https://www.notion.so/weichun0203/29068a880c078068903ed40fec3795f8?source=copy_link' },
         { id: '2', title: '財務儀表板', desc: '理財與記帳檢視', icon: '💰', color: 'bg-green-500/20', url: '#' },
         { id: '3', title: 'GitHub Repo', desc: '網頁開發練習', icon: '💻', color: 'bg-slate-500/20', url: 'https://github.com/' },
-        { id: '4', title: '常溫歌單', desc: 'Spotify 專注音樂', icon: '🎧', color: 'bg-purple-500/20', url: 'https://open.spotify.com/' }
+        { id: '4', title: '常溫歌單', desc: 'Spotify 專注音樂', icon: '🎧', color: 'bg-purple-500/20', url: 'https://open.spotify.com/' },
+        { id: '5', title: 'Baby大合唱', desc: 'Instagram 影片', icon: '🎤', color: 'bg-pink-500/20', url: 'https://www.instagram.com/p/DXB1xBnCMJW/' }
       ],
       connections: [
         { id: '1', name: '新認識的 Alex', tag: '讀書會', lastMet: getPastDate(5), lastMetType: '見面', note: '是個很健談的人，喜歡看心理學的書。', events: [{id: 'e1', date: getPastDate(5), type: '見面', desc: '交流了原子習慣的心得，是很棒的對談。'}], isOftenContacted: false, createdAt: getPastDate(10), isPinned: true },
@@ -473,9 +572,10 @@
         { id: '4', name: 'Ariel (設計師)', tag: '聊設計', lastMet: getPastDate(20), lastMetType: '電話', note: '對 UI/UX 很有熱情。', events: [{id: 'e4', date: getPastDate(20), type: '電話', desc: '上次電話聊到她想轉職，下個月可以關心一下進度。'}], isOftenContacted: false, createdAt: '2024-06-15', isPinned: false }
       ],
       goals: [
-        { id: '1', title: '完成個人網站全新改版', type: '短期專案', date: '2026.04.30', status: '進行中' },
-        { id: '2', title: '每週閱讀一本書並寫下心得', type: '習慣養成', date: '持續', status: '進行中' },
-        { id: '3', title: '報考日文檢定 N3 級別', type: '長期里程碑', date: '2026.12.01', status: '未開始' }
+        { id: '1', title: '完成個人網站全新改版', type: '短期目標', date: '2026.04.30', status: '進行中', isPinned: true },
+        { id: '2', title: '每週閱讀一本書並寫下心得', type: '習慣養成', date: '持續', status: '進行中', isPinned: false, records: [getPastDate(1), getPastDate(2)] },
+        { id: '3', title: '報考日文檢定 N3 級別', type: '長期里程碑', date: '2026.12.01', status: '未開始', isPinned: false },
+        { id: '4', title: '更新 2025 年度履歷', type: '短期目標', date: '2026.01.15', status: '已完成', isPinned: false }
       ],
       stories: [
         { id: '1', title: '北美館：未來身體特展', date: '2026.03.15', tag: '設計展', img: 'https://images.unsplash.com/photo-1518998053401-878c735777a8?auto=format&fit=crop&q=80&w=600', url: '#' },
@@ -496,9 +596,9 @@
     const app = {
       state: {
         activeTab: 'home',
-        isEditing: { home: false, connections: false, goals: false, collections: false },
-        filters: { stories: '全部', curation: '全部', connections: '全部', goals: '全部' },
-        sorts: { connections: 'time-desc' },
+        isEditing: { home: false, connections: false, collections: false }, // 移除 goals 的 inline 編輯
+        filters: { stories: '全部', curation: '全部', connections: '全部', goals: '短期目標' },
+        sorts: { connections: 'time-desc', goals: 'time-desc' },
         data: {
           shortcuts: JSON.parse(localStorage.getItem('qw-shortcuts')) || defaultData.shortcuts,
           connections: JSON.parse(localStorage.getItem('qw-connections')) || defaultData.connections,
@@ -548,16 +648,8 @@
           btn.className = "glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20";
         }
         
-        if (section === 'connections') {
-          document.getElementById('connections-add-form').classList.toggle('hidden');
-          document.getElementById('connections-add-form').classList.toggle('flex');
-          this.renderConnections();
-        } else if (section === 'home') {
+        if (section === 'home') {
           this.renderShortcuts();
-        } else if (section === 'goals') {
-          document.getElementById('goals-add-form').classList.toggle('hidden');
-          document.getElementById('goals-add-form').classList.toggle('flex');
-          this.renderGoals();
         } else if (section === 'collections') {
           this.renderStories();
           this.renderCuration();
@@ -578,6 +670,12 @@
       setConnectionsSort(val) {
         this.state.sorts.connections = val;
         this.renderConnections();
+        lucide.createIcons();
+      },
+
+      setGoalsSort(val) {
+        this.state.sorts.goals = val;
+        this.renderGoals();
         lucide.createIcons();
       },
 
@@ -661,6 +759,18 @@
         document.getElementById('confirm-modal').classList.remove('hidden');
       },
 
+      confirmDeleteFromModal() {
+        const id = document.getElementById('modal-id').value;
+        this.closeModal(); 
+        this.confirmDelete('connections', id);
+      },
+
+      confirmDeleteGoalFromModal() {
+        const id = document.getElementById('edit-gl-id').value;
+        this.closeGoalModal();
+        this.confirmDelete('goals', id);
+      },
+
       closeConfirm() {
         itemToDelete = null;
         document.getElementById('confirm-modal').classList.add('hidden');
@@ -673,7 +783,7 @@
         }
       },
 
-      // === 朋友圈 (Connections) - 滑動置頂與事件邏輯 ===
+      // === 滑動與置頂共用邏輯 ===
       resetSwipes() {
         document.querySelectorAll('.swipe-card').forEach(c => {
           c.style.transform = 'translateX(0px)';
@@ -707,34 +817,31 @@
         el.style.transition = 'transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)';
         
         if (diffX < -40) {
-          // 滑動超過一半，自動展開
           el.style.transform = `translateX(-80px)`;
-          // 設定 3 秒後自動收回
           setTimeout(() => {
             if (el.style.transform === 'translateX(-80px)') {
               el.style.transform = 'translateX(0px)';
             }
           }, 3000);
         } else {
-          // 彈回
           el.style.transform = `translateX(0px)`;
         }
         activeSwipeCard = null;
       },
 
+      // === 朋友圈 (Connections) ===
       togglePin(id) {
         const index = this.state.data.connections.findIndex(f => f.id === id);
         if (index > -1) {
           this.state.data.connections[index].isPinned = !this.state.data.connections[index].isPinned;
           this.saveData('connections');
           this.renderConnections();
-          lucide.createIcons(); // 修復：重新生成 ICON，解決點選後不穩定的問題
+          lucide.createIcons();
         }
       },
 
       renderConnections() {
         const container = document.getElementById('connections-container');
-        const isEdit = this.state.isEditing.connections;
         const filter = this.state.filters.connections;
         const sortVal = this.state.sorts.connections;
         
@@ -771,16 +878,13 @@
           return { ...friend, status, color, textClass };
         });
         
-        // 1. 執行上方 Filter 篩選
         const filtered = filter === '全部' ? mappedFriends : mappedFriends.filter(f => f.status === filter);
         
-        // 2. 執行下拉 Sort 篩選
         let finalFiltered = filtered;
         if (sortVal === 'type-meet') finalFiltered = finalFiltered.filter(f => f.lastMetType === '見面');
         if (sortVal === 'type-phone') finalFiltered = finalFiltered.filter(f => f.lastMetType === '電話');
         if (sortVal === 'type-text') finalFiltered = finalFiltered.filter(f => f.lastMetType === '文字');
 
-        // 3. 排序 (置頂優先，接著判斷時間)
         const sorted = [...finalFiltered].sort((a, b) => {
           if (a.isPinned && !b.isPinned) return -1;
           if (!a.isPinned && b.isPinned) return 1;
@@ -794,10 +898,10 @@
         let html = sorted.map(friend => {
           const typeIconMap = { '見面': '🤝', '電話': '📞', '文字': '💬' };
           const typeIcon = friend.lastMetType ? typeIconMap[friend.lastMetType] : '';
+          const formattedLastMet = friend.lastMet ? friend.lastMet.substring(5).replace('-', '/') : '尚未記錄';
 
           return `
           <div class="relative w-full rounded-xl overflow-hidden mb-1">
-            <!-- 底層動作按鈕 (滑動後顯示) -->
             <div class="absolute inset-y-0 right-0 w-24 flex justify-end bg-purple-600 rounded-xl z-0">
               <button onclick="app.togglePin('${friend.id}'); event.stopPropagation();" class="w-[80px] h-full flex flex-col items-center justify-center text-white hover:bg-purple-500 transition-colors">
                 <i data-lucide="${friend.isPinned ? 'pin-off' : 'pin'}" class="w-5 h-5 mb-1"></i>
@@ -805,14 +909,12 @@
               </button>
             </div>
 
-            <!-- 前景卡片 (可滑動) -->
             <div class="swipe-card relative z-10 w-full p-4 rounded-xl border border-white/10 flex items-center justify-between transition-transform duration-300 ease-out bg-[#0f172a]/95 backdrop-blur-xl group cursor-pointer hover:bg-white/5" style="touch-action: pan-y;"
-                 onclick="if(!${isEdit}) { app.resetSwipes(); app.openModal('${friend.id}'); }"
+                 onclick="app.resetSwipes(); app.openModal('${friend.id}');"
                  ontouchstart="app.handleTouchStart(event, this)"
                  ontouchmove="app.handleTouchMove(event, this)"
                  ontouchend="app.handleTouchEnd(event, this)">
               
-              <!-- 側邊狀態顏色條 -->
               <div class="absolute left-0 top-0 bottom-0 w-1.5 ${friend.color}"></div>
               
               <div class="flex items-center gap-4 pl-3">
@@ -826,20 +928,13 @@
               </div>
               
               <div class="flex items-center gap-3 md:gap-4">
-                <span class="hidden md:flex items-center gap-1.5 text-xs text-white/40"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${typeIcon} ${friend.lastMet || '尚未記錄'}</span>
+                <span class="hidden md:flex items-center gap-1.5 text-xs text-white/40"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${typeIcon} ${formattedLastMet}</span>
                 <span class="text-xs px-2 py-1 rounded-full bg-white/5 border whitespace-nowrap ${friend.textClass}">${friend.status}</span>
                 
-                ${isEdit ? `
-                <button onclick="app.confirmDelete('connections', '${friend.id}'); event.stopPropagation();" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors z-20">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-                ` : `
-                <!-- 網頁版 Hover 顯示置頂按鈕 -->
                 <button onclick="app.togglePin('${friend.id}'); event.stopPropagation();" class="hidden md:flex items-center justify-center p-1.5 rounded-full text-white/20 hover:bg-white/10 hover:text-purple-400 group-hover:text-white/50 transition-all z-20" title="${friend.isPinned ? '取消置頂' : '置頂'}">
                   <i data-lucide="pin" class="w-4 h-4 ${friend.isPinned ? 'text-purple-400 fill-purple-400 rotate-45' : ''}"></i>
                 </button>
                 <i data-lucide="chevron-right" class="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors"></i>
-                `}
               </div>
             </div>
           </div>
@@ -848,18 +943,30 @@
         container.innerHTML = html;
       },
 
+      openAddConnectionModal() {
+        document.getElementById('add-conn-name').value = '';
+        document.getElementById('add-conn-tag').value = '';
+        document.getElementById('add-conn-note').value = '';
+        document.getElementById('add-connection-modal').classList.remove('hidden');
+        lucide.createIcons();
+      },
+
+      closeAddConnectionModal() {
+        document.getElementById('add-connection-modal').classList.add('hidden');
+      },
+
       addConnection() {
-        const name = document.getElementById('conn-name').value;
+        const name = document.getElementById('add-conn-name').value;
         if (!name) return;
 
-        const note = document.getElementById('conn-note').value;
+        const note = document.getElementById('add-conn-note').value;
         const today = new Date().toISOString().split('T')[0];
         const events = [{ id: Date.now().toString(), date: today, type: '文字', desc: '建立朋友檔案' }];
 
         this.state.data.connections.unshift({
           id: Date.now().toString(),
           name,
-          tag: document.getElementById('conn-tag').value,
+          tag: document.getElementById('add-conn-tag').value,
           lastMet: today,
           lastMetType: '文字',
           note: note || '',
@@ -868,10 +975,9 @@
           isOftenContacted: false,
           isPinned: false
         });
+        
         this.saveData('connections');
-        document.getElementById('conn-name').value = '';
-        document.getElementById('conn-tag').value = '';
-        document.getElementById('conn-note').value = '';
+        this.closeAddConnectionModal();
         this.renderConnections();
         lucide.createIcons();
       },
@@ -884,16 +990,14 @@
         document.getElementById('modal-name').value = friend.name;
         document.getElementById('modal-tag').value = friend.tag;
         
-        // 筆記重設為顯示狀態
         document.getElementById('modal-note').value = friend.note || '';
         document.getElementById('modal-note-display').innerText = friend.note || '尚無筆記...';
         document.getElementById('modal-note-display').classList.remove('hidden');
         document.getElementById('modal-note').classList.add('hidden');
         document.getElementById('modal-note-edit-btn').classList.remove('text-purple-400');
         
-        document.getElementById('modal-oftenContacted').checked = friend.isOftenContacted || false;
+        this.setOftenContactedBtn(friend.isOftenContacted || false);
 
-        // 預設事件日期為當天
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('new-event-date').value = today;
         document.getElementById('new-event-type').value = '見面';
@@ -904,19 +1008,33 @@
         lucide.createIcons();
       },
 
+      toggleOftenContacted() {
+        const btn = document.getElementById('btn-oftenContacted');
+        const isActive = btn.dataset.active === 'true';
+        this.setOftenContactedBtn(!isActive);
+      },
+
+      setOftenContactedBtn(isActive) {
+        const btn = document.getElementById('btn-oftenContacted');
+        btn.dataset.active = isActive;
+        if (isActive) {
+          btn.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors border border-emerald-500/50 bg-emerald-500/10 text-emerald-400";
+        } else {
+          btn.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors border bg-black/20 border-white/10 text-white/50 hover:bg-white/5";
+        }
+      },
+
       toggleNoteEdit() {
         const display = document.getElementById('modal-note-display');
         const input = document.getElementById('modal-note');
         const btn = document.getElementById('modal-note-edit-btn');
         
         if (input.classList.contains('hidden')) {
-          // 切換為編輯狀態
           display.classList.add('hidden');
           input.classList.remove('hidden');
           btn.classList.add('text-purple-400');
           input.focus();
         } else {
-          // 切換為顯示狀態 (不直接儲存，僅更新顯示)
           display.classList.remove('hidden');
           input.classList.add('hidden');
           btn.classList.remove('text-purple-400');
@@ -931,19 +1049,21 @@
           return;
         }
         
-        // 確保按時間新到舊排序
         const sortedEvents = [...friend.events].sort((a, b) => new Date(b.date) - new Date(a.date));
         const typeIconMap = { '見面': '🤝', '電話': '📞', '文字': '💬' };
         
-        container.innerHTML = sortedEvents.map(ev => `
+        container.innerHTML = sortedEvents.map(ev => {
+          const formattedDate = ev.date ? ev.date.substring(5).replace('-', '/') : '';
+          return `
           <div class="flex items-start gap-2 p-2.5 bg-black/20 rounded-lg border border-white/5 relative group hover:border-purple-500/30 transition-colors">
-            <div class="text-xs font-mono text-purple-300 w-20 flex-shrink-0 pt-0.5">${ev.date}</div>
+            <div class="text-xs font-mono text-purple-300 w-10 md:w-12 flex-shrink-0 pt-0.5">${formattedDate}</div>
             <div class="text-sm text-white/80 pr-6 flex-1 break-words"><span class="mr-1">${typeIconMap[ev.type] || ''}</span>${ev.desc}</div>
             <button onclick="app.confirmDelete('friendEvent', '${friend.id}_${ev.id}'); event.stopPropagation();" class="absolute right-2 top-2.5 opacity-0 md:group-hover:opacity-100 text-rose-400 hover:text-rose-300 transition-opacity bg-slate-800 rounded p-0.5">
               <i data-lucide="x" class="w-3.5 h-3.5"></i>
             </button>
           </div>
-        `).join('');
+          `;
+        }).join('');
         lucide.createIcons();
       },
 
@@ -966,28 +1086,298 @@
             desc: descInput.value
           });
           
-          // 重新排序並更新最後見面時間與類型
           friend.events.sort((a, b) => new Date(b.date) - new Date(a.date));
           friend.lastMet = friend.events[0].date;
           friend.lastMetType = friend.events[0].type;
 
           this.saveData('connections');
           this.renderModalEvents(friend);
-          this.renderConnections(); // 同步更新背景的列表
+          this.renderConnections(); 
           lucide.createIcons(); 
           
-          // 清空輸入框，日期保留當天
           dateInput.value = new Date().toISOString().split('T')[0];
           descInput.value = '';
         }
       },
 
-      // 拆分刪除邏輯供 ConfirmModal 使用，並加入極嚴格的安全防護
+      saveModalEdit() {
+        const id = document.getElementById('modal-id').value;
+        const input = document.getElementById('modal-note');
+        if (!input.classList.contains('hidden')) {
+           document.getElementById('modal-note-display').innerText = input.value || '尚無筆記...';
+        }
+
+        const isOftenContacted = document.getElementById('btn-oftenContacted').dataset.active === 'true';
+
+        this.state.data.connections = this.state.data.connections.map(f => {
+          if(f.id === id) {
+            return {
+              ...f,
+              name: document.getElementById('modal-name').value,
+              tag: document.getElementById('modal-tag').value,
+              note: input.value,
+              isOftenContacted: isOftenContacted
+            };
+          }
+          return f;
+        });
+        this.saveData('connections');
+        this.closeModal();
+        this.renderConnections();
+        lucide.createIcons();
+      },
+
+      closeModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+      },
+
+      // === 常溫目標 (Goals) ===
+      toggleGoalPin(id) {
+        const index = this.state.data.goals.findIndex(g => g.id === id);
+        if (index > -1) {
+          this.state.data.goals[index].isPinned = !this.state.data.goals[index].isPinned;
+          this.saveData('goals');
+          this.renderGoals();
+          lucide.createIcons();
+        }
+      },
+
+      renderGoals() {
+        const container = document.getElementById('goals-container');
+        const filter = this.state.filters.goals;
+        const sortVal = this.state.sorts.goals;
+        
+        this.renderFilterBar('goals', ['短期目標', '習慣養成', '長期里程碑', '已完成']);
+        
+        // 確保舊資料「短期專案」能夠被對應到「短期目標」
+        const mappedGoals = this.state.data.goals.map(g => ({
+          ...g,
+          type: g.type === '短期專案' ? '短期目標' : g.type
+        }));
+
+        let filtered = mappedGoals;
+        if (filter !== '全部') {
+          filtered = mappedGoals.filter(g => {
+            if (filter === '短期目標') return g.type === '短期目標' && g.status !== '已完成';
+            if (filter === '習慣養成') return g.type === '習慣養成' && g.status !== '已完成';
+            if (filter === '長期里程碑') return g.type === '長期里程碑' && g.status !== '已完成';
+            if (filter === '已完成') return g.status === '已完成';
+            return true;
+          });
+        }
+
+        const parseDate = (d) => {
+            if (d === '持續' || !d) return new Date('9999-12-31').getTime();
+            return new Date(d.replace(/\./g, '-')).getTime();
+        };
+
+        const sorted = [...filtered].sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+
+          const timeA = parseDate(a.date);
+          const timeB = parseDate(b.date);
+
+          if (sortVal === 'time-asc') return timeA - timeB;
+          return timeB - timeA; // default time-desc
+        });
+        
+        let html = sorted.map(goal => {
+          const isDone = goal.status === '已完成';
+          return `
+          <div class="relative w-full rounded-xl overflow-hidden mb-1">
+            <div class="absolute inset-y-0 right-0 w-24 flex justify-end bg-purple-600 rounded-xl z-0">
+              <button onclick="app.toggleGoalPin('${goal.id}'); event.stopPropagation();" class="w-[80px] h-full flex flex-col items-center justify-center text-white hover:bg-purple-500 transition-colors">
+                <i data-lucide="${goal.isPinned ? 'pin-off' : 'pin'}" class="w-5 h-5 mb-1"></i>
+                <span class="text-[10px]">${goal.isPinned ? '取消置頂' : '置頂'}</span>
+              </button>
+            </div>
+
+            <div class="swipe-card relative z-10 w-full p-4 rounded-xl border border-white/10 flex items-center justify-between transition-transform duration-300 ease-out bg-[#0f172a]/95 backdrop-blur-xl group cursor-pointer hover:bg-white/5 ${isDone ? 'border-emerald-500/30 bg-emerald-900/20 opacity-80 hover:bg-emerald-900/30' : ''}" style="touch-action: pan-y;"
+                 onclick="app.resetSwipes(); app.openGoalModal('${goal.id}');"
+                 ontouchstart="app.handleTouchStart(event, this)"
+                 ontouchmove="app.handleTouchMove(event, this)"
+                 ontouchend="app.handleTouchEnd(event, this)">
+              
+              <div class="flex items-start gap-4">
+                <button onclick="app.toggleGoalStatus('${goal.id}'); event.stopPropagation();" class="mt-1 flex-shrink-0 text-white/40 hover:text-white transition-colors group-hover:scale-110">
+                  <i data-lucide="${isDone ? 'check-circle-2' : 'circle'}" class="w-6 h-6 ${isDone ? 'text-emerald-400' : ''}"></i>
+                </button>
+                <div>
+                  <div class="flex items-center gap-3 mb-1">
+                    <h3 class="text-lg font-medium ${isDone ? 'text-white/50 line-through' : 'text-white'} transition-colors flex items-center gap-2">
+                      ${goal.title}
+                      ${goal.isPinned ? `<i data-lucide="pin" class="w-3.5 h-3.5 text-purple-400 fill-purple-400 rotate-45"></i>` : ''}
+                    </h3>
+                  </div>
+                  <div class="flex items-center gap-2 text-xs text-white/50">
+                    <span class="px-2 py-0.5 rounded-full border border-purple-300/30 text-purple-300 whitespace-nowrap">${goal.type}</span>
+                    <span class="flex items-center gap-1"><i data-lucide="flag" class="w-3 h-3"></i> 期限: ${goal.date}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-2">
+                <button onclick="app.toggleGoalPin('${goal.id}'); event.stopPropagation();" class="hidden md:flex items-center justify-center p-1.5 rounded-full text-white/20 hover:bg-white/10 hover:text-purple-400 group-hover:text-white/50 transition-all z-20" title="${goal.isPinned ? '取消置頂' : '置頂'}">
+                  <i data-lucide="pin" class="w-4 h-4 ${goal.isPinned ? 'text-purple-400 fill-purple-400 rotate-45' : ''}"></i>
+                </button>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors"></i>
+              </div>
+            </div>
+          </div>
+        `}).join('');
+        container.innerHTML = html;
+      },
+
+      openAddGoalModal() {
+        document.getElementById('add-gl-title').value = '';
+        document.getElementById('add-gl-date').value = '持續';
+        document.getElementById('add-goal-modal').classList.remove('hidden');
+        lucide.createIcons();
+      },
+
+      closeAddGoalModal() {
+        document.getElementById('add-goal-modal').classList.add('hidden');
+      },
+
+      addGoal() {
+        const title = document.getElementById('add-gl-title').value;
+        if (!title) return;
+        this.state.data.goals.unshift({
+          id: Date.now().toString(),
+          title,
+          type: document.getElementById('add-gl-type').value,
+          date: document.getElementById('add-gl-date').value || '持續',
+          status: '進行中',
+          isPinned: false,
+          records: []
+        });
+        this.saveData('goals');
+        this.closeAddGoalModal();
+        this.renderGoals();
+        lucide.createIcons();
+      },
+
+      handleGoalTypeChange(val) {
+        if (val === '習慣養成' || val === '長期里程碑') {
+          document.getElementById('edit-gl-tracker-section').classList.remove('hidden');
+          const id = document.getElementById('edit-gl-id').value;
+          this.renderGoalTracker(id);
+        } else {
+          document.getElementById('edit-gl-tracker-section').classList.add('hidden');
+        }
+      },
+
+      renderGoalTracker(id) {
+        const goal = this.state.data.goals.find(g => g.id === id);
+        if (!goal) return;
+        const container = document.getElementById('edit-gl-tracker-list');
+        const records = goal.records || [];
+        const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+        
+        let html = '';
+        // 產生過去 7 天的圓形打卡按鈕
+        for(let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const dayOfMonth = d.getDate();
+            const dayName = daysOfWeek[d.getDay()];
+            const isChecked = records.includes(dateStr);
+            
+            const btnClass = isChecked 
+                ? "aspect-square flex-1 max-w-[44px] rounded-full flex flex-col items-center justify-center bg-emerald-500 text-white shadow-md shadow-emerald-500/20 transition-transform scale-110 border border-emerald-400" 
+                : "aspect-square flex-1 max-w-[44px] rounded-full flex flex-col items-center justify-center bg-black/20 border border-white/10 text-white/40 hover:bg-white/10 hover:text-white/70 transition-colors";
+                
+            html += `
+                <button onclick="app.toggleGoalRecord('${goal.id}', '${dateStr}')" class="${btnClass}">
+                    <span class="text-[9px] block mb-0.5 opacity-70">${dayName}</span>
+                    <span class="text-sm font-medium leading-none">${dayOfMonth}</span>
+                </button>
+            `;
+        }
+        container.innerHTML = html;
+      },
+
+      toggleGoalRecord(id, dateStr) {
+        const goal = this.state.data.goals.find(g => g.id === id);
+        if (!goal) return;
+        if (!goal.records) goal.records = [];
+        
+        const index = goal.records.indexOf(dateStr);
+        if (index > -1) {
+            goal.records.splice(index, 1);
+        } else {
+            goal.records.push(dateStr);
+        }
+        this.saveData('goals');
+        this.renderGoalTracker(id);
+      },
+
+      openGoalModal(id) {
+        const goal = this.state.data.goals.find(g => g.id === id);
+        if(!goal) return;
+        
+        document.getElementById('edit-gl-id').value = goal.id;
+        document.getElementById('edit-gl-title').value = goal.title;
+        // 確保舊資料對應正確顯示
+        const goalType = goal.type === '短期專案' ? '短期目標' : goal.type;
+        document.getElementById('edit-gl-type').value = goalType;
+        document.getElementById('edit-gl-date').value = goal.date;
+        document.getElementById('edit-gl-status').value = goal.status;
+        
+        if (goalType === '習慣養成' || goalType === '長期里程碑') {
+          document.getElementById('edit-gl-tracker-section').classList.remove('hidden');
+          this.renderGoalTracker(goal.id);
+        } else {
+          document.getElementById('edit-gl-tracker-section').classList.add('hidden');
+        }
+
+        document.getElementById('edit-goal-modal').classList.remove('hidden');
+        lucide.createIcons();
+      },
+
+      closeGoalModal() {
+        document.getElementById('edit-goal-modal').classList.add('hidden');
+      },
+
+      saveGoalEdit() {
+        const id = document.getElementById('edit-gl-id').value;
+        this.state.data.goals = this.state.data.goals.map(g => {
+          if (g.id === id) {
+            return {
+              ...g,
+              title: document.getElementById('edit-gl-title').value,
+              type: document.getElementById('edit-gl-type').value,
+              date: document.getElementById('edit-gl-date').value,
+              status: document.getElementById('edit-gl-status').value
+            };
+          }
+          return g;
+        });
+        this.saveData('goals');
+        this.closeGoalModal();
+        this.renderGoals();
+        lucide.createIcons();
+      },
+
+      toggleGoalStatus(id) {
+        this.state.data.goals = this.state.data.goals.map(g => {
+          if (g.id === id) {
+            return { ...g, status: g.status === '已完成' ? '進行中' : '已完成' };
+          }
+          return g;
+        });
+        this.saveData('goals');
+        this.renderGoals();
+        lucide.createIcons();
+      },
+
+      // 共通刪除邏輯
       deleteItem(section, id) {
         if (!section || !id) return;
         
         if (section === 'friendEvent') {
-          // 特殊處理事件刪除 id 格式為 friendId_eventId
           const parts = id.split('_');
           const friendId = parts[0];
           const eventId = parts[1];
@@ -1009,121 +1399,17 @@
           return;
         }
 
-        // 核心安全防護：如果 localStorage 的資料有異常，直接中斷執行以防止報錯
-        if (!this.state.data[section] || !Array.isArray(this.state.data[section])) {
-            console.warn(`刪除失敗：找不到對應的資料區塊 [${section}]`);
-            return;
-        }
+        if (!this.state.data[section] || !Array.isArray(this.state.data[section])) return;
 
         this.state.data[section] = this.state.data[section].filter(item => item.id !== id);
         this.saveData(section);
         
-        // 更新對應畫面
         if (section === 'shortcuts') this.renderShortcuts();
         else if (section === 'stories') this.renderStories();
         else if (section === 'curation') this.renderCuration();
         else if (section === 'connections') this.renderConnections();
         else if (section === 'goals') this.renderGoals();
         
-        lucide.createIcons();
-      },
-
-      saveModalEdit() {
-        const id = document.getElementById('modal-id').value;
-        
-        // 如果目前是編輯狀態，需確保先將 textarea 同步到 display 並取值
-        const input = document.getElementById('modal-note');
-        if (!input.classList.contains('hidden')) {
-           document.getElementById('modal-note-display').innerText = input.value || '尚無筆記...';
-        }
-
-        this.state.data.connections = this.state.data.connections.map(f => {
-          if(f.id === id) {
-            return {
-              ...f,
-              name: document.getElementById('modal-name').value,
-              tag: document.getElementById('modal-tag').value,
-              note: input.value,
-              isOftenContacted: document.getElementById('modal-oftenContacted').checked
-            };
-          }
-          return f;
-        });
-        this.saveData('connections');
-        this.closeModal();
-        this.renderConnections();
-        lucide.createIcons();
-      },
-
-      closeModal() {
-        document.getElementById('edit-modal').classList.add('hidden');
-      },
-
-      // === 常溫目標 (Goals) ===
-      renderGoals() {
-        const container = document.getElementById('goals-container');
-        const isEdit = this.state.isEditing.goals;
-        const filter = this.state.filters.goals;
-        
-        this.renderFilterBar('goals', ['進行中', '未開始', '已達成']);
-        
-        const filtered = filter === '全部' ? this.state.data.goals : this.state.data.goals.filter(g => g.status === filter);
-        
-        let html = filtered.map(goal => {
-          const isDone = goal.status === '已達成';
-          return `
-          <div class="glass-panel p-5 rounded-2xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center transition-all duration-300 border ${isDone ? 'border-emerald-500/30 bg-emerald-900/10 opacity-70' : 'border-white/10 hover:border-white/30'}">
-            <div class="flex items-start gap-4">
-              <button onclick="app.toggleGoalStatus('${goal.id}')" class="mt-1 flex-shrink-0 text-white/40 hover:text-white transition-colors" ${isEdit ? 'disabled' : ''}>
-                <i data-lucide="${isDone ? 'check-circle-2' : 'circle'}" class="w-6 h-6 ${isDone ? 'text-emerald-400' : ''}"></i>
-              </button>
-              <div>
-                <div class="flex items-center gap-3 mb-1">
-                  <h3 class="text-lg font-medium ${isDone ? 'text-white/50 line-through' : 'text-white'} transition-colors">${goal.title}</h3>
-                  <span class="text-[10px] px-2 py-0.5 rounded-full border border-purple-300/30 text-purple-300 whitespace-nowrap">${goal.type}</span>
-                </div>
-                <div class="flex items-center gap-2 text-xs text-white/50">
-                  <i data-lucide="flag" class="w-3 h-3"></i> 期限: ${goal.date}
-                </div>
-              </div>
-            </div>
-            ${isEdit ? `
-              <button onclick="app.confirmDelete('goals', '${goal.id}'); event.stopPropagation();" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors self-end md:self-center">
-                <i data-lucide="trash-2" class="w-5 h-5"></i>
-              </button>
-            ` : ''}
-          </div>
-        `}).join('');
-        container.innerHTML = html;
-      },
-
-      addGoal() {
-        const title = document.getElementById('gl-title').value;
-        if (!title) return;
-        this.state.data.goals.unshift({
-          id: Date.now().toString(),
-          title,
-          type: document.getElementById('gl-type').value,
-          date: document.getElementById('gl-date').value || '持續',
-          status: '進行中'
-        });
-        this.saveData('goals');
-        document.getElementById('gl-title').value = '';
-        document.getElementById('gl-date').value = '';
-        this.renderGoals();
-        lucide.createIcons();
-      },
-
-      toggleGoalStatus(id) {
-        if(this.state.isEditing.goals) return;
-        this.state.data.goals = this.state.data.goals.map(g => {
-          if (g.id === id) {
-            return { ...g, status: g.status === '已達成' ? '進行中' : '已達成' };
-          }
-          return g;
-        });
-        this.saveData('goals');
-        this.renderGoals();
         lucide.createIcons();
       },
 
