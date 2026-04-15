@@ -124,30 +124,38 @@
     <div class="w-full max-w-5xl">
       
       <!-- 首頁視圖 (首頁Hero + 控制中心) -->
-      <div id="view-home" class="view-section flex flex-col items-center fade-in w-full gap-16">
+      <div id="view-home" class="view-section flex flex-col items-center fade-in w-full">
         
-        <!-- Hero Section -->
-        <div class="glass-panel p-10 md:p-16 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl w-full text-center">
-          <span class="text-purple-300/80 text-sm tracking-[0.3em] uppercase mb-4 block font-light">Quiet Ripples Dashboard</span>
-          <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 leading-tight tracking-wide text-white">
-            在這裡，我們慢慢說<br />我靜靜聽。
-          </h1>
-          <p class="text-white/70 font-light text-lg mb-8 leading-relaxed">
-            這是一個只屬於我的常溫空間。用來存放靈感、管理生活，以及那些偶爾冒出來的不確定性。
-          </p>
-          <div class="absolute bottom-6 right-6">
-            <button onclick="app.triggerEasterEgg()" class="w-12 h-12 rounded-full bg-purple-500/20 hover:bg-purple-500/50 border border-purple-400/30 flex items-center justify-center transition-all duration-300 hover:scale-110 group/btn">
-              <span class="text-xl group-hover/btn:hidden">👀</span>
-              <span class="text-xl hidden group-hover/btn:block">✨</span>
-              <div class="absolute right-full mr-3 bottom-1/2 translate-y-1/2 whitespace-nowrap bg-white text-slate-900 text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity pointer-events-none">
-                我都說了不要點...
-              </div>
-            </button>
+        <!-- Hero Section (手機板全屏高度設計) -->
+        <div class="w-full min-h-[85vh] md:min-h-0 flex flex-col justify-center items-center relative mb-24 md:mb-16">
+          <div class="glass-panel p-10 md:p-16 rounded-3xl shadow-2xl relative overflow-hidden group max-w-2xl w-full text-center">
+            <span class="text-purple-300/80 text-sm tracking-[0.3em] uppercase mb-4 block font-light">Quiet Ripples Dashboard</span>
+            <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 leading-tight tracking-wide text-white">
+              在這裡，我們慢慢說<br />我靜靜聽。
+            </h1>
+            <p class="text-white/70 font-light text-lg mb-8 leading-relaxed">
+              這是一個只屬於我的常溫空間。用來存放靈感、管理生活，以及那些偶爾冒出來的不確定性。
+            </p>
+            <div class="absolute bottom-6 right-6">
+              <button onclick="app.triggerEasterEgg()" class="w-12 h-12 rounded-full bg-purple-500/20 hover:bg-purple-500/50 border border-purple-400/30 flex items-center justify-center transition-all duration-300 hover:scale-110 group/btn">
+                <span class="text-xl group-hover/btn:hidden">👀</span>
+                <span class="text-xl hidden group-hover/btn:block">✨</span>
+                <div class="absolute right-full mr-3 bottom-1/2 translate-y-1/2 whitespace-nowrap bg-white text-slate-900 text-xs px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity pointer-events-none">
+                  我都說了不要點...
+                </div>
+              </button>
+            </div>
           </div>
+          
+          <!-- 手機板專屬：向下滑動提示 -->
+          <button onclick="document.getElementById('mobile-shortcuts-section').scrollIntoView({behavior: 'smooth', block: 'start'})" class="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 flex flex-col items-center gap-1 animate-bounce transition-colors hover:text-white">
+            <span class="text-[10px] tracking-widest font-light">向下滑動至控制中心</span>
+            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+          </button>
         </div>
 
         <!-- 捷徑 / 控制中心 Section -->
-        <div class="w-full mt-4">
+        <div id="mobile-shortcuts-section" class="w-full scroll-mt-6">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
             <div>
               <h2 class="font-serif text-3xl mb-2 text-white">我的控制中心</h2>
@@ -281,25 +289,25 @@
         </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <!-- 佔位卡片 1 -->
-          <div class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group">
+          <!-- 卡片 1：罕用 App 倉庫 (新加入) -->
+          <a href="https://weichun0203.github.io/wei/app" target="_blank" class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block">
             <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <i data-lucide="kanban" class="w-6 h-6 text-blue-300"></i>
+              <i data-lucide="archive" class="w-6 h-6 text-blue-300"></i>
             </div>
-            <h3 class="text-lg font-medium text-white mb-2">專案看板 (開發中)</h3>
-            <p class="text-sm text-white/50">用視覺化方式管理大型專案與任務進度。</p>
-          </div>
+            <h3 class="text-lg font-medium text-white mb-2">罕用 App 倉庫</h3>
+            <p class="text-sm text-white/50">不再佔用手機空間，需要時隨時找回。</p>
+          </a>
           
-          <!-- 佔位卡片 2 -->
-          <div class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group">
+          <!-- 卡片 2：番茄鐘 (加入點擊事件) -->
+          <div onclick="app.openPomodoro()" class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group">
             <div class="w-12 h-12 bg-rose-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <i data-lucide="timer" class="w-6 h-6 text-rose-300"></i>
             </div>
-            <h3 class="text-lg font-medium text-white mb-2">番茄鐘 (準備中)</h3>
-            <p class="text-sm text-white/50">結合白噪音的專注力計時器，提升深度工作效率。</p>
+            <h3 class="text-lg font-medium text-white mb-2">番茄鐘</h3>
+            <p class="text-sm text-white/50">設定專注時間，時間到將有驚喜獎勵。</p>
           </div>
           
-          <!-- 佔位卡片 3 -->
+          <!-- 卡片 3：靈感白板 -->
           <div class="glass-panel p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group">
             <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <i data-lucide="lightbulb" class="w-6 h-6 text-emerald-300"></i>
@@ -359,6 +367,43 @@
     </div>
   </div>
 
+  <!-- 番茄鐘設定 Modal -->
+  <div id="pomodoro-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+    <div class="glass-panel w-full max-w-sm p-6 rounded-2xl border border-rose-400/50 bg-slate-900/95 shadow-2xl relative text-center">
+      <button onclick="app.closePomodoro()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="w-16 h-16 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
+        <i data-lucide="timer" class="w-8 h-8 text-rose-400 relative z-10"></i>
+      </div>
+      <h3 class="text-xl font-medium text-rose-300 mb-2">常溫番茄鐘</h3>
+      <p class="text-sm text-white/50 mb-6">給自己一段不被打擾的專注時光。</p>
+      
+      <div id="pomodoro-setup">
+        <div class="flex items-center justify-center gap-2 mb-6">
+          <input type="number" id="pomodoro-minutes" value="15" min="1" max="120" class="w-24 bg-black/20 border border-white/10 rounded-lg px-3 py-3 text-3xl font-light text-center text-white focus:outline-none focus:border-rose-400/50 transition-colors">
+          <span class="text-white/50 text-lg">分鐘</span>
+        </div>
+        <button onclick="app.startPomodoro()" class="w-full py-3 bg-rose-600/80 hover:bg-rose-600 rounded-lg text-sm font-medium transition-colors text-white shadow-lg shadow-rose-900/50">
+          開始專注
+        </button>
+      </div>
+
+      <div id="pomodoro-running" class="hidden">
+        <div id="pomodoro-display" class="text-6xl font-light text-white mb-6 font-mono tracking-wider tabular-nums">15:00</div>
+        <button onclick="app.stopPomodoro()" class="w-full py-3 bg-white/5 hover:bg-rose-500/20 border border-white/10 hover:border-rose-400/50 hover:text-rose-300 rounded-lg text-sm font-medium transition-all text-white/70">
+          放棄計時
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 番茄鐘懸浮計時器 (收起 Modal 時顯示) -->
+  <div id="floating-timer" onclick="app.openPomodoro()" class="hidden fixed bottom-24 md:bottom-6 right-6 z-[90] glass-panel px-4 py-2.5 rounded-full border border-rose-400/50 flex items-center gap-2.5 cursor-pointer hover:scale-105 transition-transform bg-slate-900/80 shadow-lg shadow-rose-900/20">
+    <i data-lucide="timer" class="w-4 h-4 text-rose-400 animate-pulse"></i>
+    <span id="floating-timer-display" class="text-sm font-mono text-white font-medium tabular-nums">15:00</span>
+  </div>
+
   <script>
     // --- 預設資料設定 ---
     const defaultData = {
@@ -403,6 +448,11 @@
           goals: JSON.parse(localStorage.getItem('qw-goals')) || defaultData.goals,
           stories: JSON.parse(localStorage.getItem('qw-stories')) || defaultData.stories,
           curation: JSON.parse(localStorage.getItem('qw-curation')) || defaultData.curation
+        },
+        pomodoro: {
+          interval: null,
+          timeLeft: 0,
+          active: false
         }
       },
 
@@ -884,6 +934,83 @@
         this.closeModal();
         this.renderConnections();
         lucide.createIcons();
+      },
+
+      // --- 番茄鐘邏輯 ---
+      openPomodoro() {
+        document.getElementById('pomodoro-modal').classList.remove('hidden');
+        if (this.state.pomodoro.active) {
+          document.getElementById('pomodoro-setup').classList.add('hidden');
+          document.getElementById('pomodoro-running').classList.remove('hidden');
+        } else {
+          document.getElementById('pomodoro-setup').classList.remove('hidden');
+          document.getElementById('pomodoro-running').classList.add('hidden');
+        }
+      },
+
+      closePomodoro() {
+        document.getElementById('pomodoro-modal').classList.add('hidden');
+      },
+
+      startPomodoro() {
+        const mins = parseInt(document.getElementById('pomodoro-minutes').value) || 15;
+        this.state.pomodoro.timeLeft = mins * 60;
+        this.state.pomodoro.active = true;
+        
+        document.getElementById('pomodoro-setup').classList.add('hidden');
+        document.getElementById('pomodoro-running').classList.remove('hidden');
+        document.getElementById('floating-timer').classList.remove('hidden');
+        
+        this.updatePomodoroDisplay();
+        
+        // 清除舊的計時器
+        if (this.state.pomodoro.interval) clearInterval(this.state.pomodoro.interval);
+        
+        this.state.pomodoro.interval = setInterval(() => {
+          this.state.pomodoro.timeLeft--;
+          this.updatePomodoroDisplay();
+          
+          if (this.state.pomodoro.timeLeft <= 0) {
+            this.endPomodoro();
+          }
+        }, 1000);
+      },
+
+      stopPomodoro() {
+        clearInterval(this.state.pomodoro.interval);
+        this.state.pomodoro.active = false;
+        this.state.pomodoro.timeLeft = 0;
+        document.getElementById('pomodoro-setup').classList.remove('hidden');
+        document.getElementById('pomodoro-running').classList.add('hidden');
+        document.getElementById('floating-timer').classList.add('hidden');
+      },
+
+      updatePomodoroDisplay() {
+        const m = Math.floor(this.state.pomodoro.timeLeft / 60).toString().padStart(2, '0');
+        const s = (this.state.pomodoro.timeLeft % 60).toString().padStart(2, '0');
+        const timeStr = `${m}:${s}`;
+        document.getElementById('pomodoro-display').innerText = timeStr;
+        document.getElementById('floating-timer-display').innerText = timeStr;
+      },
+
+      endPomodoro() {
+        this.stopPomodoro();
+        this.closePomodoro();
+        this.celebratePomodoro();
+      },
+
+      celebratePomodoro() {
+        // 連續 10 秒觸發 EMOJI 瀑布 (每秒掉落一次，持續 10 次)
+        let count = 0;
+        this.triggerEasterEgg(); // 先噴發第一次
+        const interval = setInterval(() => {
+          count++;
+          if (count >= 10) {
+            clearInterval(interval);
+          } else {
+            this.triggerEasterEgg();
+          }
+        }, 1000);
       },
 
       // --- 彩蛋特效 ---
