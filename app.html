@@ -84,15 +84,12 @@
                 </div>
 
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                    <!-- Quick Demo Import -->
                     <button id="quick-import-btn" onclick="togglePromptModal(true, 'quick-import')" title="快捷導入您的清單" class="glass-panel p-2.5 rounded-xl hover:bg-purple-500/20 transition-all text-purple-400 hover:text-purple-300 border-purple-500/20 active:scale-95">
                         <i data-lucide="sparkles" class="w-5 h-5"></i>
                     </button>
-                    <!-- Export Button -->
                     <button onclick="handleExportCSV()" title="匯出 CSV" class="glass-panel p-2.5 rounded-xl hover:bg-white/10 transition-all text-white/60 hover:text-white border-white/10 active:scale-95">
                         <i data-lucide="download-cloud" class="w-5 h-5"></i>
                     </button>
-                    <!-- Import Button -->
                     <button onclick="triggerImport()" title="匯入 CSV" class="glass-panel p-2.5 rounded-xl hover:bg-white/10 transition-all text-white/60 hover:text-white border-white/10 active:scale-95">
                         <i data-lucide="upload-cloud" class="w-5 h-5"></i>
                     </button>
@@ -129,7 +126,7 @@
             </div>
         </footer>
 
-        <!-- Detail Modal - 加入點擊背景關閉 -->
+        <!-- Detail Modal -->
         <div id="detail-modal" onclick="if(event.target === this) toggleDetailModal(false)" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 transition-all">
             <div class="glass-panel w-full max-w-sm rounded-3xl bg-slate-900/95 shadow-2xl relative overflow-hidden fade-in">
                 <div class="p-6">
@@ -156,7 +153,7 @@
             </div>
         </div>
 
-        <!-- Add Modal - 加入點擊背景關閉 -->
+        <!-- Add Modal -->
         <div id="add-modal" onclick="if(event.target === this) toggleModal(false)" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all">
             <div class="glass-panel w-full max-w-lg rounded-t-3xl sm:rounded-2xl bg-slate-900/90 shadow-2xl relative overflow-hidden">
                 <div id="modal-form-content">
@@ -199,7 +196,7 @@
             </div>
         </div>
 
-        <!-- Delete Confirm Modal - 加入點擊背景關閉 -->
+        <!-- Delete Confirm Modal -->
         <div id="delete-modal" onclick="if(event.target === this) toggleDeleteModal(null)" class="fixed inset-0 z-[80] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
             <div class="glass-panel bg-slate-900/95 border-rose-500/30 w-full max-sm rounded-3xl p-6 shadow-2xl fade-in text-center">
                 <div class="bg-rose-500/20 border border-rose-500/30 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto"><i data-lucide="alert-triangle" class="text-rose-400 w-8 h-8"></i></div>
@@ -212,7 +209,7 @@
             </div>
         </div>
 
-        <!-- Prompt Modal - 加入點擊背景關閉 -->
+        <!-- Prompt Modal -->
         <div id="prompt-modal" onclick="if(event.target === this) togglePromptModal(false)" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
             <div class="glass-panel bg-slate-900/95 border-purple-500/30 w-full max-w-sm rounded-3xl p-6 shadow-2xl fade-in text-center">
                 <div class="bg-purple-500/20 border border-purple-500/30 w-14 h-14 rounded-full flex items-center justify-center mb-4 mx-auto"><i data-lucide="help-circle" class="text-purple-400 w-7 h-7"></i></div>
@@ -230,7 +227,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, addDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, addDoc, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global State
         let currentUser = null;
@@ -246,7 +243,6 @@
             renderCategoryFilters();
             lucide.createIcons();
             
-            // 安全逾時機制
             setTimeout(() => { 
                 const loader = document.getElementById('loading-screen');
                 if (!loader.classList.contains('hidden')) {
@@ -397,19 +393,42 @@
         window.handleSearch = () => renderApps();
         window.handleCategoryChange = (cat) => { currentFilter = cat; renderCategoryFilters(); renderApps(); };
 
+        // 單筆存入/更新邏輯
+        async function upsertApp(appData) {
+            // 檢查名稱是否已存在
+            const existing = allApps.find(a => a.name.trim().toLowerCase() === appData.name.trim().toLowerCase());
+            
+            if (isCloudMode && currentUser) {
+                try {
+                    if (existing) {
+                        const docRef = doc(window.dbRef, 'artifacts', window.appIdRef, 'users', currentUser.uid, 'savedApps', existing.id);
+                        await updateDoc(docRef, appData);
+                    } else {
+                        await addDoc(collection(window.dbRef, 'artifacts', window.appIdRef, 'users', currentUser.uid, 'savedApps'), appData);
+                    }
+                } catch (err) { console.error("Upsert Error:", err); }
+            } else {
+                if (existing) {
+                    Object.assign(existing, appData);
+                } else {
+                    appData.id = Date.now().toString() + Math.random();
+                    allApps.unshift(appData);
+                }
+                saveLocally();
+            }
+        }
+
         window.handleFormSubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
             const form = e.target;
             const fd = new FormData(form);
             const data = {
-                id: Date.now().toString(), name: fd.get('name'), category: fd.get('category'),
+                name: fd.get('name'), category: fd.get('category'),
                 iconEmoji: fd.get('iconEmoji'), storeUrl: fd.get('storeUrl'), note: fd.get('note'), createdAt: new Date().toISOString()
             };
             btn.disabled = true;
-            if (isCloudMode && currentUser) {
-                try { await addDoc(collection(window.dbRef, 'artifacts', window.appIdRef, 'users', currentUser.uid, 'savedApps'), data); } catch (e) { }
-            } else { allApps.unshift(data); saveLocally(); }
+            await upsertApp(data);
             document.getElementById('modal-form-content').classList.add('hidden');
             document.getElementById('modal-success-content').classList.remove('hidden');
             setTimeout(() => { toggleModal(false); form.reset(); btn.disabled = false; }, 1200);
@@ -418,14 +437,14 @@
         window.togglePromptModal = (show, type = '', msg = '') => {
             const modal = document.getElementById('prompt-modal');
             if (!show) { modal.classList.add('hidden'); return; }
-            document.getElementById('prompt-message').textContent = msg || (type === 'quick-import' ? "即將導入您的清單（共 27 個應用程式），確定要繼續嗎？" : "");
+            document.getElementById('prompt-message').textContent = msg || (type === 'quick-import' ? "即將導入您的清單，若名稱重複將自動更新內容。確定要繼續嗎？" : "");
             document.getElementById('prompt-confirm-btn').onclick = () => { if (type === 'quick-import') executeQuickImport(); togglePromptModal(false); };
             modal.classList.remove('hidden');
             lucide.createIcons();
         };
 
         window.handleExportCSV = () => {
-            if (!allApps.length) return togglePromptModal(true, 'info', '目前倉庫無資料可以匯出。');
+            if (!allApps.length) return alert("無資料");
             const headers = ["App名稱", "分類", "Emoji", "連結", "備註", "日期"];
             const rows = allApps.map(a => [a.name, a.category, a.iconEmoji, a.storeUrl, a.note, new Date(a.createdAt).toLocaleDateString()]);
             const csv = "\ufeff" + headers.join(",") + "\n" + rows.map(r => r.map(c => `"${(c||"").replace(/"/g, '""')}"`).join(",")).join("\n");
@@ -444,12 +463,13 @@
                     const m = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
                     if (!m) continue;
                     const clean = (s) => (s||"").replace(/^"|"$/g, '').replace(/""/g, '"');
-                    const item = { name: clean(m[0]), category: clean(m[1]), iconEmoji: clean(m[2]), storeUrl: clean(m[3]), note: clean(m[4]), createdAt: new Date().toISOString() };
-                    if (isCloudMode && currentUser) { await addDoc(collection(window.dbRef, 'artifacts', window.appIdRef, 'users', currentUser.uid, 'savedApps'), item); }
-                    else { item.id = Date.now().toString() + Math.random(); allApps.unshift(item); }
+                    const item = { 
+                        name: clean(m[0]), category: clean(m[1]), iconEmoji: clean(m[2]), 
+                        storeUrl: clean(m[3]), note: clean(m[4]), createdAt: new Date().toISOString() 
+                    };
+                    await upsertApp(item);
                 }
-                if (!isCloudMode) saveLocally();
-                togglePromptModal(true, 'info', 'CSV 匯入完成！');
+                togglePromptModal(true, 'info', 'CSV 匯入完成（重複項已更新）！');
                 e.target.value = "";
             };
             reader.readAsText(file);
@@ -471,7 +491,7 @@
                 { name: "Ridey", cat: "旅遊", emoji: "🚗", url: "https://play.google.com/store/apps/details?id=today.ridey&hl=zh_TW", note: "共乘服務" },
                 { name: "Samsung Shop", cat: "購物", emoji: "📱", url: "https://play.google.com/store/apps/details?id=com.samsung.ecomm.global.gbr&hl=zh_TW", note: "三星官方商城" },
                 { name: "Samsung Members", cat: "生活", emoji: "👥", url: "https://play.google.com/store/apps/details?id=com.samsung.android.voc&hl=zh_TW", note: "三星會員服務" },
-                { name: "NotebookLM", cat: "工具", emoji: "📓", url: "https://notebooklm.google.com/", note: "Google AI 筆記" },
+                { name: "NotebookLM", cat: "工具", emoji: "📓", url: "https://play.google.com/store/apps/details?id=com.google.android.apps.labs.language.tailwind&hl=zh_TW", note: "Google AI 筆記" },
                 { name: "MOMO 購物", cat: "購物", emoji: "🍑", url: "https://play.google.com/store/apps/details?id=com.momo.mobile.shoppingv2.android&hl=zh_TW", note: "電商平台" },
                 { name: "停車大聲公", cat: "生活", emoji: "🅿️", url: "https://play.google.com/store/apps/details?id=com.alfred.parkinglot&hl=zh_TW", note: "停車位搜尋" },
                 { name: "Obsidian", cat: "工具", emoji: "💎", url: "https://play.google.com/store/apps/details?id=md.obsidian&hl=zh_TW", note: "知識管理筆記" },
@@ -487,18 +507,15 @@
             ];
             const loader = document.getElementById('loading-screen');
             loader.classList.remove('hidden');
-            if (isCloudMode && currentUser) {
-                for (const item of list) {
-                    await addDoc(collection(window.dbRef, 'artifacts', window.appIdRef, 'users', currentUser.uid, 'savedApps'), {
-                        name: item.name, category: item.cat, iconEmoji: item.emoji, storeUrl: item.url, note: item.note, createdAt: new Date().toISOString()
-                    });
-                }
-            } else {
-                const local = list.map(i => ({ id: Date.now().toString() + Math.random(), name: i.name, category: i.cat, iconEmoji: i.emoji, storeUrl: i.url, note: i.note, createdAt: new Date().toISOString() }));
-                allApps = [...local, ...allApps]; saveLocally();
+            for (const item of list) {
+                const data = {
+                    name: item.name, category: item.cat, iconEmoji: item.emoji, 
+                    storeUrl: item.url, note: item.note, createdAt: new Date().toISOString()
+                };
+                await upsertApp(data);
             }
             loader.classList.add('hidden');
-            togglePromptModal(true, 'info', '導入成功！');
+            togglePromptModal(true, 'info', '導入成功（重複項已自動更新）！');
         };
     </script>
 </body>
