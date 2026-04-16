@@ -84,6 +84,13 @@
                 </div>
 
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <!-- 回首頁按鈕 -->
+                    <a href="https://weichun0203.github.io/wei/" title="回首頁" class="glass-panel p-2.5 rounded-xl hover:bg-white/10 transition-all text-white/60 hover:text-white border-white/10 active:scale-95">
+                        <i data-lucide="home" class="w-5 h-5"></i>
+                    </a>
+
+                    <div class="w-px h-6 bg-white/10 mx-1"></div>
+
                     <button id="quick-import-btn" onclick="togglePromptModal(true, 'quick-import')" title="快捷導入您的清單" class="glass-panel p-2.5 rounded-xl hover:bg-purple-500/20 transition-all text-purple-400 hover:text-purple-300 border-purple-500/20 active:scale-95">
                         <i data-lucide="sparkles" class="w-5 h-5"></i>
                     </button>
@@ -115,7 +122,7 @@
                 <div id="category-filters" class="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide"></div>
             </div>
 
-            <!-- Apps List - 3 columns grid for mobile -->
+            <!-- Apps List -->
             <div id="apps-container" class="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4"></div>
         </main>
 
@@ -393,9 +400,7 @@
         window.handleSearch = () => renderApps();
         window.handleCategoryChange = (cat) => { currentFilter = cat; renderCategoryFilters(); renderApps(); };
 
-        // 單筆存入/更新邏輯
         async function upsertApp(appData) {
-            // 檢查名稱是否已存在
             const existing = allApps.find(a => a.name.trim().toLowerCase() === appData.name.trim().toLowerCase());
             
             if (isCloudMode && currentUser) {
@@ -444,7 +449,7 @@
         };
 
         window.handleExportCSV = () => {
-            if (!allApps.length) return alert("無資料");
+            if (!allApps.length) return;
             const headers = ["App名稱", "分類", "Emoji", "連結", "備註", "日期"];
             const rows = allApps.map(a => [a.name, a.category, a.iconEmoji, a.storeUrl, a.note, new Date(a.createdAt).toLocaleDateString()]);
             const csv = "\ufeff" + headers.join(",") + "\n" + rows.map(r => r.map(c => `"${(c||"").replace(/"/g, '""')}"`).join(",")).join("\n");
