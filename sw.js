@@ -1,4 +1,4 @@
-const CACHE_NAME = 'qw-dashboard-v1';
+const CACHE_NAME = 'qw-dashboard-v2';
 const urlsToCache = [
   './',
   './index.html',
