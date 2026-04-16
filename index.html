@@ -603,7 +603,7 @@
     const app = {
       state: {
         activeTab: 'home',
-        isEditing: { home: false, connections: false, collections: false }, // 移除 goals 的 inline 編輯
+        isEditing: { home: false, connections: false, collections: false }, 
         filters: { stories: '全部', curation: '全部', connections: '全部', goals: '短期目標' },
         sorts: { connections: 'time-desc', goals: 'time-desc' },
         data: {
@@ -728,9 +728,13 @@
           `;
         }
 
-        html += this.state.data.shortcuts.map(link => `
+        html += this.state.data.shortcuts.map(link => {
+          // 判斷是否為預設的五個項目，如果是則不渲染垃圾桶按鈕
+          const isDefaultShortcut = ['1', '2', '3', '4', '5'].includes(link.id);
+          
+          return `
           <div class="relative group">
-            ${isEdit ? `<button onclick="app.confirmDelete('shortcuts', '${link.id}'); event.preventDefault(); event.stopPropagation();" class="absolute -top-3 -right-3 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg transition-transform hover:scale-110"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+            ${isEdit && !isDefaultShortcut ? `<button onclick="app.confirmDelete('shortcuts', '${link.id}'); event.preventDefault(); event.stopPropagation();" class="absolute -top-3 -right-3 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg transition-transform hover:scale-110"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
             <a href="${link.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="block glass-panel h-full p-6 rounded-2xl ${isEdit ? 'opacity-80' : 'hover:-translate-y-1'} transition-transform duration-300 flex flex-col items-start gap-4 ${link.color} border border-white/5 hover:border-white/20">
               <div class="text-3xl">${link.icon}</div>
               <div>
@@ -740,7 +744,7 @@
               <i data-lucide="external-link" class="w-4 h-4 absolute top-6 right-6 text-white/20"></i>
             </a>
           </div>
-        `).join('');
+        `}).join('');
         container.innerHTML = html;
       },
 
@@ -1403,6 +1407,11 @@
             this.renderConnections();
             lucide.createIcons();
           }
+          return;
+        }
+
+        // 防呆機制：控制中心的預設 5 個項目禁止被刪除
+        if (section === 'shortcuts' && ['1', '2', '3', '4', '5'].includes(id)) {
           return;
         }
 
