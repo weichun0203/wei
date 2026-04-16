@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>常溫航點 - 常用連結基地</title>
+  
+  <!-- PWA 核心設定 (Meta Tags) -->
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="常溫航點">
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- 引入 Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #0f172a; 
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    .font-serif {
+      font-family: 'Noto Serif TC', serif;
+    }
+
+    .bg-fluid {
+      background: linear-gradient(-45deg, #0F4C81, #1e1b4b, #4c1d95, #8B5CF6);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.5); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.8); }
+
+    /* 淡入動畫 */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 隱藏滾動條但可滾動 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-fluid relative transition-colors duration-1000">
+
+  <!-- 主要內容區 -->
+  <main class="pt-12 pb-16 min-h-screen p-6 md:p-12 flex flex-col items-center justify-start fade-in">
+    <div class="w-full max-w-4xl mx-auto">
+      
+      <!-- 標題與控制區 -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 border-b border-white/10 pb-6 gap-4">
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-purple-500/20 rounded-xl border border-purple-400/30 flex items-center justify-center">
+              <i data-lucide="compass" class="w-5 h-5 text-purple-300"></i>
+            </div>
+            <h1 class="font-serif text-2xl text-white font-medium tracking-wider">常溫航點</h1>
+          </div>
+          <p class="text-white/60 font-light text-sm">將散落於各領域的網站連結分類存放，隨時準備啟航。</p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <a href="https://weichun0203.github.io/wei/" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="home" class="w-4 h-4"></i> <span>回首頁</span>
+          </a>
+          <button onclick="app.toggleEdit()" id="edit-btn" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="edit-2" class="w-4 h-4"></i> <span>編輯連結</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 過濾列 -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 sticky top-6 z-30 py-2 bg-[#0f172a]/80 backdrop-blur-md rounded-2xl px-2 -mx-2">
+        <div id="filter-container" class="flex gap-2 overflow-x-auto w-full no-scrollbar px-2 py-1">
+          <!-- 過濾按鈕將由 JS 渲染 -->
+        </div>
+      </div>
+
+      <!-- 列表容器 -->
+      <div class="flex flex-col gap-3" id="bookmarks-container">
+        <!-- 卡片與新增表單將由 JS 渲染 -->
+      </div>
+      
+    </div>
+  </main>
+
+  <!-- 確認刪除 Modal -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+    <div class="glass-panel w-full max-w-xs p-6 rounded-2xl border border-rose-400/50 bg-slate-900/95 shadow-2xl relative text-center">
+      <div class="w-12 h-12 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="alert-triangle" class="w-6 h-6 text-rose-400"></i>
+      </div>
+      <h3 class="text-lg font-medium text-white mb-2">確定要刪除嗎？</h3>
+      <p class="text-sm text-white/50 mb-6">資料刪除後將無法復原喔。</p>
+      <div class="flex gap-3">
+        <button onclick="app.closeConfirm()" class="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors text-sm">取消</button>
+        <button onclick="app.executeDelete()" class="flex-1 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition-colors text-sm">確定刪除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 預設資料設定 ---
+    const defaultData = [
+      { id: '1', title: 'Figma', desc: 'UI/UX 介面設計與原型製作工具', category: '設計', icon: '🎨', color: 'bg-purple-500/20', url: 'https://figma.com' },
+      { id: '2', title: 'GitHub', desc: '代碼代管與專案版本控制', category: '開發', icon: '💻', color: 'bg-slate-500/20', url: 'https://github.com' },
+      { id: '3', title: 'Notion', desc: '全方位工作區、專案與筆記管理', category: '工具', icon: '📝', color: 'bg-blue-500/20', url: 'https://notion.so' },
+      { id: '4', title: 'Tailwind CSS', desc: '實用優先的 CSS 框架官方文件', category: '開發', icon: '🌊', color: 'bg-cyan-500/20', url: 'https://tailwindcss.com' },
+      { id: '5', title: 'Pinterest', desc: '尋找設計排版與視覺靈感', category: '靈感', icon: '📌', color: 'bg-rose-500/20', url: 'https://pinterest.com' },
+      { id: '6', title: 'ChatGPT', desc: 'AI 輔助開發與對話語言模型', category: 'AI', icon: '🤖', color: 'bg-emerald-500/20', url: 'https://chat.openai.com' },
+      { id: '7', title: 'Lucide Icons', desc: '簡潔美觀的開源 SVG 圖標庫', category: '設計', icon: '✨', color: 'bg-amber-500/20', url: 'https://lucide.dev/' },
+      { id: '8', title: 'Spotify', desc: '專注工作時的背景音樂播放器', category: '日常', icon: '🎧', color: 'bg-emerald-500/20', url: 'https://open.spotify.com' }
+    ];
+
+    let itemToDeleteId = null;
+
+    // --- 應用程式核心邏輯 ---
+    const app = {
+      state: {
+        isEditing: false,
+        filter: '全部',
+        bookmarks: JSON.parse(localStorage.getItem('qw-bookmarks')) || defaultData
+      },
+
+      init() {
+        lucide.createIcons();
+        this.renderAll();
+      },
+
+      saveData() {
+        localStorage.setItem('qw-bookmarks', JSON.stringify(this.state.bookmarks));
+      },
+
+      toggleEdit() {
+        this.state.isEditing = !this.state.isEditing;
+        const btn = document.getElementById('edit-btn');
+        
+        if (this.state.isEditing) {
+          btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> <span class="hidden sm:inline">完成編輯</span>`;
+          btn.className = "glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border bg-purple-600/50 border-purple-400 text-white shadow-lg shadow-purple-900/50";
+        } else {
+          btn.innerHTML = `<i data-lucide="edit-2" class="w-4 h-4"></i> <span class="hidden sm:inline">編輯連結</span>`;
+          btn.className = "glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20";
+        }
+        
+        this.renderBookmarks();
+        lucide.createIcons();
+      },
+
+      setFilter(val) {
+        this.state.filter = val;
+        this.renderAll();
+      },
+
+      renderAll() {
+        this.renderFilters();
+        this.renderBookmarks();
+        lucide.createIcons();
+      },
+
+      renderFilters() {
+        const container = document.getElementById('filter-container');
+        const categories = this.state.bookmarks.map(b => b.category).filter(Boolean);
+        const uniqueCategories = ['全部', ...new Set(categories)];
+        
+        container.innerHTML = uniqueCategories.map(opt => `
+          <button onclick="app.setFilter('${opt}')" 
+            class="px-5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors border flex-shrink-0 ${this.state.filter === opt ? 'bg-purple-500/80 text-white border-purple-400 shadow-lg shadow-purple-900/20' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white'}">
+            ${opt}
+          </button>
+        `).join('');
+      },
+
+      renderBookmarks() {
+        const container = document.getElementById('bookmarks-container');
+        const isEdit = this.state.isEditing;
+        const filter = this.state.filter;
+        
+        let html = '';
+
+        // 編輯模式下渲染新增表單
+        if (isEdit) {
+          html += `
+            <div class="glass-panel p-5 rounded-xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-4 shadow-inner shadow-purple-500/10 fade-in">
+              <div class="text-sm font-medium text-purple-300 flex items-center gap-2 mb-1">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> 新增連結
+              </div>
+              <div class="flex flex-col md:flex-row gap-2">
+                <input type="text" id="bm-icon" placeholder="圖示(Emoji)" value="🔗" class="w-full md:w-20 flex-shrink-0 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-center text-white focus:outline-none focus:border-purple-400/50">
+                <input type="text" id="bm-title" placeholder="網站名稱" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <input type="text" id="bm-category" placeholder="分類 (例如: 開發)" class="w-full md:w-1/3 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              </div>
+              <div class="flex flex-col md:flex-row gap-2">
+                <input type="text" id="bm-desc" placeholder="簡單說明這個網站的用途" class="w-full md:w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <input type="text" id="bm-url" placeholder="https://..." class="w-full md:w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              </div>
+              
+              <div class="flex gap-2 items-center text-xs text-white/50 mt-1">
+                <span class="flex-shrink-0">清單主題色:</span>
+                <select id="bm-color" class="bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 focus:outline-none focus:border-purple-400/50 flex-1 text-white">
+                  <option value="bg-purple-500/20" class="bg-slate-800 text-purple-300">典雅紫</option>
+                  <option value="bg-blue-500/20" class="bg-slate-800 text-blue-300">科技藍</option>
+                  <option value="bg-cyan-500/20" class="bg-slate-800 text-cyan-300">海洋青</option>
+                  <option value="bg-emerald-500/20" class="bg-slate-800 text-emerald-300">自然綠</option>
+                  <option value="bg-amber-500/20" class="bg-slate-800 text-amber-300">活力橘</option>
+                  <option value="bg-rose-500/20" class="bg-slate-800 text-rose-300">溫暖紅</option>
+                  <option value="bg-slate-500/20" class="bg-slate-800 text-slate-300">低調灰</option>
+                </select>
+              </div>
+              
+              <button onclick="app.addBookmark()" class="mt-2 py-2.5 bg-purple-600/80 hover:bg-purple-500 rounded-lg text-sm font-medium text-white transition-colors flex items-center justify-center gap-2">
+                新增至分類
+              </button>
+            </div>
+          `;
+        }
+
+        const filtered = filter === '全部' 
+          ? this.state.bookmarks 
+          : this.state.bookmarks.filter(b => b.category === filter);
+
+        html += filtered.map(link => `
+          <div class="relative group fade-in">
+            ${isEdit ? `<button onclick="app.confirmDelete('${link.id}'); event.preventDefault(); event.stopPropagation();" class="absolute -top-2 -right-2 p-1.5 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg transition-transform hover:scale-110"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
+            
+            <a href="${link.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="glass-panel w-full p-4 rounded-xl ${isEdit ? 'opacity-80' : 'hover:bg-white/10 hover:translate-x-1'} transition-all duration-300 flex items-center gap-4 border border-white/5 hover:border-white/20 group-hover:shadow-md relative overflow-hidden">
+              
+              <!-- 左側色條裝飾 -->
+              <div class="absolute left-0 top-0 bottom-0 w-1.5 ${link.color}"></div>
+
+              <!-- Icon -->
+              <div class="w-10 h-10 ml-2 flex-shrink-0 rounded-lg bg-white/5 flex items-center justify-center text-xl shadow-inner border border-white/10 backdrop-blur-md">
+                ${link.icon}
+              </div>
+              
+              <!-- Content -->
+              <div class="flex-1 min-w-0 flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
+                <div class="flex items-center gap-3 flex-shrink-0">
+                  <h3 class="text-base font-medium text-white/90 truncate max-w-[150px] md:max-w-[200px]">
+                    ${link.title}
+                  </h3>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full border border-white/20 text-white/60 bg-black/20 tracking-wider flex-shrink-0">${link.category}</span>
+                </div>
+                <p class="text-sm text-white/40 truncate flex-1">${link.desc}</p>
+              </div>
+              
+              <!-- Link Icon -->
+              <div class="w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center bg-white/5 opacity-0 md:opacity-100 md:bg-transparent group-hover:bg-white/10 transition-all">
+                <i data-lucide="chevron-right" class="w-4 h-4 text-white/60 group-hover:text-white transition-colors"></i>
+              </div>
+            </a>
+          </div>
+        `).join('');
+
+        container.innerHTML = html;
+        lucide.createIcons();
+      },
+
+      addBookmark() {
+        const title = document.getElementById('bm-title').value;
+        const url = document.getElementById('bm-url').value;
+        const category = document.getElementById('bm-category').value;
+        
+        if (!title || !url) {
+            alert('請至少填寫名稱與網址！'); // 簡易防呆，因為代碼運行在 iframe 也可以使用 alert，或你可以做客製化提示
+            return;
+        }
+
+        this.state.bookmarks.unshift({
+          id: Date.now().toString(),
+          title,
+          icon: document.getElementById('bm-icon').value || '🔗',
+          desc: document.getElementById('bm-desc').value || '',
+          url,
+          category: category || '未分類',
+          color: document.getElementById('bm-color').value
+        });
+
+        this.saveData();
+        
+        // 如果新增的分類不在目前過濾器中，切換回全部
+        if (this.state.filter !== '全部' && this.state.filter !== category) {
+            this.state.filter = '全部';
+        }
+
+        this.renderAll();
+      },
+
+      // === 刪除防呆確認 ===
+      confirmDelete(id) {
+        itemToDeleteId = id;
+        document.getElementById('confirm-modal').classList.remove('hidden');
+      },
+
+      closeConfirm() {
+        itemToDeleteId = null;
+        document.getElementById('confirm-modal').classList.add('hidden');
+      },
+
+      executeDelete() {
+        if (itemToDeleteId) {
+          this.state.bookmarks = this.state.bookmarks.filter(b => b.id !== itemToDeleteId);
+          this.saveData();
+          this.closeConfirm();
+          this.renderAll();
+        }
+      }
+    };
+
+    // 初始化啟動
+    document.addEventListener('DOMContentLoaded', () => {
+      app.init();
+    });
+  </script>
+</body>
+</html>
