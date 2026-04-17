@@ -21,6 +21,9 @@
   <!-- 引入 Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- 引入 Chart.js 圖表庫 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body {
       font-family: 'Noto Sans TC', sans-serif;
@@ -109,9 +112,9 @@
       <i data-lucide="target" class="w-6 h-6"></i>
       <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">目標</span>
     </button>
-    <button onclick="app.switchTab('collections')" id="nav-collections" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="常溫選集">
-      <i data-lucide="layers" class="w-6 h-6"></i>
-      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">選集</span>
+    <button onclick="app.switchTab('accounting')" id="nav-accounting" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="記帳與時間">
+      <i data-lucide="calculator" class="w-6 h-6"></i>
+      <span class="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity md:block hidden">記帳</span>
     </button>
     <button onclick="app.switchTab('more')" id="nav-more" class="nav-btn flex flex-col items-center gap-1 transition-all duration-300 group text-white/50 hover:text-white hover:scale-105" title="更多功能">
       <i data-lucide="grid" class="w-6 h-6"></i>
@@ -215,36 +218,50 @@
         <div class="space-y-3" id="goals-container"></div>
       </div>
 
-      <!-- 常溫選集視圖 -->
-      <div id="view-collections" class="view-section hidden fade-in w-full">
+      <!-- 常溫記帳與時間視圖 -->
+      <div id="view-accounting" class="view-section hidden fade-in w-full max-w-4xl mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
           <div>
-            <h2 class="font-serif text-3xl mb-2 text-white">常溫選集</h2>
-            <p class="text-white/60 font-light">收納那些觸動靈感的圖文手札與嚴選好物。</p>
+            <h2 class="font-serif text-3xl mb-2 text-white">收支與時間花費</h2>
+            <p class="text-white/60 font-light">紀錄生活中的每一筆流動，掌握自己的財務與時間狀況。</p>
           </div>
-          <button onclick="app.toggleEdit('collections')" id="edit-btn-collections" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
-            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯選集
+          
+          <!-- 右側功能按鈕列 -->
+          <div class="flex flex-wrap gap-2 md:gap-3 w-full md:w-auto justify-end">
+            <button onclick="document.getElementById('csv-upload').click()" class="glass-panel px-3 py-2 rounded-full flex items-center gap-1.5 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20" title="匯入CSV">
+              <i data-lucide="upload" class="w-4 h-4"></i> <span class="hidden md:inline">匯入</span>
+            </button>
+            <input type="file" id="csv-upload" accept=".csv" class="hidden" onchange="app.handleCSVImport(event)">
+            <button onclick="app.exportCSV()" class="glass-panel px-3 py-2 rounded-full flex items-center gap-1.5 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20" title="匯出CSV">
+              <i data-lucide="download" class="w-4 h-4"></i> <span class="hidden md:inline">匯出</span>
+            </button>
+            <button onclick="app.openChartModal()" class="glass-panel px-3 py-2 rounded-full flex items-center gap-1.5 text-sm transition-colors border text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30" title="分析圖表">
+              <i data-lucide="pie-chart" class="w-4 h-4"></i> <span class="hidden md:inline">分析</span>
+            </button>
+            <button onclick="app.openCurrentAddModal()" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white hover:bg-purple-600/50 border-purple-500/50 bg-purple-600/20">
+              <i data-lucide="plus" class="w-4 h-4"></i> 新增紀錄
+            </button>
+          </div>
+        </div>
+
+        <!-- 模組切換 Tabs -->
+        <div class="flex gap-2 mb-6 bg-black/20 p-1.5 rounded-xl w-fit border border-white/10 relative z-10">
+          <button onclick="app.switchAccountingTab('money')" id="tab-btn-money" class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm">
+            金錢花費
+          </button>
+          <button onclick="app.switchAccountingTab('time')" id="tab-btn-time" class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white">
+            時間花費
           </button>
         </div>
 
-        <div class="flex gap-2 mb-6 bg-black/20 p-1.5 rounded-xl w-fit border border-white/10 mx-auto md:mx-0 relative z-10">
-          <button onclick="app.scrollToCollection('stories')" id="tab-btn-stories" class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm">
-            常溫手札
-          </button>
-          <button onclick="app.scrollToCollection('curation')" id="tab-btn-curation" class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white">
-            常溫選物
-          </button>
+        <!-- 動態渲染區域：統計面版 -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-8" id="accounting-summary">
+          <!-- Rendered by JS -->
         </div>
-        
-        <div id="collection-swipe-container" class="flex w-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth pb-8" onscroll="app.handleCollectionScroll(this)">
-          <div class="w-full min-w-full flex-shrink-0 snap-start pr-0 md:pr-4" id="slide-stories">
-            <div id="stories-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container"></div>
-          </div>
-          <div class="w-full min-w-full flex-shrink-0 snap-start pl-0 md:pl-4" id="slide-curation">
-            <div id="curation-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
-            <div class="space-y-4" id="curation-container"></div>
-          </div>
+
+        <!-- 動態渲染區域：列表 -->
+        <div class="space-y-3" id="accounting-container">
+          <!-- Rendered by JS -->
         </div>
       </div>
 
@@ -283,6 +300,15 @@
             <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">支會停車系統</h3>
             <p class="hidden md:block text-sm text-white/50">應對支會移車事宜。</p>
           </a>
+          
+          <a href="https://weichun0203.github.io/wei/skill.html" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-pink-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
+              <i data-lucide="layers" class="w-5 h-5 md:w-6 md:h-6 text-pink-300"></i>
+            </div>
+            <h3 class="text-sm md:text-lg font-medium text-white mb-1 md:mb-2 leading-tight">常溫選集</h3>
+            <p class="hidden md:block text-sm text-white/50">作品與技能展示</p>
+          </a>
+
           <a href="https://weichun0203.github.io/wei/app.html" class="glass-panel p-4 md:p-8 rounded-2xl border border-white/10 opacity-70 hover:opacity-100 transition-opacity cursor-pointer group block flex flex-col items-center md:items-start text-center md:text-left">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform">
               <i data-lucide="archive" class="w-5 h-5 md:w-6 md:h-6 text-blue-300"></i>
@@ -318,6 +344,106 @@
   </main>
 
   <!-- ==================== Modals ==================== -->
+
+  <!-- 分析圖表 Modal -->
+  <div id="chart-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 fade-in">
+    <div class="glass-panel w-full max-w-lg p-6 md:p-8 rounded-3xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative flex flex-col items-center">
+      <button onclick="app.closeChartModal()" class="absolute top-5 right-5 text-white/50 hover:text-white transition-colors bg-white/5 p-2 rounded-full hover:bg-white/10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-medium text-white mb-2 flex items-center gap-2" id="chart-modal-title">
+        <i data-lucide="pie-chart" class="w-5 h-5 text-emerald-400"></i> 本月分析
+      </h3>
+      <p class="text-sm text-white/50 mb-6" id="chart-modal-desc">看看資源都花去哪裡了</p>
+      
+      <!-- Chart.js 畫布容器 -->
+      <div class="w-full relative h-[300px] flex justify-center items-center">
+        <canvas id="analysisChart"></canvas>
+        <div id="chart-empty-state" class="hidden absolute inset-0 flex items-center justify-center text-white/40 text-sm">
+          本月尚無足夠資料可分析
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新增記帳 Modal -->
+  <div id="add-accounting-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+    <div class="glass-panel w-full max-w-sm p-6 rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative">
+      <button onclick="app.closeAddAccountingModal()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-medium text-purple-300 mb-4 flex items-center gap-2">
+        <i data-lucide="calculator" class="w-5 h-5"></i> 新增記帳
+      </h3>
+      <div class="space-y-4">
+        <div class="flex gap-2">
+          <button id="btn-expense" onclick="app.setAccountingType('expense')" class="flex-1 py-2 rounded-lg text-sm transition-colors border bg-rose-500/20 border-rose-500/50 text-rose-400">支出</button>
+          <button id="btn-income" onclick="app.setAccountingType('income')" class="flex-1 py-2 rounded-lg text-sm transition-colors border bg-black/20 border-white/10 text-white/50 hover:bg-white/5">收入</button>
+          <input type="hidden" id="add-acc-type" value="expense">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">日期</label>
+            <input type="date" id="add-acc-date" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+          </div>
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">金額</label>
+            <input type="number" id="add-acc-amount" placeholder="0" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-white/50 mb-1 block">分類</label>
+          <input type="text" id="add-acc-category" placeholder="例如：餐飲、交通、薪資..." class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+        </div>
+        <div>
+          <label class="text-xs text-white/50 mb-1 block">備註</label>
+          <input type="text" id="add-acc-note" placeholder="簡單描述..." class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+        </div>
+        <button onclick="app.addAccounting()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors text-white mt-2">
+          儲存紀錄
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新增時間花費 Modal -->
+  <div id="add-time-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+    <div class="glass-panel w-full max-w-sm p-6 rounded-2xl border border-indigo-400/50 bg-slate-900/95 shadow-2xl relative">
+      <button onclick="app.closeAddTimeModal()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-medium text-indigo-300 mb-4 flex items-center gap-2">
+        <i data-lucide="clock" class="w-5 h-5"></i> 紀錄時間
+      </h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs text-white/50 mb-1 block">日期</label>
+          <input type="date" id="add-time-date" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-400/50">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">花費小時</label>
+            <input type="number" id="add-time-hours" placeholder="0" min="0" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-400/50">
+          </div>
+          <div>
+            <label class="text-xs text-white/50 mb-1 block">花費分鐘</label>
+            <input type="number" id="add-time-minutes" placeholder="30" min="0" max="59" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-400/50">
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-white/50 mb-1 block">活動分類</label>
+          <input type="text" id="add-time-category" placeholder="例如：學習、工作、運動..." class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-400/50">
+        </div>
+        <div>
+          <label class="text-xs text-white/50 mb-1 block">內容備註</label>
+          <input type="text" id="add-time-note" placeholder="看了哪些書？做了什麼專案？" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-400/50">
+        </div>
+        <button onclick="app.addTimeTracking()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition-colors text-white mt-2">
+          儲存時間紀錄
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- 新增人物 Modal -->
   <div id="add-connection-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
@@ -363,7 +489,7 @@
           </div>
         </div>
         
-        <!-- 狀態 按鈕 (取代 Checkboxes) -->
+        <!-- 狀態 按鈕 -->
         <div class="flex flex-wrap gap-4 py-2">
           <button id="btn-oftenContacted" type="button" onclick="app.toggleOftenContacted()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors border bg-black/20 border-white/10 text-white/50">
             <i data-lucide="star" class="w-4 h-4"></i>
@@ -454,7 +580,7 @@
 
   <!-- 編輯目標 Modal -->
   <div id="edit-goal-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
-    <div class="glass-panel w-full max-w-lg p-6 rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative">
+    <div class="glass-panel w-full max-w-lg p-6 rounded-2xl border border-purple-400/50 bg-slate-900/95 shadow-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar">
       <button onclick="app.closeGoalModal()" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
@@ -490,7 +616,7 @@
           </select>
         </div>
 
-        <!-- 習慣打卡區塊 -->
+        <!-- 習慣打卡區塊 (針對習慣養成) -->
         <div id="edit-gl-tracker-section" class="hidden border-t border-white/5 pt-4 mt-2">
           <label class="text-xs text-emerald-400 mb-3 flex items-center justify-between">
             <span class="flex items-center gap-1.5"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> 近期執行紀錄 (點擊打卡)</span>
@@ -499,8 +625,24 @@
             <!-- 圓形按鈕將由 JS 渲染 -->
           </div>
         </div>
+
+        <!-- 執行清單小目標區塊 (針對短期與長期目標) -->
+        <div id="edit-gl-tasks-section" class="hidden border-t border-white/5 pt-4 mt-2">
+          <label class="text-xs text-white/50 mb-3 flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><i data-lucide="list-todo" class="w-3.5 h-3.5"></i> 執行清單 (細分小目標)</span>
+          </label>
+          <div class="flex gap-2 mb-3">
+            <input type="text" id="new-task-input" placeholder="新增小目標 (按Enter也可新增)..." onkeydown="if(event.key==='Enter') app.addGoalTask()" class="flex-1 bg-black/20 border border-white/10 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-purple-400/50">
+            <button onclick="app.addGoalTask()" class="px-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm text-white transition-colors flex-shrink-0">
+              新增
+            </button>
+          </div>
+          <div id="edit-gl-tasks-list" class="space-y-1.5 max-h-40 overflow-y-auto no-scrollbar pr-1">
+            <!-- 任務列表由 JS 渲染 -->
+          </div>
+        </div>
         
-        <div class="flex gap-3 mt-4">
+        <div class="flex gap-3 mt-4 border-t border-white/5 pt-4">
           <button onclick="app.saveGoalEdit()" class="flex-1 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors text-white">
             儲存變更
           </button>
@@ -563,7 +705,13 @@
     <span id="floating-timer-display" class="text-sm font-mono text-white font-medium tabular-nums">15:00</span>
   </div>
 
+  <!-- Toast 通知容器 -->
+  <div id="toast-container" class="fixed top-6 left-1/2 -translate-x-1/2 z-[300] flex flex-col gap-2 pointer-events-none"></div>
+
   <script>
+    // 建立一個全域變數來存 Chart 實例
+    let analysisChartInstance = null;
+
     // --- 預設資料設定 ---
     const getPastDate = (days) => {
         const d = new Date();
@@ -586,18 +734,27 @@
         { id: '4', name: 'Ariel (設計師)', tag: '聊設計', lastMet: getPastDate(20), lastMetType: '電話', note: '對 UI/UX 很有熱情。', events: [{id: 'e4', date: getPastDate(20), type: '電話', desc: '上次電話聊到她想轉職，下個月可以關心一下進度。'}], isOftenContacted: false, createdAt: '2024-06-15', isPinned: false }
       ],
       goals: [
-        { id: '1', title: '完成個人網站全新改版', type: '短期目標', date: '2026.04.30', status: '進行中', isPinned: true },
+        { 
+          id: '1', title: '完成個人網站全新改版', type: '短期目標', date: '2026.04.30', status: '進行中', isPinned: true,
+          tasks: [
+            { id: 't1', title: '設計 Figma 初稿', isDone: true },
+            { id: 't2', title: '切版與整合 Tailwind', isDone: false },
+            { id: 't3', title: '發布至 GitHub Pages', isDone: false }
+          ]
+        },
         { id: '2', title: '每週閱讀一本書並寫下心得', type: '習慣養成', date: '持續', status: '進行中', isPinned: false, records: [getPastDate(1), getPastDate(2)] },
         { id: '3', title: '報考日文檢定 N3 級別', type: '長期里程碑', date: '2026.12.01', status: '未開始', isPinned: false },
         { id: '4', title: '更新 2025 年度履歷', type: '短期目標', date: '2026.01.15', status: '已完成', isPinned: false }
       ],
-      stories: [
-        { id: '1', title: '北美館：未來身體特展', date: '2026.03.15', tag: '設計展', img: 'https://images.unsplash.com/photo-1518998053401-878c735777a8?auto=format&fit=crop&q=80&w=600', url: '#' },
-        { id: '2', title: '街角的咖啡與底片', date: '2026.02.28', tag: '攝影', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=600', url: '#' }
+      accounting: [
+        { id: '1', type: 'expense', amount: 150, category: '餐飲', date: new Date().toISOString().split('T')[0], note: '午餐便當' },
+        { id: '2', type: 'income', amount: 40000, category: '薪資', date: getPastDate(2), note: '薪水入帳' },
+        { id: '3', type: 'expense', amount: 1200, category: '交通', date: getPastDate(1), note: '悠遊卡加值' }
       ],
-      curation: [
-        { id: '1', title: 'JODOO：零程式碼架構思維', type: '文章', desc: '關於如何運用系統思維建立個人資料庫的筆記。', url: '#' },
-        { id: '2', title: 'Aesop 悟香水', type: '選物', desc: '帶有羅勒與柚子的沉靜木質調，工作時的安神劑。', url: '#' }
+      timeTracking: [
+        { id: '1', date: new Date().toISOString().split('T')[0], duration: 120, category: '學習', note: '學 React Hooks' },
+        { id: '2', date: getPastDate(1), duration: 45, category: '運動', note: '慢跑' },
+        { id: '3', date: getPastDate(1), duration: 240, category: '專案', note: '常溫編集網站切版' }
       ]
     };
 
@@ -610,15 +767,16 @@
     const app = {
       state: {
         activeTab: 'home',
-        isEditing: { home: false, connections: false, collections: false }, 
-        filters: { stories: '全部', curation: '全部', connections: '全部', goals: '短期目標' },
+        activeAccountingTab: 'money', // 'money' 或 'time'
+        isEditing: { home: false, connections: false }, 
+        filters: { connections: '全部', goals: '短期目標' },
         sorts: { connections: 'time-desc', goals: 'time-desc' },
         data: {
           shortcuts: JSON.parse(localStorage.getItem('qw-shortcuts')) || defaultData.shortcuts,
           connections: JSON.parse(localStorage.getItem('qw-connections')) || defaultData.connections,
           goals: JSON.parse(localStorage.getItem('qw-goals')) || defaultData.goals,
-          stories: JSON.parse(localStorage.getItem('qw-stories')) || defaultData.stories,
-          curation: JSON.parse(localStorage.getItem('qw-curation')) || defaultData.curation
+          accounting: JSON.parse(localStorage.getItem('qw-accounting')) || defaultData.accounting,
+          timeTracking: JSON.parse(localStorage.getItem('qw-timeTracking')) || defaultData.timeTracking
         },
         pomodoro: {
           interval: null,
@@ -629,6 +787,10 @@
 
       init() {
         lucide.createIcons();
+        // 初始化 Chart.js 預設顏色
+        Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
+        Chart.defaults.font.family = "'Noto Sans TC', sans-serif";
+
         this.renderAll();
       },
 
@@ -664,9 +826,6 @@
         
         if (section === 'home') {
           this.renderShortcuts();
-        } else if (section === 'collections') {
-          this.renderStories();
-          this.renderCuration();
         }
         
         lucide.createIcons();
@@ -674,8 +833,6 @@
 
       setFilter(section, val) {
         this.state.filters[section] = val;
-        if(section === 'stories') this.renderStories();
-        if(section === 'curation') this.renderCuration();
         if(section === 'connections') this.renderConnections();
         if(section === 'goals') this.renderGoals();
         lucide.createIcons();
@@ -710,8 +867,7 @@
         this.renderShortcuts();
         this.renderConnections();
         this.renderGoals();
-        this.renderStories();
-        this.renderCuration();
+        this.renderAccountingView();
         lucide.createIcons();
       },
 
@@ -875,30 +1031,25 @@
           const isNew = (now - created) < oneMonthMs; 
           const isNoUpdate = (now - lastMetDate) > oneMonthMs; 
 
-          let status = '保持聯繫';
+          // 決定側邊裝飾線的優先顏色
           let color = 'bg-purple-400';
-          let textClass = 'text-purple-400 border-purple-400/30';
+          if (friend.isOftenContacted) color = 'bg-emerald-400';
+          else if (isNew) color = 'bg-yellow-400';
+          else if (isNoUpdate) color = 'bg-blue-400';
 
-          if (isNew) {
-            status = '新朋友';
-            color = 'bg-yellow-400';
-            textClass = 'text-yellow-400 border-yellow-400/30';
-          } else if (friend.isOftenContacted) {
-            status = '時常聯絡';
-            color = 'bg-emerald-400';
-            textClass = 'text-emerald-400 border-emerald-400/30';
-          } else if (isNoUpdate) {
-            status = '太久沒見';
-            color = 'bg-blue-400';
-            textClass = 'text-blue-400 border-blue-400/30';
-          }
-
-          return { ...friend, status, color, textClass };
+          return { ...friend, color, isNew, isNoUpdate };
         });
         
-        const filtered = filter === '全部' ? mappedFriends : mappedFriends.filter(f => f.status === filter);
+        let finalFiltered = mappedFriends;
+        if (filter !== '全部') {
+          finalFiltered = mappedFriends.filter(f => {
+            if (filter === '新朋友') return f.isNew;
+            if (filter === '時常聯絡') return f.isOftenContacted;
+            if (filter === '太久沒見') return f.isNoUpdate;
+            return false;
+          });
+        }
         
-        let finalFiltered = filtered;
         if (sortVal === 'type-meet') finalFiltered = finalFiltered.filter(f => f.lastMetType === '見面');
         if (sortVal === 'type-phone') finalFiltered = finalFiltered.filter(f => f.lastMetType === '電話');
         if (sortVal === 'type-text') finalFiltered = finalFiltered.filter(f => f.lastMetType === '文字');
@@ -917,6 +1068,20 @@
           const typeIconMap = { '見面': '🤝', '電話': '📞', '文字': '💬' };
           const typeIcon = friend.lastMetType ? typeIconMap[friend.lastMetType] : '';
           const formattedLastMet = friend.lastMet ? friend.lastMet.substring(5).replace('-', '/') : '尚未記錄';
+
+          let badges = '';
+          if (friend.isNew) {
+            badges += `<span class="text-[10px] md:text-xs px-2 py-1 rounded-full bg-white/5 border whitespace-nowrap text-yellow-400 border-yellow-400/30">新朋友</span>`;
+          }
+          if (friend.isOftenContacted) {
+            badges += `<span class="text-[10px] md:text-xs px-2 py-1 rounded-full bg-white/5 border whitespace-nowrap text-emerald-400 border-emerald-400/30 flex items-center gap-1"><i data-lucide="star" class="w-3 h-3 hidden md:block"></i><span class="hidden md:inline">時常聯絡</span><span class="md:hidden">常聯絡</span></span>`;
+          }
+          if (friend.isNoUpdate) {
+            badges += `<span class="text-[10px] md:text-xs px-2 py-1 rounded-full bg-white/5 border whitespace-nowrap text-blue-400 border-blue-400/30">太久沒見</span>`;
+          }
+          if (!friend.isNew && !friend.isOftenContacted && !friend.isNoUpdate) {
+            badges += `<span class="text-[10px] md:text-xs px-2 py-1 rounded-full bg-white/5 border whitespace-nowrap text-purple-400 border-purple-400/30">保持聯繫</span>`;
+          }
 
           return `
           <div class="relative w-full rounded-xl overflow-hidden mb-1">
@@ -945,14 +1110,17 @@
                 </div>
               </div>
               
-              <div class="flex items-center gap-3 md:gap-4">
-                <span class="hidden md:flex items-center gap-1.5 text-xs text-white/40"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${typeIcon} ${formattedLastMet}</span>
-                <span class="text-xs px-2 py-1 rounded-full bg-white/5 border whitespace-nowrap ${friend.textClass}">${friend.status}</span>
+              <div class="flex items-center gap-2 md:gap-4">
+                <span class="hidden md:flex items-center gap-1.5 text-xs text-white/40 flex-shrink-0"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${typeIcon} ${formattedLastMet}</span>
                 
-                <button onclick="app.togglePin('${friend.id}'); event.stopPropagation();" class="hidden md:flex items-center justify-center p-1.5 rounded-full text-white/20 hover:bg-white/10 hover:text-purple-400 group-hover:text-white/50 transition-all z-20" title="${friend.isPinned ? '取消置頂' : '置頂'}">
+                <div class="flex gap-1.5 flex-wrap justify-end">
+                  ${badges}
+                </div>
+                
+                <button onclick="app.togglePin('${friend.id}'); event.stopPropagation();" class="hidden md:flex items-center justify-center p-1.5 rounded-full text-white/20 hover:bg-white/10 hover:text-purple-400 group-hover:text-white/50 transition-all z-20 flex-shrink-0" title="${friend.isPinned ? '取消置頂' : '置頂'}">
                   <i data-lucide="pin" class="w-4 h-4 ${friend.isPinned ? 'text-purple-400 fill-purple-400 rotate-45' : ''}"></i>
                 </button>
-                <i data-lucide="chevron-right" class="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors"></i>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors flex-shrink-0"></i>
               </div>
             </div>
           </div>
@@ -1202,6 +1370,17 @@
         
         let html = sorted.map(goal => {
           const isDone = goal.status === '已完成';
+          
+          // 計算小目標任務進度
+          let taskProgress = '';
+          if (goal.type === '短期目標' || goal.type === '長期里程碑') {
+            const tasks = goal.tasks || [];
+            if (tasks.length > 0) {
+              const doneCount = tasks.filter(t => t.isDone).length;
+              taskProgress = `<span class="flex items-center gap-1 ml-2 text-purple-300/80"><i data-lucide="list-todo" class="w-3 h-3"></i> ${doneCount}/${tasks.length}</span>`;
+            }
+          }
+
           return `
           <div class="relative w-full rounded-xl overflow-hidden mb-1">
             <div class="absolute inset-y-0 right-0 w-24 flex justify-end bg-purple-600 rounded-xl z-0">
@@ -1228,9 +1407,10 @@
                       ${goal.isPinned ? `<i data-lucide="pin" class="w-3.5 h-3.5 text-purple-400 fill-purple-400 rotate-45"></i>` : ''}
                     </h3>
                   </div>
-                  <div class="flex items-center gap-2 text-xs text-white/50">
+                  <div class="flex items-center gap-2 text-xs text-white/50 flex-wrap">
                     <span class="px-2 py-0.5 rounded-full border border-purple-300/30 text-purple-300 whitespace-nowrap">${goal.type}</span>
                     <span class="flex items-center gap-1"><i data-lucide="flag" class="w-3 h-3"></i> 期限: ${goal.date}</span>
+                    ${taskProgress}
                   </div>
                 </div>
               </div>
@@ -1268,7 +1448,8 @@
           date: document.getElementById('add-gl-date').value || '持續',
           status: '進行中',
           isPinned: false,
-          records: []
+          records: [],
+          tasks: []
         });
         this.saveData('goals');
         this.closeAddGoalModal();
@@ -1277,14 +1458,100 @@
       },
 
       handleGoalTypeChange(val) {
+        const id = document.getElementById('edit-gl-id').value;
+        const trackerSection = document.getElementById('edit-gl-tracker-section');
+        const tasksSection = document.getElementById('edit-gl-tasks-section');
+
+        // 習慣養成顯示 Tracker
         if (val === '習慣養成' || val === '長期里程碑') {
-          document.getElementById('edit-gl-tracker-section').classList.remove('hidden');
-          const id = document.getElementById('edit-gl-id').value;
-          this.renderGoalTracker(id);
+          trackerSection.classList.remove('hidden');
+          if(id) this.renderGoalTracker(id);
         } else {
-          document.getElementById('edit-gl-tracker-section').classList.add('hidden');
+          trackerSection.classList.add('hidden');
+        }
+
+        // 短期目標或長期里程碑顯示細分子任務清單
+        if (val === '短期目標' || val === '長期里程碑') {
+          tasksSection.classList.remove('hidden');
+          if(id) this.renderGoalTasks(id);
+        } else {
+          tasksSection.classList.add('hidden');
         }
       },
+
+      // --- 執行清單 (小目標) 相關功能 ---
+      renderGoalTasks(id) {
+        const goal = this.state.data.goals.find(g => g.id === id);
+        if (!goal) return;
+        
+        const container = document.getElementById('edit-gl-tasks-list');
+        const tasks = goal.tasks || [];
+
+        if (tasks.length === 0) {
+          container.innerHTML = `<div class="text-xs text-white/30 text-center py-4 bg-black/10 rounded border border-white/5">目前無小目標，試著細分行動會更容易達成喔！</div>`;
+          return;
+        }
+
+        container.innerHTML = tasks.map(t => `
+          <div class="flex items-start gap-2.5 p-2 bg-black/20 rounded-lg border border-white/5 relative group hover:border-purple-500/30 transition-colors">
+            <button onclick="app.toggleGoalTaskStatus('${goal.id}', '${t.id}')" class="mt-0.5 flex-shrink-0 text-white/40 hover:text-white transition-colors">
+              <i data-lucide="${t.isDone ? 'check-circle-2' : 'circle'}" class="w-4 h-4 ${t.isDone ? 'text-emerald-400' : ''}"></i>
+            </button>
+            <div class="text-sm flex-1 break-words ${t.isDone ? 'text-white/30 line-through' : 'text-white/80'}">${t.title}</div>
+            <button onclick="app.deleteGoalTask('${goal.id}', '${t.id}')" class="opacity-0 md:group-hover:opacity-100 text-rose-400 hover:text-rose-300 transition-opacity bg-slate-800 rounded p-1 flex-shrink-0">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `).join('');
+        lucide.createIcons();
+      },
+
+      addGoalTask() {
+        const id = document.getElementById('edit-gl-id').value;
+        const input = document.getElementById('new-task-input');
+        const title = input.value.trim();
+        if (!title) return;
+
+        const goal = this.state.data.goals.find(g => g.id === id);
+        if (goal) {
+          if (!goal.tasks) goal.tasks = [];
+          goal.tasks.push({
+            id: 't_' + Date.now().toString(),
+            title: title,
+            isDone: false
+          });
+          this.saveData('goals');
+          this.renderGoalTasks(id);
+          input.value = '';
+          
+          // 如果目標列表正在顯示，也一併更新外面的進度顯示
+          this.renderGoals(); 
+        }
+      },
+
+      toggleGoalTaskStatus(goalId, taskId) {
+        const goal = this.state.data.goals.find(g => g.id === goalId);
+        if (goal && goal.tasks) {
+          const task = goal.tasks.find(t => t.id === taskId);
+          if (task) {
+            task.isDone = !task.isDone;
+            this.saveData('goals');
+            this.renderGoalTasks(goalId);
+            this.renderGoals(); 
+          }
+        }
+      },
+
+      deleteGoalTask(goalId, taskId) {
+        const goal = this.state.data.goals.find(g => g.id === goalId);
+        if (goal && goal.tasks) {
+          goal.tasks = goal.tasks.filter(t => t.id !== taskId);
+          this.saveData('goals');
+          this.renderGoalTasks(goalId);
+          this.renderGoals(); 
+        }
+      },
+      // ---------------------------------
 
       renderGoalTracker(id) {
         const goal = this.state.data.goals.find(g => g.id === id);
@@ -1344,12 +1611,8 @@
         document.getElementById('edit-gl-date').value = goal.date;
         document.getElementById('edit-gl-status').value = goal.status;
         
-        if (goalType === '習慣養成' || goalType === '長期里程碑') {
-          document.getElementById('edit-gl-tracker-section').classList.remove('hidden');
-          this.renderGoalTracker(goal.id);
-        } else {
-          document.getElementById('edit-gl-tracker-section').classList.add('hidden');
-        }
+        // 觸發顯示/隱藏的 UI 邏輯
+        this.handleGoalTypeChange(goalType);
 
         document.getElementById('edit-goal-modal').classList.remove('hidden');
         lucide.createIcons();
@@ -1391,7 +1654,563 @@
         lucide.createIcons();
       },
 
-      // 共通刪除邏輯
+      // === 常溫記帳與時間 (Accounting & Time Tracking) ===
+      switchAccountingTab(type) {
+        this.state.activeAccountingTab = type;
+        const btnMoney = document.getElementById('tab-btn-money');
+        const btnTime = document.getElementById('tab-btn-time');
+        
+        if (type === 'money') {
+          btnMoney.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm";
+          btnTime.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white";
+        } else {
+          btnTime.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm";
+          btnMoney.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white";
+        }
+        
+        this.renderAccountingView();
+      },
+
+      renderAccountingView() {
+        if (this.state.activeAccountingTab === 'money') {
+          this.renderMoneyTracking();
+        } else {
+          this.renderTimeTracking();
+        }
+        lucide.createIcons();
+      },
+
+      renderMoneyTracking() {
+        const container = document.getElementById('accounting-container');
+        const summaryContainer = document.getElementById('accounting-summary');
+        const records = this.state.data.accounting || [];
+
+        // 排序: 新到舊
+        const sortedRecords = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // 計算本月摘要
+        const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
+        let monthExpense = 0;
+        let monthIncome = 0;
+
+        records.forEach(r => {
+          if (r.date.startsWith(currentMonth)) {
+            if (r.type === 'expense') monthExpense += Number(r.amount);
+            else if (r.type === 'income') monthIncome += Number(r.amount);
+          }
+        });
+
+        let balance = monthIncome - monthExpense;
+
+        summaryContainer.innerHTML = `
+          <div class="glass-panel p-4 md:p-6 rounded-2xl border border-white/10 flex flex-col justify-center text-center">
+            <span class="text-xs text-white/50 mb-1">本月支出</span>
+            <span class="text-xl md:text-3xl font-medium text-rose-400">$${monthExpense.toLocaleString()}</span>
+          </div>
+          <div class="glass-panel p-4 md:p-6 rounded-2xl border border-white/10 flex flex-col justify-center text-center">
+            <span class="text-xs text-white/50 mb-1">本月收入</span>
+            <span class="text-xl md:text-3xl font-medium text-emerald-400">$${monthIncome.toLocaleString()}</span>
+          </div>
+          <div class="glass-panel p-4 md:p-6 rounded-2xl border border-white/10 flex flex-col justify-center text-center hidden md:flex">
+            <span class="text-xs text-white/50 mb-1">本月結餘</span>
+            <span class="text-xl md:text-3xl font-medium ${balance >= 0 ? 'text-white' : 'text-rose-300'}">$${balance.toLocaleString()}</span>
+          </div>
+        `;
+
+        if (sortedRecords.length === 0) {
+          container.innerHTML = `<div class="text-center text-white/40 py-10 glass-panel rounded-2xl border border-white/5">目前還沒有記帳紀錄喔！</div>`;
+          return;
+        }
+
+        container.innerHTML = sortedRecords.map(item => {
+          const isExpense = item.type === 'expense';
+          const icon = isExpense ? 'trending-down' : 'trending-up';
+          const color = isExpense ? 'text-rose-400' : 'text-emerald-400';
+          const bg = isExpense ? 'bg-rose-500/10 border-rose-500/20' : 'bg-emerald-500/10 border-emerald-500/20';
+          const sign = isExpense ? '-' : '+';
+
+          return `
+            <div class="glass-panel p-4 rounded-xl flex items-center justify-between border border-white/5 hover:bg-white/5 transition-colors group relative">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center border flex-shrink-0 ${bg}">
+                  <i data-lucide="${icon}" class="w-5 h-5 ${color}"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-0.5">
+                    <span class="text-xs px-2 py-0.5 rounded bg-white/10 text-white/70 whitespace-nowrap">${item.category}</span>
+                    <span class="text-sm font-medium text-white line-clamp-1">${item.note || '無備註'}</span>
+                  </div>
+                  <div class="text-xs text-white/40">${item.date}</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-4 pr-6 md:pr-0 flex-shrink-0">
+                <span class="text-lg font-medium ${color}">${sign}$${Number(item.amount).toLocaleString()}</span>
+                <button onclick="app.confirmDelete('accounting', '${item.id}')" class="opacity-0 md:group-hover:opacity-100 text-rose-400 hover:text-rose-300 transition-opacity p-2 rounded-full hover:bg-rose-500/10 hidden md:block">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+              <!-- Mobile Delete Button -->
+              <button onclick="app.confirmDelete('accounting', '${item.id}')" class="absolute top-2 right-2 p-1.5 text-rose-400/50 md:hidden hover:text-rose-400">
+                 <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          `;
+        }).join('');
+      },
+
+      renderTimeTracking() {
+        const container = document.getElementById('accounting-container');
+        const summaryContainer = document.getElementById('accounting-summary');
+        const records = this.state.data.timeTracking || [];
+
+        // 排序: 新到舊
+        const sortedRecords = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // 計算本月與今日摘要
+        const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
+        const today = new Date().toISOString().split('T')[0];
+        let monthMinutes = 0;
+        let todayMinutes = 0;
+
+        records.forEach(r => {
+          if (r.date.startsWith(currentMonth)) monthMinutes += Number(r.duration);
+          if (r.date === today) todayMinutes += Number(r.duration);
+        });
+
+        const formatTime = (mins) => {
+          const h = Math.floor(mins / 60);
+          const m = mins % 60;
+          if (h > 0 && m > 0) return `${h}h ${m}m`;
+          if (h > 0) return `${h}h`;
+          return `${m}m`;
+        };
+
+        summaryContainer.innerHTML = `
+          <div class="glass-panel p-4 md:p-6 rounded-2xl border border-white/10 flex flex-col justify-center text-center">
+            <span class="text-xs text-white/50 mb-1">今日花費時間</span>
+            <span class="text-xl md:text-3xl font-medium text-indigo-400">${formatTime(todayMinutes)}</span>
+          </div>
+          <div class="glass-panel p-4 md:p-6 rounded-2xl border border-white/10 flex flex-col justify-center text-center col-span-1 md:col-span-2">
+            <span class="text-xs text-white/50 mb-1">本月累積時間</span>
+            <span class="text-xl md:text-3xl font-medium text-indigo-300">${formatTime(monthMinutes)}</span>
+          </div>
+        `;
+
+        if (sortedRecords.length === 0) {
+          container.innerHTML = `<div class="text-center text-white/40 py-10 glass-panel rounded-2xl border border-white/5">目前還沒有時間紀錄喔！</div>`;
+          return;
+        }
+
+        container.innerHTML = sortedRecords.map(item => {
+          return `
+            <div class="glass-panel p-4 rounded-xl flex items-center justify-between border border-white/5 hover:bg-white/5 transition-colors group relative">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center border flex-shrink-0 bg-indigo-500/10 border-indigo-500/20">
+                  <i data-lucide="clock" class="w-5 h-5 text-indigo-400"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-0.5">
+                    <span class="text-xs px-2 py-0.5 rounded bg-white/10 text-white/70 whitespace-nowrap">${item.category}</span>
+                    <span class="text-sm font-medium text-white line-clamp-1">${item.note || '無備註'}</span>
+                  </div>
+                  <div class="text-xs text-white/40">${item.date}</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-4 pr-6 md:pr-0 flex-shrink-0">
+                <span class="text-lg font-medium text-indigo-300">${formatTime(item.duration)}</span>
+                <button onclick="app.confirmDelete('timeTracking', '${item.id}')" class="opacity-0 md:group-hover:opacity-100 text-rose-400 hover:text-rose-300 transition-opacity p-2 rounded-full hover:bg-rose-500/10 hidden md:block">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+              <!-- Mobile Delete Button -->
+              <button onclick="app.confirmDelete('timeTracking', '${item.id}')" class="absolute top-2 right-2 p-1.5 text-rose-400/50 md:hidden hover:text-rose-400">
+                 <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          `;
+        }).join('');
+      },
+
+      openCurrentAddModal() {
+        if (this.state.activeAccountingTab === 'money') {
+          this.openAddAccountingModal();
+        } else {
+          this.openAddTimeModal();
+        }
+      },
+
+      // --- 金錢新增 ---
+      openAddAccountingModal() {
+        document.getElementById('add-acc-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('add-acc-amount').value = '';
+        document.getElementById('add-acc-category').value = '';
+        document.getElementById('add-acc-note').value = '';
+        this.setAccountingType('expense'); // 預設支出
+        document.getElementById('add-accounting-modal').classList.remove('hidden');
+        lucide.createIcons();
+      },
+
+      closeAddAccountingModal() {
+        document.getElementById('add-accounting-modal').classList.add('hidden');
+      },
+
+      setAccountingType(type) {
+        document.getElementById('add-acc-type').value = type;
+        const btnExpense = document.getElementById('btn-expense');
+        const btnIncome = document.getElementById('btn-income');
+        
+        if (type === 'expense') {
+          btnExpense.className = "flex-1 py-2 rounded-lg text-sm transition-colors border bg-rose-500/20 border-rose-500/50 text-rose-400";
+          btnIncome.className = "flex-1 py-2 rounded-lg text-sm transition-colors border bg-black/20 border-white/10 text-white/50 hover:bg-white/5";
+        } else {
+          btnIncome.className = "flex-1 py-2 rounded-lg text-sm transition-colors border bg-emerald-500/20 border-emerald-500/50 text-emerald-400";
+          btnExpense.className = "flex-1 py-2 rounded-lg text-sm transition-colors border bg-black/20 border-white/10 text-white/50 hover:bg-white/5";
+        }
+      },
+
+      addAccounting() {
+        const type = document.getElementById('add-acc-type').value;
+        const date = document.getElementById('add-acc-date').value;
+        const amount = document.getElementById('add-acc-amount').value;
+        const category = document.getElementById('add-acc-category').value || (type === 'expense' ? '支出' : '收入');
+        const note = document.getElementById('add-acc-note').value;
+
+        if (!date || !amount) return;
+
+        this.state.data.accounting.push({
+          id: Date.now().toString(),
+          type,
+          date,
+          amount: Number(amount),
+          category,
+          note
+        });
+
+        this.saveData('accounting');
+        this.closeAddAccountingModal();
+        this.renderAccountingView();
+      },
+
+      // --- 時間新增 ---
+      openAddTimeModal() {
+        document.getElementById('add-time-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('add-time-hours').value = '';
+        document.getElementById('add-time-minutes').value = '';
+        document.getElementById('add-time-category').value = '';
+        document.getElementById('add-time-note').value = '';
+        document.getElementById('add-time-modal').classList.remove('hidden');
+        lucide.createIcons();
+      },
+
+      closeAddTimeModal() {
+        document.getElementById('add-time-modal').classList.add('hidden');
+      },
+
+      addTimeTracking() {
+        const date = document.getElementById('add-time-date').value;
+        const hours = Number(document.getElementById('add-time-hours').value) || 0;
+        const minutes = Number(document.getElementById('add-time-minutes').value) || 0;
+        const category = document.getElementById('add-time-category').value || '未分類';
+        const note = document.getElementById('add-time-note').value;
+
+        const totalMinutes = (hours * 60) + minutes;
+
+        if (!date || totalMinutes <= 0) return;
+
+        if (!this.state.data.timeTracking) this.state.data.timeTracking = [];
+
+        this.state.data.timeTracking.push({
+          id: Date.now().toString(),
+          date,
+          duration: totalMinutes,
+          category,
+          note
+        });
+
+        this.saveData('timeTracking');
+        this.closeAddTimeModal();
+        this.renderAccountingView();
+      },
+
+      // --- 匯出 CSV ---
+      exportCSV() {
+        const type = this.state.activeAccountingTab;
+        // 加上 BOM 確保 Excel 開啟中文不會亂碼
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
+        const todayStr = new Date().toISOString().split('T')[0];
+        let fileName = '';
+
+        if (type === 'money') {
+          fileName = `常溫記帳_${todayStr}.csv`;
+          csvContent += "日期,類型,分類,金額,備註\n";
+          const records = [...(this.state.data.accounting || [])].sort((a,b) => new Date(b.date) - new Date(a.date));
+          records.forEach(row => {
+            const typeStr = row.type === 'expense' ? '支出' : '收入';
+            // 處理備註中可能有逗號的問題
+            const safeNote = row.note ? `"${row.note.replace(/"/g, '""')}"` : '';
+            csvContent += `${row.date},${typeStr},${row.category},${row.amount},${safeNote}\n`;
+          });
+        } else {
+          fileName = `時間花費_${todayStr}.csv`;
+          csvContent += "日期,分類,時長(分鐘),備註\n";
+          const records = [...(this.state.data.timeTracking || [])].sort((a,b) => new Date(b.date) - new Date(a.date));
+          records.forEach(row => {
+            const safeNote = row.note ? `"${row.note.replace(/"/g, '""')}"` : '';
+            csvContent += `${row.date},${row.category},${row.duration},${safeNote}\n`;
+          });
+        }
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+
+      // --- 匯入 CSV ---
+      handleCSVImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const text = e.target.result;
+          this.processCSVData(text);
+          event.target.value = ''; // 重置 input 狀態，允許重複選擇同一個檔案
+        };
+        reader.readAsText(file);
+      },
+
+      processCSVData(csvText) {
+        const type = this.state.activeAccountingTab;
+        const lines = csvText.split('\n').map(line => line.trim()).filter(line => line);
+        if (lines.length <= 1) {
+          this.showToast('檔案格式錯誤或無資料', 'error');
+          return;
+        }
+
+        // CSV 解析函數（處理引號與逗號）
+        const parseLine = (line) => {
+          let result = [];
+          let inQuotes = false;
+          let current = '';
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              result.push(current);
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          result.push(current);
+          return result.map(s => s.replace(/^"|"$/g, '').trim());
+        };
+
+        let newRecords = [];
+        let successCount = 0;
+
+        // 略過第一行標題
+        for (let i = 1; i < lines.length; i++) {
+          const columns = parseLine(lines[i]);
+          if (type === 'money' && columns.length >= 4) {
+            const [date, typeStr, category, amount, note] = columns;
+            const recordType = typeStr === '收入' ? 'income' : 'expense';
+            if (date && !isNaN(Number(amount))) {
+              newRecords.push({
+                id: 'imp_' + Date.now().toString() + '_' + i,
+                type: recordType,
+                date: date,
+                amount: Number(amount),
+                category: category || (recordType === 'expense' ? '支出' : '收入'),
+                note: note || ''
+              });
+              successCount++;
+            }
+          } else if (type === 'time' && columns.length >= 3) {
+            const [date, category, duration, note] = columns;
+            if (date && !isNaN(Number(duration))) {
+              newRecords.push({
+                id: 'imp_' + Date.now().toString() + '_' + i,
+                date: date,
+                duration: Number(duration),
+                category: category || '未分類',
+                note: note || ''
+              });
+              successCount++;
+            }
+          }
+        }
+
+        if (successCount > 0) {
+          if (type === 'money') {
+            this.state.data.accounting = [...this.state.data.accounting, ...newRecords];
+            this.saveData('accounting');
+          } else {
+            if (!this.state.data.timeTracking) this.state.data.timeTracking = [];
+            this.state.data.timeTracking = [...this.state.data.timeTracking, ...newRecords];
+            this.saveData('timeTracking');
+          }
+          this.renderAccountingView();
+          this.showToast(`成功匯入 ${successCount} 筆紀錄！`, 'success');
+        } else {
+          this.showToast('找不到符合格式的紀錄', 'error');
+        }
+      },
+
+      // --- Toast 通知系統 ---
+      showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        const icon = type === 'success' ? '<i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>' : '<i data-lucide="alert-circle" class="w-4 h-4 text-rose-400"></i>';
+        
+        toast.className = `glass-panel px-5 py-2.5 rounded-full flex items-center gap-2 text-sm text-white shadow-xl fade-in border ${type === 'success' ? 'border-emerald-500/30' : 'border-rose-500/30'} bg-slate-900/95`;
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        
+        container.appendChild(toast);
+        lucide.createIcons();
+        
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(-10px)';
+          toast.style.transition = 'all 0.3s ease';
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      },
+
+      // --- 分析圖表 Modal ---
+      openChartModal() {
+        document.getElementById('chart-modal').classList.remove('hidden');
+        this.renderChart();
+      },
+
+      closeChartModal() {
+        document.getElementById('chart-modal').classList.add('hidden');
+        if (analysisChartInstance) {
+          analysisChartInstance.destroy();
+          analysisChartInstance = null;
+        }
+      },
+
+      renderChart() {
+        const type = this.state.activeAccountingTab;
+        const currentMonth = new Date().toISOString().substring(0, 7);
+        const titleEl = document.getElementById('chart-modal-title');
+        const descEl = document.getElementById('chart-modal-desc');
+        const emptyStateEl = document.getElementById('chart-empty-state');
+        const ctx = document.getElementById('analysisChart').getContext('2d');
+
+        // 銷毀舊圖表
+        if (analysisChartInstance) {
+          analysisChartInstance.destroy();
+        }
+
+        let groupedData = {};
+        
+        if (type === 'money') {
+          titleEl.innerHTML = `<i data-lucide="pie-chart" class="w-5 h-5 text-rose-400"></i> 本月支出分析`;
+          descEl.innerText = '看看錢錢都變成什麼喜歡的形狀了';
+          
+          const records = this.state.data.accounting || [];
+          records.forEach(r => {
+            // 只統計當月且為「支出」的項目
+            if (r.date.startsWith(currentMonth) && r.type === 'expense') {
+              groupedData[r.category] = (groupedData[r.category] || 0) + Number(r.amount);
+            }
+          });
+        } else {
+          titleEl.innerHTML = `<i data-lucide="pie-chart" class="w-5 h-5 text-indigo-400"></i> 本月時間分析`;
+          descEl.innerText = '看看時間都投資在哪裡了 (單位: 小時)';
+          
+          const records = this.state.data.timeTracking || [];
+          records.forEach(r => {
+            // 統計當月時間
+            if (r.date.startsWith(currentMonth)) {
+              // 轉換為小時以利閱讀
+              groupedData[r.category] = (groupedData[r.category] || 0) + (Number(r.duration) / 60);
+            }
+          });
+        }
+
+        const labels = Object.keys(groupedData);
+        const dataValues = Object.values(groupedData);
+
+        if (labels.length === 0) {
+          emptyStateEl.classList.remove('hidden');
+          return;
+        } else {
+          emptyStateEl.classList.add('hidden');
+        }
+
+        // 常溫風格色票
+        const chartColors = [
+          'rgba(244, 63, 94, 0.8)',   // Rose
+          'rgba(167, 139, 250, 0.8)', // Purple
+          'rgba(96, 165, 250, 0.8)',  // Blue
+          'rgba(52, 211, 153, 0.8)',  // Emerald
+          'rgba(251, 191, 36, 0.8)',  // Amber
+          'rgba(45, 212, 191, 0.8)',  // Teal
+          'rgba(232, 121, 249, 0.8)'  // Fuchsia
+        ];
+
+        analysisChartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: dataValues.map(v => Number(v.toFixed(1))), // 小數點後一位
+              backgroundColor: chartColors,
+              borderColor: 'rgba(15, 23, 42, 1)', // 背景色邊框
+              borderWidth: 2,
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: {
+                  color: 'rgba(255,255,255,0.7)',
+                  font: { family: "'Noto Sans TC', sans-serif" },
+                  padding: 20
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                titleFont: { family: "'Noto Sans TC', sans-serif", size: 14 },
+                bodyFont: { family: "'Noto Sans TC', sans-serif", size: 13 },
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                  label: function(context) {
+                    let label = context.label || '';
+                    if (label) label += ': ';
+                    if (context.parsed !== null) {
+                      if (type === 'money') {
+                        label += '$' + context.parsed.toLocaleString();
+                      } else {
+                        label += context.parsed + ' 小時';
+                      }
+                    }
+                    return label;
+                  }
+                }
+              }
+            }
+          }
+        });
+        lucide.createIcons();
+      },
+
+      // --- 共通刪除邏輯 ---
       deleteItem(section, id) {
         if (!section || !id) return;
         
@@ -1428,174 +2247,11 @@
         this.saveData(section);
         
         if (section === 'shortcuts') this.renderShortcuts();
-        else if (section === 'stories') this.renderStories();
-        else if (section === 'curation') this.renderCuration();
         else if (section === 'connections') this.renderConnections();
         else if (section === 'goals') this.renderGoals();
+        else if (section === 'accounting' || section === 'timeTracking') this.renderAccountingView();
         
         lucide.createIcons();
-      },
-
-      // === 常溫選集：手札 (Stories) ===
-      renderStories() {
-        const container = document.getElementById('stories-container');
-        const isEdit = this.state.isEditing.collections;
-        const filter = this.state.filters.stories;
-        
-        this.renderFilterBar('stories', this.state.data.stories.map(s => s.tag));
-        
-        const filtered = filter === '全部' ? this.state.data.stories : this.state.data.stories.filter(s => s.tag === filter);
-        
-        let html = '';
-        if (isEdit) {
-          html += `
-            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-6 md:col-span-3">
-              <div class="text-sm font-medium text-purple-300">寫篇新手札</div>
-              <input type="text" id="st-title" placeholder="標題" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <div class="flex gap-2">
-                <input type="text" id="st-date" placeholder="日期" class="w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-                <input type="text" id="st-tag" placeholder="標籤" value="日常" class="w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              </div>
-              <input type="text" id="st-img" placeholder="圖片 URL" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <input type="text" id="st-url" placeholder="文章連結 URL" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <button onclick="app.addStory()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">發佈手札</button>
-            </div>
-          `;
-        }
-
-        html += filtered.map(story => {
-          const hasUrl = story.url && story.url !== '#';
-          return `
-          <a href="${hasUrl ? story.url : 'javascript:void(0)'}" target="${hasUrl ? '_blank' : '_self'}" onclick="return ${isEdit || !hasUrl ? 'false' : 'true'}" class="relative glass-panel rounded-2xl overflow-hidden group border border-white/10 hover:border-purple-400/50 transition-colors duration-300 block">
-            ${isEdit ? `<button onclick="app.confirmDelete('stories', '${story.id}'); event.preventDefault(); event.stopPropagation();" class="absolute top-2 right-2 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
-            <div class="h-48 overflow-hidden ${isEdit ? 'opacity-50' : ''}">
-              <img src="${story.img}" alt="${story.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&q=80&w=600'">
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-center mb-3">
-                <span class="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-200">${story.tag}</span>
-                <span class="text-xs text-white/40">${story.date}</span>
-              </div>
-              <h3 class="text-lg font-medium text-white/90 group-hover:text-purple-300 transition-colors flex items-center gap-2">
-                ${story.title}
-                ${hasUrl ? `<i data-lucide="external-link" class="w-3.5 h-3.5 text-white/30"></i>` : ''}
-              </h3>
-            </div>
-          </a>
-        `}).join('');
-        container.innerHTML = html;
-      },
-
-      addStory() {
-        const title = document.getElementById('st-title').value;
-        if (!title) return;
-        this.state.data.stories.unshift({
-          id: Date.now().toString(),
-          title,
-          date: document.getElementById('st-date').value,
-          tag: document.getElementById('st-tag').value || '日常',
-          img: document.getElementById('st-img').value,
-          url: document.getElementById('st-url').value
-        });
-        this.saveData('stories');
-        this.renderStories();
-        lucide.createIcons();
-      },
-
-      // === 常溫選集：選物 (Curation) ===
-      renderCuration() {
-        const container = document.getElementById('curation-container');
-        const isEdit = this.state.isEditing.collections;
-        const filter = this.state.filters.curation;
-        
-        this.renderFilterBar('curation', this.state.data.curation.map(c => c.type));
-        
-        const filtered = filter === '全部' ? this.state.data.curation : this.state.data.curation.filter(c => c.type === filter);
-        
-        let html = '';
-        if (isEdit) {
-          html += `
-            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-6">
-              <div class="text-sm font-medium text-purple-300">新增推薦選物</div>
-              <div class="flex gap-2">
-                <input type="text" id="cu-type" placeholder="分類" value="選物" class="w-1/4 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-                <input type="text" id="cu-title" placeholder="名稱" class="w-3/4 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              </div>
-              <input type="text" id="cu-desc" placeholder="簡短心得描述" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <input type="text" id="cu-url" placeholder="網址連結" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
-              <button onclick="app.addCuration()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">新增至清單</button>
-            </div>
-          `;
-        }
-
-        html += filtered.map(item => `
-          <div class="glass-panel p-6 rounded-2xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center transition-colors border ${isEdit ? 'border-white/20 opacity-90' : 'border-white/5 hover:bg-white/10'}">
-            <div class="w-full md:w-auto">
-              <div class="flex items-center gap-3 mb-1">
-                <span class="text-xs text-purple-300 border border-purple-300/30 px-2 py-0.5 rounded">${item.type}</span>
-                <h3 class="text-lg font-medium text-white line-clamp-2">${item.title}</h3>
-              </div>
-              <p class="text-sm text-white/60 line-clamp-3">${item.desc}</p>
-            </div>
-            <div class="flex items-center gap-2 self-end md:self-center">
-              <a href="${item.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="text-white/40 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors">
-                <i data-lucide="external-link" class="w-5 h-5"></i>
-              </a>
-              ${isEdit ? `<button onclick="app.confirmDelete('curation', '${item.id}'); event.preventDefault(); event.stopPropagation();" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>` : ''}
-            </div>
-          </div>
-        `).join('');
-        container.innerHTML = html;
-      },
-
-      addCuration() {
-        const title = document.getElementById('cu-title').value;
-        if (!title) return;
-        this.state.data.curation.unshift({
-          id: Date.now().toString(),
-          title,
-          type: document.getElementById('cu-type').value || '選物',
-          desc: document.getElementById('cu-desc').value,
-          url: document.getElementById('cu-url').value
-        });
-        this.saveData('curation');
-        this.renderCuration();
-        lucide.createIcons();
-      },
-
-      scrollToCollection(type) {
-        const container = document.getElementById('collection-swipe-container');
-        const target = document.getElementById(`slide-${type}`);
-        if (!container || !target) return;
-        
-        container.scrollTo({
-          left: target.offsetLeft - container.offsetLeft,
-          behavior: 'smooth'
-        });
-        this.updateCollectionTabs(type);
-      },
-
-      handleCollectionScroll(el) {
-        const scrollLeft = el.scrollLeft;
-        const width = el.clientWidth;
-        if (scrollLeft > width / 2) {
-          this.updateCollectionTabs('curation');
-        } else {
-          this.updateCollectionTabs('stories');
-        }
-      },
-
-      updateCollectionTabs(activeType) {
-        const btnStories = document.getElementById('tab-btn-stories');
-        const btnCuration = document.getElementById('tab-btn-curation');
-        
-        if (activeType === 'stories') {
-          btnStories.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm";
-          btnCuration.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white";
-        } else {
-          btnCuration.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm";
-          btnStories.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white";
-        }
       },
 
       // --- 番茄鐘邏輯 ---
