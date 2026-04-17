@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>常溫選集 - 瑋葳的個人基地</title>
+  
+  <!-- PWA 核心設定 (Meta Tags & Icons) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="常溫選集">
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- 引入 Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #0f172a; 
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    .font-serif {
+      font-family: 'Noto Serif TC', serif;
+    }
+
+    .bg-fluid {
+      background: linear-gradient(-45deg, #0F4C81, #1e1b4b, #4c1d95, #8B5CF6);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.5); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.8); }
+
+    /* 淡入動畫 */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 隱藏滾動條但可滾動 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-fluid relative transition-colors duration-1000">
+
+  <!-- 頂部簡單導覽 (可自行加上回首頁連結) -->
+  <nav class="w-full p-6 absolute top-0 left-0 z-50">
+    <a href="index.html" class="inline-flex items-center gap-2 text-white/60 hover:text-white transition-colors text-sm">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> 回首頁
+    </a>
+  </nav>
+
+  <!-- 主要內容區 -->
+  <main class="min-h-screen p-6 md:p-12 flex flex-col items-center justify-start pt-20 md:pt-24">
+    <div class="w-full max-w-5xl">
+      
+      <!-- 常溫選集視圖 -->
+      <div id="view-collections" class="w-full fade-in">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+          <div>
+            <h2 class="font-serif text-3xl mb-2 text-white">常溫選集</h2>
+            <p class="text-white/60 font-light">收納那些觸動靈感的圖文手札與嚴選好物。</p>
+          </div>
+          <button onclick="app.toggleEdit()" id="edit-btn-collections" class="glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20">
+            <i data-lucide="edit-2" class="w-4 h-4"></i> 編輯選集
+          </button>
+        </div>
+
+        <div class="flex gap-2 mb-6 bg-black/20 p-1.5 rounded-xl w-fit border border-white/10 mx-auto md:mx-0 relative z-10">
+          <button onclick="app.scrollToCollection('stories')" id="tab-btn-stories" class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm">
+            常溫手札
+          </button>
+          <button onclick="app.scrollToCollection('curation')" id="tab-btn-curation" class="px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white">
+            常溫選物
+          </button>
+        </div>
+        
+        <div id="collection-swipe-container" class="flex w-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth pb-8" onscroll="app.handleCollectionScroll(this)">
+          
+          <!-- 手札 Slide -->
+          <div class="w-full min-w-full flex-shrink-0 snap-start pr-0 md:pr-4" id="slide-stories">
+            <div id="stories-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="stories-container"></div>
+          </div>
+
+          <!-- 選物 Slide -->
+          <div class="w-full min-w-full flex-shrink-0 snap-start pl-0 md:pl-4" id="slide-curation">
+            <div id="curation-filter" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+            <div class="space-y-4" id="curation-container"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 確認刪除 Modal -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 fade-in">
+    <div class="glass-panel w-full max-w-xs p-6 rounded-2xl border border-rose-400/50 bg-slate-900/95 shadow-2xl relative text-center">
+      <div class="w-12 h-12 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="alert-triangle" class="w-6 h-6 text-rose-400"></i>
+      </div>
+      <h3 class="text-lg font-medium text-white mb-2">確定要刪除嗎？</h3>
+      <p class="text-sm text-white/50 mb-6">資料刪除後將無法復原喔。</p>
+      <div class="flex gap-3">
+        <button onclick="app.closeConfirm()" class="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors text-sm">取消</button>
+        <button onclick="app.executeDelete()" class="flex-1 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition-colors text-sm">確定刪除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 預設資料設定 ---
+    const defaultData = {
+      stories: [
+        { id: '1', title: '北美館：未來身體特展', date: '2026.03.15', tag: '設計展', img: 'https://images.unsplash.com/photo-1518998053401-878c735777a8?auto=format&fit=crop&q=80&w=600', url: '#' },
+        { id: '2', title: '街角的咖啡與底片', date: '2026.02.28', tag: '攝影', img: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=600', url: '#' }
+      ],
+      curation: [
+        { id: '1', title: 'JODOO：零程式碼架構思維', type: '文章', desc: '關於如何運用系統思維建立個人資料庫的筆記。', url: '#' },
+        { id: '2', title: 'Aesop 悟香水', type: '選物', desc: '帶有羅勒與柚子的沉靜木質調，工作時的安神劑。', url: '#' }
+      ]
+    };
+
+    let itemToDelete = null;
+
+    // --- 應用程式核心邏輯 ---
+    const app = {
+      state: {
+        isEditing: false, 
+        filters: { stories: '全部', curation: '全部' },
+        data: {
+          stories: JSON.parse(localStorage.getItem('qw-stories')) || defaultData.stories,
+          curation: JSON.parse(localStorage.getItem('qw-curation')) || defaultData.curation
+        }
+      },
+
+      init() {
+        lucide.createIcons();
+        this.renderAll();
+      },
+
+      saveData(key) {
+        localStorage.setItem(`qw-${key}`, JSON.stringify(this.state.data[key]));
+      },
+
+      toggleEdit() {
+        this.state.isEditing = !this.state.isEditing;
+        const btn = document.getElementById(`edit-btn-collections`);
+        
+        if (this.state.isEditing) {
+          btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 完成編輯`;
+          btn.className = "glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border bg-purple-600/50 border-purple-400 text-white shadow-lg shadow-purple-900/50";
+        } else {
+          btn.innerHTML = `<i data-lucide="edit-2" class="w-4 h-4"></i> 編輯選集`;
+          btn.className = "glass-panel px-4 py-2 rounded-full flex items-center gap-2 text-sm transition-colors border text-white/70 hover:bg-white/10 border-white/20";
+        }
+        
+        this.renderStories();
+        this.renderCuration();
+        lucide.createIcons();
+      },
+
+      setFilter(section, val) {
+        this.state.filters[section] = val;
+        if(section === 'stories') this.renderStories();
+        if(section === 'curation') this.renderCuration();
+        lucide.createIcons();
+      },
+
+      renderFilterBar(section, options) {
+        const container = document.getElementById(`${section}-filter`);
+        const selected = this.state.filters[section];
+        const allOptions = ['全部', ...new Set(options)];
+        
+        container.innerHTML = allOptions.map(opt => `
+          <button onclick="app.setFilter('${section}', '${opt}')" 
+            class="px-4 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors border flex-shrink-0 ${selected === opt ? 'bg-purple-500/80 text-white border-purple-400' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white'}">
+            ${opt}
+          </button>
+        `).join('');
+      },
+
+      renderAll() {
+        this.renderStories();
+        this.renderCuration();
+        lucide.createIcons();
+      },
+
+      // === 刪除防呆確認 ===
+      confirmDelete(section, id) {
+        itemToDelete = { section, id };
+        document.getElementById('confirm-modal').classList.remove('hidden');
+      },
+
+      closeConfirm() {
+        itemToDelete = null;
+        document.getElementById('confirm-modal').classList.add('hidden');
+      },
+
+      executeDelete() {
+        if (itemToDelete && itemToDelete.section && itemToDelete.id) {
+          this.deleteItem(itemToDelete.section, itemToDelete.id);
+          this.closeConfirm();
+        }
+      },
+
+      deleteItem(section, id) {
+        if (!section || !id) return;
+        if (!this.state.data[section] || !Array.isArray(this.state.data[section])) return;
+
+        this.state.data[section] = this.state.data[section].filter(item => item.id !== id);
+        this.saveData(section);
+        
+        if (section === 'stories') this.renderStories();
+        else if (section === 'curation') this.renderCuration();
+        
+        lucide.createIcons();
+      },
+
+      // === 常溫選集：手札 (Stories) ===
+      renderStories() {
+        const container = document.getElementById('stories-container');
+        const isEdit = this.state.isEditing;
+        const filter = this.state.filters.stories;
+        
+        this.renderFilterBar('stories', this.state.data.stories.map(s => s.tag));
+        
+        const filtered = filter === '全部' ? this.state.data.stories : this.state.data.stories.filter(s => s.tag === filter);
+        
+        let html = '';
+        if (isEdit) {
+          html += `
+            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-6 md:col-span-3">
+              <div class="text-sm font-medium text-purple-300">寫篇新手札</div>
+              <input type="text" id="st-title" placeholder="標題" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <div class="flex gap-2">
+                <input type="text" id="st-date" placeholder="日期" class="w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <input type="text" id="st-tag" placeholder="標籤" value="日常" class="w-1/2 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              </div>
+              <input type="text" id="st-img" placeholder="圖片 URL" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <input type="text" id="st-url" placeholder="文章連結 URL (選填)" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <button onclick="app.addStory()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">發佈手札</button>
+            </div>
+          `;
+        }
+
+        html += filtered.map(story => {
+          const hasUrl = story.url && story.url !== '#';
+          return `
+          <a href="${hasUrl ? story.url : 'javascript:void(0)'}" target="${hasUrl ? '_blank' : '_self'}" onclick="return ${isEdit || !hasUrl ? 'false' : 'true'}" class="relative glass-panel rounded-2xl overflow-hidden group border border-white/10 hover:border-purple-400/50 transition-colors duration-300 block">
+            ${isEdit ? `<button onclick="app.confirmDelete('stories', '${story.id}'); event.preventDefault(); event.stopPropagation();" class="absolute top-2 right-2 p-2 bg-rose-500/90 text-white rounded-full z-10 hover:bg-rose-600 shadow-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+            <div class="h-48 overflow-hidden ${isEdit ? 'opacity-50' : ''}">
+              <img src="${story.img}" alt="${story.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.src='https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&q=80&w=600'">
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-200">${story.tag}</span>
+                <span class="text-xs text-white/40">${story.date}</span>
+              </div>
+              <h3 class="text-lg font-medium text-white/90 group-hover:text-purple-300 transition-colors flex items-center gap-2">
+                ${story.title}
+                ${hasUrl ? `<i data-lucide="external-link" class="w-3.5 h-3.5 text-white/30"></i>` : ''}
+              </h3>
+            </div>
+          </a>
+        `}).join('');
+        container.innerHTML = html;
+      },
+
+      addStory() {
+        const title = document.getElementById('st-title').value;
+        if (!title) return;
+        this.state.data.stories.unshift({
+          id: Date.now().toString(),
+          title,
+          date: document.getElementById('st-date').value,
+          tag: document.getElementById('st-tag').value || '日常',
+          img: document.getElementById('st-img').value,
+          url: document.getElementById('st-url').value
+        });
+        this.saveData('stories');
+        this.renderStories();
+        lucide.createIcons();
+      },
+
+      // === 常溫選集：選物 (Curation) ===
+      renderCuration() {
+        const container = document.getElementById('curation-container');
+        const isEdit = this.state.isEditing;
+        const filter = this.state.filters.curation;
+        
+        this.renderFilterBar('curation', this.state.data.curation.map(c => c.type));
+        
+        const filtered = filter === '全部' ? this.state.data.curation : this.state.data.curation.filter(c => c.type === filter);
+        
+        let html = '';
+        if (isEdit) {
+          html += `
+            <div class="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-purple-400/50 bg-purple-900/10 mb-6">
+              <div class="text-sm font-medium text-purple-300">新增推薦選物</div>
+              <div class="flex gap-2">
+                <input type="text" id="cu-type" placeholder="分類" value="選物" class="w-1/4 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+                <input type="text" id="cu-title" placeholder="名稱" class="w-3/4 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              </div>
+              <input type="text" id="cu-desc" placeholder="簡短心得描述" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <input type="text" id="cu-url" placeholder="網址連結" class="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-400/50">
+              <button onclick="app.addCuration()" class="mt-2 py-2 bg-purple-600/50 hover:bg-purple-600/80 rounded-lg text-sm text-white transition-colors">新增至清單</button>
+            </div>
+          `;
+        }
+
+        html += filtered.map(item => `
+          <div class="glass-panel p-6 rounded-2xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center transition-colors border ${isEdit ? 'border-white/20 opacity-90' : 'border-white/5 hover:bg-white/10'}">
+            <div class="w-full md:w-auto">
+              <div class="flex items-center gap-3 mb-1">
+                <span class="text-xs text-purple-300 border border-purple-300/30 px-2 py-0.5 rounded">${item.type}</span>
+                <h3 class="text-lg font-medium text-white line-clamp-2">${item.title}</h3>
+              </div>
+              <p class="text-sm text-white/60 line-clamp-3">${item.desc}</p>
+            </div>
+            <div class="flex items-center gap-2 self-end md:self-center">
+              <a href="${item.url}" target="_blank" onclick="return ${isEdit ? 'false' : 'true'}" class="text-white/40 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors">
+                <i data-lucide="external-link" class="w-5 h-5"></i>
+              </a>
+              ${isEdit ? `<button onclick="app.confirmDelete('curation', '${item.id}'); event.preventDefault(); event.stopPropagation();" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-full transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>` : ''}
+            </div>
+          </div>
+        `).join('');
+        container.innerHTML = html;
+      },
+
+      addCuration() {
+        const title = document.getElementById('cu-title').value;
+        if (!title) return;
+        this.state.data.curation.unshift({
+          id: Date.now().toString(),
+          title,
+          type: document.getElementById('cu-type').value || '選物',
+          desc: document.getElementById('cu-desc').value,
+          url: document.getElementById('cu-url').value
+        });
+        this.saveData('curation');
+        this.renderCuration();
+        lucide.createIcons();
+      },
+
+      // === 標籤切換與滑動邏輯 ===
+      scrollToCollection(type) {
+        const container = document.getElementById('collection-swipe-container');
+        const target = document.getElementById(`slide-${type}`);
+        if (!container || !target) return;
+        
+        container.scrollTo({
+          left: target.offsetLeft - container.offsetLeft,
+          behavior: 'smooth'
+        });
+        this.updateCollectionTabs(type);
+      },
+
+      handleCollectionScroll(el) {
+        const scrollLeft = el.scrollLeft;
+        const width = el.clientWidth;
+        if (scrollLeft > width / 2) {
+          this.updateCollectionTabs('curation');
+        } else {
+          this.updateCollectionTabs('stories');
+        }
+      },
+
+      updateCollectionTabs(activeType) {
+        const btnStories = document.getElementById('tab-btn-stories');
+        const btnCuration = document.getElementById('tab-btn-curation');
+        
+        if (activeType === 'stories') {
+          btnStories.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm";
+          btnCuration.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white";
+        } else {
+          btnCuration.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white bg-white/10 shadow-sm";
+          btnStories.className = "px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 text-white/50 hover:text-white";
+        }
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      app.init();
+    });
+  </script>
+</body>
+</html>
